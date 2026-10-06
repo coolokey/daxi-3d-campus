@@ -651,9 +651,9 @@
     </div>
 
     <div class="top-actions">
-      <button class="btn-action glass active" id="btn-mode-toggle" title="切換漫遊或鳥瞰視角">
-        <span id="btn-mode-icon">🧑‍🎓</span>
-        <span id="btn-mode-text">人物漫遊</span>
+      <button class="btn-action glass" id="btn-mode-toggle" title="切換漫遊或鳥瞰視角">
+        <span id="btn-mode-icon">🦅</span>
+        <span id="btn-mode-text">鳥瞰全景</span>
       </button>
       <button class="btn-action glass" id="btn-map-overlay" title="查看 115 官方平面圖 (快捷鍵 M)">
         <span>🗺️</span>
@@ -745,9 +745,9 @@
   <div id="help-modal" class="glass">
     <h3 style="margin-bottom: 12px; font-weight: 900; font-size: 18px; color: var(--accent);">🎮 3D 智慧導覽操作說明</h3>
     <ul style="list-style: none; line-height: 1.8; font-size: 13px; color: #cbd5e1; margin-bottom: 16px;">
-      <li>⌨️ <b>鍵盤控制</b>：<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或方向鍵走動，<kbd>Shift</kbd> 加速奔跑。</li>
-      <li>🖱️ <b>滑鼠旋轉</b>：左鍵拖曳 360° 旋轉視野，右鍵平移，滾輪縮放距離。</li>
-      <li>📱 <b>觸控螢幕</b>：單指滑動旋轉，雙指捏合縮放，右下角方向鈕移動角色。</li>
+      <li>🖱️ <b>自由旋轉視野</b>：左鍵拖曳 360° 旋轉視野，右鍵平移，滾輪自由縮放距離。</li>
+      <li>⌨️ <b>人物行走操控</b>：<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或方向鍵視角相對走動，<kbd>Shift</kbd> 加速奔跑。</li>
+      <li>📱 <b>觸控支援</b>：單指旋轉全景，雙指捏合縮放，右下角按鈕移動角色。</li>
       <li>🏢 <b>樓層切換</b>：點選右側 1F ~ 4F 即可透視內部教室配置與走廊。</li>
       <li>🪜 <b>實體樓梯爬升</b>：導航至 2F/3F 教室時，同學會由川堂走至樓梯間沿踏階走上樓！</li>
       <li>🚶 <b>自動帶路</b>：搜尋或點擊任意門牌後，點擊「自動帶路」同學將親自帶您前往！</li>
@@ -784,7 +784,7 @@
         ]
       },
 
-      // 2. 行政大樓前棟 (1F 校長/輔導、2F 教務/學務、3F 會議室)
+      // 2. 行政大樓前棟
       {
         id: "admin-front",
         name: "行政大樓 (前棟)",
@@ -806,7 +806,7 @@
         ]
       },
 
-      // 2. 行政大樓後棟 (1F 健康中心/專任教師、2F 總務/人事/會計、3F 教師研習)
+      // 2. 行政大樓後棟
       {
         id: "admin-back",
         name: "行政大樓 (後棟)",
@@ -827,7 +827,7 @@
         ]
       },
 
-      // 3. 八年級教學棟 (前棟)：1F 幼兒園、2F 807/801/802/803、3F 806/808/桌遊教室
+      // 3. 八年級教學棟 (前棟)
       {
         id: "grade8-front",
         name: "八年級教學棟 (前棟)",
@@ -852,7 +852,7 @@
         ]
       },
 
-      // 3. 八年級教學棟 (中棟)：1F 木藝/804/809、2F 805/專科、3F 表演教室
+      // 3. 八年級教學棟 (中棟)
       {
         id: "grade8-mid",
         name: "八年級教學棟 (中棟)",
@@ -874,7 +874,7 @@
         ]
       },
 
-      // 3. 九年級後棟：1F 908/905/903、2F 907/904/902、3F 906/901
+      // 3. 九年級後棟
       {
         id: "grade9-back",
         name: "九年級教學棟",
@@ -899,7 +899,7 @@
         ]
       },
 
-      // 4. 科技館 (1F 視聽/生科/電腦、2F 生科二/理化實驗室)
+      // 4. 科技館
       {
         id: "tech-building",
         name: "科技館",
@@ -919,7 +919,7 @@
         ]
       },
 
-      // 4. 綜合大樓 (1F 餐飲/校史/圖書室、2F 資源/大電腦/資訊機房)
+      // 4. 綜合大樓
       {
         id: "multi-building",
         name: "綜合大樓 / 圖書室",
@@ -939,7 +939,7 @@
         ]
       },
 
-      // 4. 藝術館 (1F 樂活、2F/3F 音樂、4F 美術)
+      // 4. 藝術館
       {
         id: "art-building",
         name: "藝術館",
@@ -958,7 +958,7 @@
         ]
       },
 
-      // 4. 七年級新大樓 (東北角：1F 701/709/704/708、2F 702/703、3F 706/707/數學研究室)
+      // 4. 七年級新大樓
       {
         id: "new-grade7",
         name: "七年級新大樓",
@@ -1072,13 +1072,14 @@
     let avatarLeftArm = null, avatarRightArm = null;
     let avatarLeftLeg = null, avatarRightLeg = null;
     let avatarAngle = 0;
-    let avatarCurrentFloor = 1;
-    const avatarSpeed = 16;
-    const avatarRunSpeed = 26;
+    let prevAvatarPos = new THREE.Vector3(0, 0, 96);
+    const avatarSpeed = 18;
+    const avatarRunSpeed = 28;
 
     function createStudentAvatar() {
       avatarGroup = new THREE.Group();
       avatarGroup.position.set(0, 0, 96);
+      prevAvatarPos.copy(avatarGroup.position);
 
       const shadow = new THREE.Mesh(
         new THREE.CircleGeometry(0.7, 16),
@@ -1298,7 +1299,6 @@
 
       for (let f = 1; f < totalFloors; f++) {
         const baseH = (f - 1) * FH;
-        // Stair steps
         const stepCount = 8;
         for (let s = 0; s < stepCount; s++) {
           const stepMesh = new THREE.Mesh(
@@ -1307,10 +1307,9 @@
           );
           stepMesh.position.set(0, baseH + (s + 0.5) * (FH / stepCount), -s * 0.42);
           stepMesh.castShadow = true;
-          stepGroup.add(stepMesh);
+          stairGroup.add(stepMesh);
         }
 
-        // Slanted Handrail (樓梯金屬安全扶手)
         const rail = new THREE.Mesh(
           new THREE.BoxGeometry(0.12, 0.12, stepCount * 0.45 * 1.4),
           new THREE.MeshLambertMaterial({ color: 0x1e3a8a })
@@ -1319,7 +1318,6 @@
         rail.rotation.x = 0.55;
         stairGroup.add(rail);
 
-        // Landing Floor (樓梯中轉平台)
         const landing = new THREE.Mesh(
           new THREE.BoxGeometry(2.8, 0.25, 2.2),
           new THREE.MeshLambertMaterial({ color: 0xffffff })
@@ -1568,13 +1566,11 @@
       bldGroup.position.set(cfg.x, 0, cfg.z);
       const totalH = cfg.floors * FH;
 
-      // Floor Slices
       for (let f = 1; f <= cfg.floors; f++) {
         const floorGroup = new THREE.Group();
         floorGroup.name = `floor-${f}`;
         const fCenterY = (f - 0.5) * FH;
 
-        // Main Wall Box
         const floorMesh = new THREE.Mesh(
           new THREE.BoxGeometry(cfg.width, FH - 0.22, cfg.depth),
           new THREE.MeshLambertMaterial({ color: cfg.color, roughness: 0.65 })
@@ -1584,7 +1580,6 @@
         floorMesh.receiveShadow = true;
         floorGroup.add(floorMesh);
 
-        // Recessed Window Band
         const winBand = new THREE.Mesh(
           new THREE.BoxGeometry(cfg.width + 0.15, 1.4, cfg.depth + 0.15),
           new THREE.MeshLambertMaterial({ color: 0x0f172a, transparent: true, opacity: 0.9 })
@@ -1592,7 +1587,6 @@
         winBand.position.y = fCenterY + 0.2;
         floorGroup.add(winBand);
 
-        // External Cantilevered Corridor Floor Slab (外挑走廊板)
         const slab = new THREE.Mesh(
           new THREE.BoxGeometry(cfg.width + 1.2, 0.32, cfg.depth + 2.4),
           new THREE.MeshLambertMaterial({ color: 0xffffff })
@@ -1601,7 +1595,6 @@
         slab.castShadow = true;
         floorGroup.add(slab);
 
-        // Corridor Safety Balustrade Railing (走廊安全欄杆)
         const rail = new THREE.Mesh(
           new THREE.BoxGeometry(cfg.width + 1.2, 1.1, 0.15),
           new THREE.MeshLambertMaterial({ color: 0xf1f5f9 })
@@ -1610,7 +1603,6 @@
         rail.castShadow = true;
         floorGroup.add(rail);
 
-        // Structural Columns
         const colCount = Math.max(3, Math.round(cfg.width / 8));
         const colStep = cfg.width / colCount;
         for (let c = 0; c <= colCount; c++) {
@@ -1628,7 +1620,6 @@
         floorMeshes.push(floorGroup);
       }
 
-      // 3D Physical Staircases Attached to Building
       if (cfg.stairs) {
         cfg.stairs.forEach(st => {
           const stMesh = create3DStaircaseMesh(st.x - cfg.x, st.z - cfg.z, st.floors);
@@ -1636,7 +1627,6 @@
         });
       }
 
-      // Activity Center Towers
       if (cfg.isGymSpecial) {
         [-14, 14].forEach(offsetZ => {
           const tower = new THREE.Mesh(
@@ -1659,7 +1649,6 @@
         bldGroup.add(dome);
       }
 
-      // Pitched Red Metal Roofs
       if (cfg.hasPitchedRoof) {
         const roofShape = new THREE.Shape();
         roofShape.moveTo(-cfg.depth / 2 - 0.8, 0);
@@ -1686,7 +1675,6 @@
 
       scene.add(bldGroup);
 
-      // Register Rooms & 3D Badges
       cfg.rooms.forEach(r => {
         const roomObj = {
           id: r.id,
@@ -1700,7 +1688,6 @@
         };
         ROOMS_DB[r.id] = roomObj;
 
-        // 3D Floating Room Badge Element
         const badgeDiv = document.createElement("div");
         badgeDiv.className = "room-badge";
         const catColor = CATEGORY_COLORS[roomObj.cat] || "#2563eb";
@@ -1721,7 +1708,6 @@
         });
       });
 
-      // 3D DOM Building Label
       const labelDiv = document.createElement("div");
       labelDiv.className = "building-label";
       labelDiv.textContent = cfg.name;
@@ -1735,7 +1721,7 @@
     });
 
     /* ==========================================================================
-       5. A* NAVIGATION GRAPH & MULTI-FLOOR STAIRCASE WAYPOINTS
+       5. A* NAVIGATION GRAPH & WAYPOINTS
        ========================================================================== */
     const NAV_NODES = {
       "gate": { id: "gate", x: 0, y: 0, z: 96, neighbors: ["statue-plaza"] },
@@ -1878,7 +1864,6 @@
       "new7-3f-math": { "id": "new7-3f-math", x: 87, y: 7.4, z: -58, neighbors: ["new7-3f-707"] }
     };
 
-    // Ensure bidirectional connectivity
     Object.keys(NAV_NODES).forEach(nid => {
       const node = NAV_NODES[nid];
       node.neighbors.forEach(neighId => {
@@ -2043,9 +2028,9 @@
     }
 
     /* ==========================================================================
-       7. CONTROL MODES & KEYBOARD / DPAD
+       7. CONTROL MODES & SMOOTH CAMERA
        ========================================================================== */
-    let currentMode = "avatar";
+    let currentMode = "bird"; // Start in Overview Mode (鳥瞰全景) for 100% free OrbitControls interaction
     const moveInput = { forward: false, backward: false, left: false, right: false, sprint: false };
     let walkAnimCycle = 0;
 
@@ -2058,8 +2043,14 @@
       if (mode === "avatar") {
         toggleBtn.classList.add("active");
         btnIcon.textContent = "🧑‍🎓";
-        btnText.textContent = "人物漫遊";
+        btnText.textContent = "人物漫遊中";
         showToast("切換為「人物漫遊模式」！可用鍵盤或方向按鈕自由走動。");
+        // Smoothly position camera behind avatar while keeping OrbitControls alive
+        if (avatarGroup) {
+          controls.target.copy(avatarGroup.position.clone().add(new THREE.Vector3(0, 1.8, 0)));
+          const behindPos = avatarGroup.position.clone().add(new THREE.Vector3(0, 8, 16));
+          animateCameraTo(behindPos, controls.target);
+        }
       } else {
         toggleBtn.classList.remove("active");
         btnIcon.textContent = "🦅";
@@ -2167,21 +2158,27 @@
       btnAutoWalk.textContent = "🚶‍♂️ 自動帶路";
       btnAutoWalk.classList.remove("walking");
 
-      // Smoothly adjust floor slice filter if target is on upper floor
       if (room.floor > 1) {
         setFloorFilter(room.floor);
       } else {
         setFloorFilter("all");
       }
 
-      setControlMode("avatar");
+      // Smoothly focus camera towards destination node
+      const destNode = NAV_NODES[targetNodeId];
+      if (destNode) {
+        animateCameraTo(
+          new THREE.Vector3(destNode.x + 24, (destNode.y || 0) + 18, destNode.z + 32),
+          new THREE.Vector3(destNode.x, (destNode.y || 0) + 2, destNode.z)
+        );
+      }
     }
 
     function animateCameraTo(targetCamPos, targetLookAt) {
       const startCamPos = camera.position.clone();
       const startLookAt = controls.target.clone();
       let progress = 0;
-      const duration = 1100;
+      const duration = 1000;
       const startTime = performance.now();
 
       function tween(now) {
@@ -2191,6 +2188,7 @@
 
         camera.position.lerpVectors(startCamPos, targetCamPos, ease);
         controls.target.lerpVectors(startLookAt, targetLookAt, ease);
+        controls.update();
 
         if (progress < 1) {
           requestAnimationFrame(tween);
@@ -2307,21 +2305,17 @@
       const toMiniX = (x) => (x + 160) * scaleX;
       const toMiniZ = (z) => (z + 110) * scaleZ;
 
-      // Lawn
       miniCtx.fillStyle = "#1e392a";
       miniCtx.fillRect(0, 0, 148, 148);
 
-      // Track
       miniCtx.fillStyle = "#2b2d42";
       miniCtx.beginPath();
       miniCtx.arc(toMiniX(-85), toMiniZ(-15), 18, 0, Math.PI * 2);
       miniCtx.fill();
 
-      // Basketball
       miniCtx.fillStyle = "#f97316";
       miniCtx.fillRect(toMiniX(-30), toMiniZ(-45), 26, 16);
 
-      // Buildings
       BUILDINGS_CONFIG.forEach(cfg => {
         miniCtx.fillStyle = cfg.id === "gym-bld" ? "#d98a80" : "#475569";
         const bx = toMiniX(cfg.x - cfg.width / 2);
@@ -2331,7 +2325,6 @@
         miniCtx.fillRect(bx, bz, bw, bh);
       });
 
-      // Avatar Dot & Direction Cone
       if (avatarGroup) {
         const ax = toMiniX(avatarGroup.position.x);
         const az = toMiniZ(avatarGroup.position.z);
@@ -2386,13 +2379,12 @@
       let isMoving = false;
       const currentSpeed = (moveInput.sprint ? avatarRunSpeed : avatarSpeed) * delta;
 
-      // 1. AUTO-WALK (自動走動與平滑爬樓梯)
+      // 1. AUTO-WALK (平滑爬樓梯與行進)
       if (isAutoWalking && currentNavPoints.length > 1) {
         isMoving = true;
         const currentTargetPt = currentNavPoints[autoWalkIndex + 1];
         if (currentTargetPt) {
           const curPos = avatarGroup.position;
-          // Target position with exact multi-floor height!
           const targetPos = new THREE.Vector3(currentTargetPt.x, currentTargetPt.y - 0.6, currentTargetPt.z);
           const distToTarget = curPos.distanceTo(targetPos);
 
@@ -2410,23 +2402,26 @@
           }
         }
       }
-      // 2. MANUAL KEYBOARD / DPAD CONTROLS
+      // 2. MANUAL KEYBOARD / DPAD CONTROLS (Camera-Relative Movement)
       else if (avatarGroup && currentMode === "avatar") {
-        let moveX = 0, moveZ = 0;
+        const camDir = new THREE.Vector3();
+        camera.getWorldDirection(camDir);
+        camDir.y = 0;
+        camDir.normalize();
+        const camRight = new THREE.Vector3().crossVectors(camDir, new THREE.Vector3(0, 1, 0)).normalize();
 
-        if (moveInput.forward) moveZ -= 1;
-        if (moveInput.backward) moveZ += 1;
-        if (moveInput.left) moveX -= 1;
-        if (moveInput.right) moveX += 1;
+        const moveVec = new THREE.Vector3();
+        if (moveInput.forward) moveVec.add(camDir);
+        if (moveInput.backward) moveVec.sub(camDir);
+        if (moveInput.left) moveVec.sub(camRight);
+        if (moveInput.right) moveVec.add(camRight);
 
-        if (moveX !== 0 || moveZ !== 0) {
+        if (moveVec.lengthSq() > 0.001) {
           isMoving = true;
-          const angle = Math.atan2(moveX, moveZ);
-          avatarAngle = angle;
+          moveVec.normalize();
+          avatarAngle = Math.atan2(-moveVec.x, -moveVec.z);
           avatarGroup.rotation.y = avatarAngle;
-
-          const dir = new THREE.Vector3(Math.sin(angle), 0, Math.cos(angle)).normalize();
-          avatarGroup.position.addScaledVector(dir, currentSpeed);
+          avatarGroup.position.addScaledVector(moveVec, currentSpeed);
         }
       }
 
@@ -2445,17 +2440,13 @@
           avatarRightArm.rotation.x = 0;
         }
 
-        // Camera Follow in Avatar Mode
-        if (currentMode === "avatar") {
-          const targetLookAt = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.8, 0));
-          controls.target.lerp(targetLookAt, 0.08);
-
-          const camOffset = new THREE.Vector3(0, 7.5, 15);
-          const desiredCamPos = avatarGroup.position.clone().add(camOffset);
-          camera.position.lerp(desiredCamPos, 0.06);
-        } else {
-          controls.update();
+        // Camera Follow in Avatar Mode: Follow position delta without overriding user's rotation!
+        if (currentMode === "avatar" && isMoving) {
+          const deltaPos = avatarGroup.position.clone().sub(prevAvatarPos);
+          camera.position.add(deltaPos);
+          controls.target.add(deltaPos);
         }
+        prevAvatarPos.copy(avatarGroup.position);
 
         // Nametag Screen Position
         const avatarScreenPos = avatarGroup.position.clone().add(new THREE.Vector3(0, 3.2, 0));
@@ -2470,6 +2461,9 @@
           avatarNametag.style.top = `${screenY}px`;
         }
       }
+
+      // Always update OrbitControls so rotation/zoom NEVER freezes!
+      controls.update();
 
       // 3D Floating Building Labels
       labelElements.forEach(item => {
