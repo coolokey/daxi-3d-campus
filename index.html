@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>桃園市立大溪國中 115學年度 3D 智慧校園立體導覽圖</title>
-  <meta name="description" content="依據大溪國中115學年度官方校園平面圖與真實空拍影像高精度重構，提供來賓全校立體探索、處室班級精準查找、跨樓層A*路徑導引與虛擬自動帶路。">
+  <meta name="description" content="依據大溪國中115學年度官方校園平面圖與真實空拍影像高精度重構，提供來賓全校立體探索、處室班級精準查找、實體樓梯爬升、跨樓層A*路徑導引與虛擬自動帶路。">
   
   <!-- Favicon SVG inline -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏫</text></svg>">
@@ -301,7 +301,7 @@
       bottom: calc(18px + var(--safe-bottom));
       left: 50%;
       transform: translateX(-50%) translateY(140%);
-      width: min(520px, calc(100% - 32px));
+      width: min(540px, calc(100% - 32px));
       padding: 14px 18px;
       z-index: 25;
       display: flex;
@@ -483,7 +483,7 @@
       background: rgba(255,255,255,0.2);
     }
 
-    /* On-Screen D-Pad Controller */
+    /* On-Screen D-Pad for Mobile & Mouse */
     #dpad-controller {
       position: absolute;
       right: 20px;
@@ -669,14 +669,15 @@
   <!-- Quick Filter Chips -->
   <div id="quick-bar">
     <div class="venue-chip" data-to="principal">🏛️ 校長室</div>
-    <div class="venue-chip" data-to="academic">📚 教務處</div>
-    <div class="venue-chip" data-to="student-affairs">🎖️ 學務處</div>
+    <div class="venue-chip" data-to="academic">📚 教務處 (2F)</div>
+    <div class="venue-chip" data-to="student-affairs">🎖️ 學務處 (2F)</div>
     <div class="venue-chip" data-to="counseling">💬 輔導室</div>
-    <div class="venue-chip" data-to="general">💼 總務處</div>
+    <div class="venue-chip" data-to="general">💼 總務處 (2F)</div>
     <div class="venue-chip" data-to="health">🩺 健康中心</div>
     <div class="venue-chip" data-to="701">🎒 701 教室</div>
-    <div class="venue-chip" data-to="801">🎒 801 教室</div>
-    <div class="venue-chip" data-to="901">🎒 901 教室</div>
+    <div class="venue-chip" data-to="801">🎒 801 教室 (2F)</div>
+    <div class="venue-chip" data-to="806">🎒 806 教室 (3F)</div>
+    <div class="venue-chip" data-to="901">🎒 901 教室 (3F)</div>
     <div class="venue-chip" data-to="woodwork-1">🪵 木藝教室</div>
     <div class="venue-chip" data-to="library">📖 圖書館</div>
     <div class="venue-chip" data-to="gym">🏀 體育館禮堂</div>
@@ -747,7 +748,8 @@
       <li>⌨️ <b>鍵盤控制</b>：<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或方向鍵走動，<kbd>Shift</kbd> 加速奔跑。</li>
       <li>🖱️ <b>滑鼠旋轉</b>：左鍵拖曳 360° 旋轉視野，右鍵平移，滾輪縮放距離。</li>
       <li>📱 <b>觸控螢幕</b>：單指滑動旋轉，雙指捏合縮放，右下角方向鈕移動角色。</li>
-      <li>🏢 <b>樓層切換</b>：點選右側 1F ~ 4F 即可透視內部教室配置。</li>
+      <li>🏢 <b>樓層切換</b>：點選右側 1F ~ 4F 即可透視內部教室配置與走廊。</li>
+      <li>🪜 <b>實體樓梯爬升</b>：導航至 2F/3F 教室時，同學會由川堂走至樓梯間沿踏階走上樓！</li>
       <li>🚶 <b>自動帶路</b>：搜尋或點擊任意門牌後，點擊「自動帶路」同學將親自帶您前往！</li>
       <li>🗺️ <b>平面總圖</b>：按 <kbd>M</kbd> 鍵可隨時對照 115 學年度原始平面藍圖。</li>
     </ul>
@@ -759,10 +761,10 @@
     /* ==========================================================================
        1. CAMPUS DATA & CONFIGURATION (115學年度大溪國中)
        ========================================================================== */
-    const FH = 3.6; // Floor Height (meters)
+    const FH = 3.6; // Floor Height in meters
 
     const BUILDINGS_CONFIG = [
-      // 1. 活動中心 (西側獨立大型場館：鮭魚粉立面、雙圓柱梯、圓頂)
+      // 1. 活動中心
       {
         id: "gym-bld",
         name: "學生活動中心 / 體育館",
@@ -771,11 +773,14 @@
         roofColor: 0x9e473e,
         x: -58, z: 62, width: 32, depth: 42, floors: 3,
         isGymSpecial: true,
-        entrance: { x: -45, z: 62, y: 0.5 },
+        stairs: [
+          { x: -44, z: 48, name: "活動中心南側雙圓柱梯", floors: 3 },
+          { x: -44, z: 76, name: "活動中心北側雙圓柱梯", floors: 3 }
+        ],
         rooms: [
-          { id: "gym", code: "GYM-1", name: "活動中心大禮堂", floor: 1, rel: [0, 0], cat: "sports" },
-          { id: "weight-room", code: "GYM-2", name: "體育重訓室 (2F)", floor: 2, rel: [0, 0], cat: "sports" },
-          { id: "scout-room", code: "GYM-3", name: "童軍團部 / 柔道室 (3F)", floor: 3, rel: [0, 0], cat: "sports" }
+          { id: "gym", code: "GYM-1", name: "活動中心大禮堂", floor: 1, node: "gym-1f-hall", cat: "sports" },
+          { id: "weight-room", code: "GYM-2", name: "體育重訓室 (2F)", floor: 2, node: "gym-stair-s-2f", cat: "sports" },
+          { id: "scout-room", code: "GYM-3", name: "童軍團部 / 柔道室 (3F)", floor: 3, node: "gym-stair-s-3f", cat: "sports" }
         ]
       },
 
@@ -788,13 +793,16 @@
         roofColor: 0xd63031,
         hasPitchedRoof: true,
         x: 8, z: 38, width: 28, depth: 14, floors: 3,
-        entrance: { x: 8, z: 46, y: 0.5 },
+        stairs: [
+          { x: -4, z: 46, name: "行政前棟西側樓梯", floors: 3 },
+          { x: 20, z: 46, name: "行政前棟東側樓梯", floors: 3 }
+        ],
         rooms: [
-          { id: "principal", code: "A1-01", name: "校長室 (1F)", floor: 1, rel: [6, 1], cat: "admin" },
-          { id: "counseling", code: "A1-02", name: "輔導室 (1F)", floor: 1, rel: [-6, 1], cat: "admin" },
-          { id: "academic", code: "A2-01", name: "教務處 (2F)", floor: 2, rel: [6, 2], cat: "admin" },
-          { id: "student-affairs", code: "A2-02", name: "學務處 (2F)", floor: 2, rel: [-6, 2], cat: "admin" },
-          { id: "conf-room", code: "A3-01", name: "行政大會議室 (3F)", floor: 3, rel: [0, 3], cat: "admin" },
+          { id: "principal", code: "A1-01", name: "校長室 (1F)", floor: 1, node: "admin-f-1f-e", cat: "admin" },
+          { id: "counseling", code: "A1-02", name: "輔導室 (1F)", floor: 1, node: "admin-f-1f-w", cat: "admin" },
+          { id: "academic", code: "A2-01", name: "教務處 (2F)", floor: 2, node: "admin-f-2f-e", cat: "admin" },
+          { id: "student-affairs", code: "A2-02", name: "學務處 (2F)", floor: 2, node: "admin-f-2f-w", cat: "admin" },
+          { id: "conf-room", code: "A3-01", name: "行政大會議室 (3F)", floor: 3, node: "admin-f-3f-c", cat: "admin" },
         ]
       },
 
@@ -807,12 +815,15 @@
         roofColor: 0xd63031,
         hasPitchedRoof: true,
         x: -28, z: 38, width: 28, depth: 14, floors: 3,
-        entrance: { x: -28, z: 46, y: 0.5 },
+        stairs: [
+          { x: -40, z: 46, name: "行政後棟西側樓梯", floors: 3 },
+          { x: -16, z: 46, name: "行政後棟東側樓梯", floors: 3 }
+        ],
         rooms: [
-          { id: "health", code: "B1-01", name: "健康中心 (1F)", floor: 1, rel: [-6, 1], cat: "admin" },
-          { id: "spec-teacher", code: "B1-02", name: "專任教師室 (1F)", floor: 1, rel: [6, 1], cat: "admin" },
-          { id: "general", code: "B2-01", name: "總務處 / 人事室 / 會計室 (2F)", floor: 2, rel: [0, 2], cat: "admin" },
-          { id: "teacher-study", code: "B3-01", name: "教師研習中心 (3F)", floor: 3, rel: [0, 3], cat: "admin" },
+          { id: "health", code: "B1-01", name: "健康中心 (1F)", floor: 1, node: "admin-b-1f-w", cat: "admin" },
+          { id: "spec-teacher", code: "B1-02", name: "專任教師室 (1F)", floor: 1, node: "admin-b-1f-e", cat: "admin" },
+          { id: "general", code: "B2-01", name: "總務處 / 人事室 / 會計室 (2F)", floor: 2, node: "admin-b-stair-w-2f", cat: "admin" },
+          { id: "teacher-study", code: "B3-01", name: "教師研習中心 (3F)", floor: 3, node: "admin-b-stair-w-3f", cat: "admin" },
         ]
       },
 
@@ -825,16 +836,19 @@
         roofColor: 0xd63031,
         hasPitchedRoof: true,
         x: 48, z: 44, width: 38, depth: 12, floors: 3,
-        entrance: { x: 38, z: 44, y: 0.5 },
+        stairs: [
+          { x: 28, z: 51, name: "八年級前棟西側樓梯", floors: 3 },
+          { x: 68, z: 51, name: "八年級前棟東側樓梯", floors: 3 }
+        ],
         rooms: [
-          { id: "kindergarten", code: "8F1-K", name: "非營利幼兒園 (1F)", floor: 1, rel: [0, 1], cat: "admin" },
-          { id: "807", code: "8F2-807", name: "807 教室", floor: 2, rel: [-13, 2], cat: "grade8" },
-          { id: "801", code: "8F2-801", name: "801 教室", floor: 2, rel: [-4, 2], cat: "grade8" },
-          { id: "802", code: "8F2-802", name: "802 教室", floor: 2, rel: [4, 2], cat: "grade8" },
-          { id: "803", code: "8F2-803", name: "803 教室", floor: 2, rel: [13, 2], cat: "grade8" },
-          { id: "806", code: "8F3-806", name: "806 教室", floor: 3, rel: [-10, 3], cat: "grade8" },
-          { id: "808", code: "8F3-808", name: "808 教室", floor: 3, rel: [0, 3], cat: "grade8" },
-          { id: "boardgame", code: "8F3-BG", name: "桌遊益智教室 (3F)", floor: 3, rel: [10, 3], cat: "special" },
+          { id: "kindergarten", code: "8F1-K", name: "非營利幼兒園 (1F)", floor: 1, node: "g8f-1f-hall", cat: "admin" },
+          { id: "807", code: "8F2-807", name: "807 教室 (2F)", floor: 2, node: "g8f-2f-807", cat: "grade8" },
+          { id: "801", code: "8F2-801", name: "801 教室 (2F)", floor: 2, node: "g8f-2f-801", cat: "grade8" },
+          { id: "802", code: "8F2-802", name: "802 教室 (2F)", floor: 2, node: "g8f-2f-802", cat: "grade8" },
+          { id: "803", code: "8F2-803", name: "803 教室 (2F)", floor: 2, node: "g8f-2f-803", cat: "grade8" },
+          { id: "806", code: "8F3-806", name: "806 教室 (3F)", floor: 3, node: "g8f-3f-806", cat: "grade8" },
+          { id: "808", code: "8F3-808", name: "808 教室 (3F)", floor: 3, node: "g8f-3f-808", cat: "grade8" },
+          { id: "boardgame", code: "8F3-BG", name: "桌遊益智教室 (3F)", floor: 3, node: "g8f-3f-bg", cat: "special" },
         ]
       },
 
@@ -847,13 +861,16 @@
         roofColor: 0xd63031,
         hasPitchedRoof: true,
         x: 48, z: 24, width: 38, depth: 12, floors: 3,
-        entrance: { x: 38, z: 24, y: 0.5 },
+        stairs: [
+          { x: 28, z: 31, name: "八年級中棟西側樓梯", floors: 3 },
+          { x: 68, z: 31, name: "八年級中棟東側樓梯", floors: 3 }
+        ],
         rooms: [
-          { id: "woodwork-1", code: "8M1-W", name: "木藝傳承教室 (1F)", floor: 1, rel: [-10, 1], cat: "special" },
-          { id: "804", code: "8M1-804", name: "804 教室", floor: 1, rel: [0, 1], cat: "grade8" },
-          { id: "809", code: "8M1-809", name: "809 體育班", floor: 1, rel: [10, 1], cat: "grade8" },
-          { id: "805", code: "8M2-805", name: "805 教室", floor: 2, rel: [0, 2], cat: "grade8" },
-          { id: "drama-room", code: "8M3-D", name: "表演藝術教室 (3F)", floor: 3, rel: [0, 3], cat: "special" },
+          { id: "woodwork-1", code: "8M1-W", name: "木藝傳承教室 (1F)", floor: 1, node: "g8m-1f-wood", cat: "special" },
+          { id: "804", code: "8M1-804", name: "804 教室 (1F)", floor: 1, node: "g8m-1f-804", cat: "grade8" },
+          { id: "809", code: "8M1-809", name: "809 體育班 (1F)", floor: 1, node: "g8m-1f-809", cat: "grade8" },
+          { id: "805", code: "8M2-805", name: "805 教室 (2F)", floor: 2, node: "g8m-stair-w-2f", cat: "grade8" },
+          { id: "drama-room", code: "8M3-D", name: "表演藝術教室 (3F)", floor: 3, node: "g8m-stair-w-3f", cat: "special" },
         ]
       },
 
@@ -866,16 +883,19 @@
         roofColor: 0xd63031,
         hasPitchedRoof: true,
         x: 48, z: 4, width: 38, depth: 12, floors: 3,
-        entrance: { x: 38, z: 4, y: 0.5 },
+        stairs: [
+          { x: 28, z: 11, name: "九年級西側樓梯", floors: 3 },
+          { x: 68, z: 11, name: "九年級東側樓梯", floors: 3 }
+        ],
         rooms: [
-          { id: "908", code: "9B1-908", name: "908 教室", floor: 1, rel: [-10, 1], cat: "grade9" },
-          { id: "905", code: "9B1-905", name: "905 教室", floor: 1, rel: [0, 1], cat: "grade9" },
-          { id: "903", code: "9B1-903", name: "903 教室", floor: 1, rel: [10, 1], cat: "grade9" },
-          { id: "907", code: "9B2-907", name: "907 教室", floor: 2, rel: [-10, 2], cat: "grade9" },
-          { id: "904", code: "9B2-904", name: "904 教室", floor: 2, rel: [0, 2], cat: "grade9" },
-          { id: "902", code: "9B2-902", name: "902 教室", floor: 2, rel: [10, 2], cat: "grade9" },
-          { id: "906", code: "9B3-906", name: "906 教室", floor: 3, rel: [-8, 3], cat: "grade9" },
-          { id: "901", code: "9B3-901", name: "901 教室", floor: 3, rel: [8, 3], cat: "grade9" },
+          { id: "908", code: "9B1-908", name: "908 教室 (1F)", floor: 1, node: "g9-1f-908", cat: "grade9" },
+          { id: "905", code: "9B1-905", name: "905 教室 (1F)", floor: 1, node: "g9-1f-905", cat: "grade9" },
+          { id: "903", code: "9B1-903", name: "903 教室 (1F)", floor: 1, node: "g9-1f-903", cat: "grade9" },
+          { id: "907", code: "9B2-907", name: "907 教室 (2F)", floor: 2, node: "g9-stair-w-2f", cat: "grade9" },
+          { id: "904", code: "9B2-904", name: "904 教室 (2F)", floor: 2, node: "g9-2f-904", cat: "grade9" },
+          { id: "902", code: "9B2-902", name: "902 教室 (2F)", floor: 2, node: "g9-2f-902", cat: "grade9" },
+          { id: "906", code: "9B3-906", name: "906 教室 (3F)", floor: 3, node: "g9-stair-w-3f", cat: "grade9" },
+          { id: "901", code: "9B3-901", name: "901 教室 (3F)", floor: 3, node: "g9-3f-901", cat: "grade9" },
         ]
       },
 
@@ -887,13 +907,15 @@
         color: 0xe4f2ef,
         roofColor: 0x1b675e,
         x: 96, z: 12, width: 16, depth: 36, floors: 2,
-        entrance: { x: 86, z: 12, y: 0.5 },
+        stairs: [
+          { x: 86, z: 18, name: "科技館採光樓梯", floors: 2 }
+        ],
         rooms: [
-          { id: "audiovisual-1f", code: "TC1-AV", name: "視聽多媒體教室 (1F)", floor: 1, rel: [0, -10], cat: "special" },
-          { id: "life-tech-1", code: "TC1-LT1", name: "生活科技教室一 (1F)", floor: 1, rel: [0, 0], cat: "special" },
-          { id: "life-tech-2", code: "TC2-LT2", name: "生活科技教室二 (2F)", floor: 2, rel: [0, 0], cat: "special" },
-          { id: "physics-lab", code: "TC2-PHY", name: "理化第一實驗室 (2F)", floor: 2, rel: [0, -10], cat: "special" },
-          { id: "computer-lab-1", code: "TC1-PC", name: "第一電腦教室 (1F)", floor: 1, rel: [0, 10], cat: "special" },
+          { id: "audiovisual-1f", code: "TC1-AV", name: "視聽多媒體教室 (1F)", floor: 1, node: "tech-1f-av", cat: "special" },
+          { id: "life-tech-1", code: "TC1-LT1", name: "生活科技教室一 (1F)", floor: 1, node: "tech-1f-lt1", cat: "special" },
+          { id: "computer-lab-1", code: "TC1-PC", name: "第一電腦教室 (1F)", floor: 1, node: "tech-1f-pc", cat: "special" },
+          { id: "life-tech-2", code: "TC2-LT2", name: "生活科技教室二 (2F)", floor: 2, node: "tech-2f-hall", cat: "special" },
+          { id: "physics-lab", code: "TC2-PHY", name: "理化第一實驗室 (2F)", floor: 2, node: "tech-2f-hall", cat: "special" },
         ]
       },
 
@@ -905,13 +927,15 @@
         color: 0xeeeaf2,
         roofColor: 0x5e3a73,
         x: 96, z: 54, width: 16, depth: 40, floors: 2,
-        entrance: { x: 86, z: 54, y: 0.5 },
+        stairs: [
+          { x: 86, z: 58, name: "綜合大樓樓梯", floors: 2 }
+        ],
         rooms: [
-          { id: "food-classroom", code: "MB1-F", name: "餐飲烹飪教室 (1F)", floor: 1, rel: [0, -12], cat: "special" },
-          { id: "history-room", code: "MB1-H", name: "校史展覽室 (1F)", floor: 1, rel: [0, -4], cat: "admin" },
-          { id: "library", code: "MB1-LIB", name: "中央圖書館 Library (1F)", floor: 1, rel: [0, 8], cat: "special" },
-          { id: "large-computer", code: "MB2-LPC", name: "大電腦多功能教室 (2F)", floor: 2, rel: [0, 8], cat: "special" },
-          { id: "it-server", code: "MB2-SRV", name: "全校資訊機房 (2F)", floor: 2, rel: [0, 0], cat: "admin" },
+          { id: "food-classroom", code: "MB1-F", name: "餐飲烹飪教室 (1F)", floor: 1, node: "multi-1f-food", cat: "special" },
+          { id: "history-room", code: "MB1-H", name: "校史展覽室 (1F)", floor: 1, node: "multi-1f-hist", cat: "admin" },
+          { id: "library", code: "MB1-LIB", name: "中央圖書館 Library (1F)", floor: 1, node: "multi-1f-lib", cat: "special" },
+          { id: "large-computer", code: "MB2-LPC", name: "大電腦多功能教室 (2F)", floor: 2, node: "multi-2f-hall", cat: "special" },
+          { id: "it-server", code: "MB2-SRV", name: "全校資訊機房 (2F)", floor: 2, node: "multi-2f-hall", cat: "admin" },
         ]
       },
 
@@ -923,12 +947,14 @@
         color: 0xf8e9eb,
         roofColor: 0x82414f,
         x: 96, z: -28, width: 16, depth: 32, floors: 4,
-        entrance: { x: 86, z: -28, y: 0.5 },
+        stairs: [
+          { x: 86, z: -28, name: "藝術館主樓梯間", floors: 4 }
+        ],
         rooms: [
-          { id: "broadwood", code: "ART1-BW", name: "樂活體能教室 (1F)", floor: 1, rel: [0, 8], cat: "sports" },
-          { id: "music-2f", code: "ART2-M1", name: "第一音樂教室 (2F)", floor: 2, rel: [0, 0], cat: "special" },
-          { id: "music-3f", code: "ART3-M2", name: "第二音樂教室 (3F)", floor: 3, rel: [0, 0], cat: "special" },
-          { id: "art-4f", code: "ART4-ART", name: "美術創作教室 (4F)", floor: 4, rel: [0, -8], cat: "special" },
+          { id: "broadwood", code: "ART1-BW", name: "樂活體能教室 (1F)", floor: 1, node: "art-1f-bw", cat: "sports" },
+          { id: "music-2f", code: "ART2-M1", name: "第一音樂教室 (2F)", floor: 2, node: "art-2f-m1", cat: "special" },
+          { id: "music-3f", code: "ART3-M2", name: "第二音樂教室 (3F)", floor: 3, node: "art-3f-m2", cat: "special" },
+          { id: "art-4f", code: "ART4-ART", name: "美術創作教室 (4F)", floor: 4, node: "art-4f-art", cat: "special" },
         ]
       },
 
@@ -940,17 +966,19 @@
         color: 0xe6f0f7,
         roofColor: 0x2b5b7a,
         x: 75, z: -68, width: 46, depth: 16, floors: 3,
-        entrance: { x: 65, z: -68, y: 0.5 },
+        stairs: [
+          { x: 54, z: -58, name: "七年級新大樓西側樓梯", floors: 3 }
+        ],
         rooms: [
-          { id: "701", code: "7N1-701", name: "701 教室 (1F)", floor: 1, rel: [-14, 1], cat: "grade7" },
-          { id: "709", code: "7N1-709", name: "709 體育班 (1F)", floor: 1, rel: [-6, 1], cat: "grade7" },
-          { id: "704", code: "7N1-704", name: "704 教室 (1F)", floor: 1, rel: [6, 1], cat: "grade7" },
-          { id: "708", code: "7N1-708", name: "708 教室 (1F)", floor: 1, rel: [14, 1], cat: "grade7" },
-          { id: "702", code: "7N2-702", name: "702 教室 (2F)", floor: 2, rel: [-10, 2], cat: "grade7" },
-          { id: "703", code: "7N2-703", name: "703 教室 (2F)", floor: 2, rel: [10, 2], cat: "grade7" },
-          { id: "706", code: "7N3-706", name: "706 質數研究室 (3F)", floor: 3, rel: [-10, 3], cat: "grade7" },
-          { id: "707", code: "7N3-707", name: "707 教室 (3F)", floor: 3, rel: [0, 3], cat: "grade7" },
-          { id: "math-lab", code: "7N3-MATH", name: "數學名師研究室 (蔡之民老師 3F)", floor: 3, rel: [12, 3], cat: "special" },
+          { id: "701", code: "7N1-701", name: "701 教室 (1F)", floor: 1, node: "new7-1f-701", cat: "grade7" },
+          { id: "709", code: "7N1-709", name: "709 體育班 (1F)", floor: 1, node: "new7-1f-709", cat: "grade7" },
+          { id: "704", code: "7N1-704", name: "704 教室 (1F)", floor: 1, node: "new7-1f-704", cat: "grade7" },
+          { id: "708", code: "7N1-708", name: "708 教室 (1F)", floor: 1, node: "new7-1f-708", cat: "grade7" },
+          { id: "702", code: "7N2-702", name: "702 教室 (2F)", floor: 2, node: "new7-stair-w-2f", cat: "grade7" },
+          { id: "703", code: "7N2-703", name: "703 教室 (2F)", floor: 2, node: "new7-2f-703", cat: "grade7" },
+          { id: "706", code: "7N3-706", name: "706 質數研究室 (3F)", floor: 3, node: "new7-stair-w-3f", cat: "grade7" },
+          { id: "707", code: "7N3-707", name: "707 教室 (3F)", floor: 3, node: "new7-3f-707", cat: "grade7" },
+          { id: "math-lab", code: "7N3-MATH", name: "數學名師研究室 (3F)", floor: 3, node: "new7-3f-math", cat: "special" },
         ]
       }
     ];
@@ -993,7 +1021,6 @@
     controls.minDistance = 6;
     controls.maxDistance = 420;
 
-    // Lighting
     const hemiLight = new THREE.HemisphereLight(0xe8f4f8, 0x3d4e33, 0.65);
     scene.add(hemiLight);
 
@@ -1015,7 +1042,6 @@
     sunLight.shadow.bias = -0.0005;
     scene.add(sunLight);
 
-    // Procedural Tile & Lawn Canvas Textures
     function createPaverTexture() {
       const cvs = document.createElement("canvas");
       cvs.width = 256; cvs.height = 256;
@@ -1040,18 +1066,19 @@
     const paverTex = createPaverTexture();
 
     /* ==========================================================================
-       3. 3D STUDENT AVATAR (大溪同學 3D 角色)
+       3. 3D STUDENT AVATAR
        ========================================================================== */
     let avatarGroup = null;
     let avatarLeftArm = null, avatarRightArm = null;
     let avatarLeftLeg = null, avatarRightLeg = null;
     let avatarAngle = 0;
+    let avatarCurrentFloor = 1;
     const avatarSpeed = 16;
     const avatarRunSpeed = 26;
 
     function createStudentAvatar() {
       avatarGroup = new THREE.Group();
-      avatarGroup.position.set(0, 0, 92); // Start at Main Gate
+      avatarGroup.position.set(0, 0, 96);
 
       const shadow = new THREE.Mesh(
         new THREE.CircleGeometry(0.7, 16),
@@ -1061,7 +1088,6 @@
       shadow.position.y = 0.04;
       avatarGroup.add(shadow);
 
-      // Torso (School Uniform)
       const torso = new THREE.Mesh(
         new THREE.BoxGeometry(0.8, 1.1, 0.45),
         new THREE.MeshLambertMaterial({ color: 0xf8fafc })
@@ -1070,7 +1096,6 @@
       torso.castShadow = true;
       avatarGroup.add(torso);
 
-      // Tie / Necktie Badge
       const tie = new THREE.Mesh(
         new THREE.BoxGeometry(0.16, 0.5, 0.04),
         new THREE.MeshLambertMaterial({ color: 0x2563eb })
@@ -1078,7 +1103,6 @@
       tie.position.set(0, 1.6, 0.24);
       avatarGroup.add(tie);
 
-      // School Backpack
       const bag = new THREE.Mesh(
         new THREE.BoxGeometry(0.68, 0.8, 0.32),
         new THREE.MeshLambertMaterial({ color: 0x1e293b })
@@ -1087,7 +1111,6 @@
       bag.castShadow = true;
       avatarGroup.add(bag);
 
-      // Head & Hair
       const head = new THREE.Mesh(
         new THREE.SphereGeometry(0.38, 16, 16),
         new THREE.MeshLambertMaterial({ color: 0xffd1b3 })
@@ -1144,7 +1167,7 @@
     createStudentAvatar();
 
     /* ==========================================================================
-       4. CAMPUS ENVIRONMENT & PARAMETRIC ARCHITECTURE
+       4. CAMPUS ENVIRONMENT, STAIRCASES & ARCHITECTURE
        ========================================================================== */
     const floorMeshes = [];
     const labelElements = [];
@@ -1161,12 +1184,11 @@
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // 4.2 Main Gate Plaza, Avenue, Trees & Statue
+    // 4.2 Main Entrance Plaza & Trees
     function createMainEntrancePlaza() {
       const plazaGroup = new THREE.Group();
       plazaGroup.position.set(0, 0.02, 90);
 
-      // Paved Main Avenue
       const plaza = new THREE.Mesh(
         new THREE.PlaneGeometry(84, 42),
         new THREE.MeshLambertMaterial({ map: paverTex, color: 0xf1f5f9 })
@@ -1175,11 +1197,9 @@
       plaza.receiveShadow = true;
       plazaGroup.add(plaza);
 
-      // Central Statue Plaza (迎賓銅像與花台圓環)
       const statueGroup = new THREE.Group();
-      statueGroup.position.set(0, 0, -10);
+      statueGroup.position.set(0, 0, -12);
 
-      // Tiered Circular Pedestal
       const baseRing = new THREE.Mesh(new THREE.CylinderGeometry(5.2, 5.8, 0.4, 24), new THREE.MeshLambertMaterial({ color: 0x94a3b8 }));
       baseRing.position.y = 0.2;
       baseRing.receiveShadow = true;
@@ -1201,7 +1221,6 @@
 
       plazaGroup.add(statueGroup);
 
-      // Main Gate Pillars & Gatehouse (警衛室)
       const pillarGeo = new THREE.BoxGeometry(2.4, 6.2, 2.4);
       const pillarMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
       const pL = new THREE.Mesh(pillarGeo, pillarMat);
@@ -1225,71 +1244,99 @@
 
       scene.add(plazaGroup);
 
-      // Cypress / Pine Trees in front of Admin Building (正如實景照片龍柏)
       [-12, -6, 6, 12, -22, 22].forEach(tx => {
-        const tree = createCypressTree(tx, 68);
-        scene.add(tree);
+        scene.add(createCypressTree(tx, 68));
       });
     }
     createMainEntrancePlaza();
 
-    // Procedural Cypress Tree (龍柏)
     function createCypressTree(x, z) {
       const tree = new THREE.Group();
       tree.position.set(x, 0, z);
-
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 1.5, 8), new THREE.MeshLambertMaterial({ color: 0x5c4033 }));
       trunk.position.y = 0.75;
       trunk.castShadow = true;
       tree.add(trunk);
-
       const fol1 = new THREE.Mesh(new THREE.ConeGeometry(1.6, 3.8, 8), new THREE.MeshLambertMaterial({ color: 0x2d6a4f }));
       fol1.position.y = 2.8;
       fol1.castShadow = true;
       tree.add(fol1);
-
       const fol2 = new THREE.Mesh(new THREE.ConeGeometry(1.2, 3.2, 8), new THREE.MeshLambertMaterial({ color: 0x40916c }));
       fol2.position.y = 4.4;
       fol2.castShadow = true;
       tree.add(fol2);
-
       return tree;
     }
 
-    // Procedural Broadleaf Canopy Tree (中庭綠蔭大樹)
     function createBroadleafTree(x, z, scale = 1) {
       const tree = new THREE.Group();
       tree.position.set(x, 0, z);
       tree.scale.set(scale, scale, scale);
-
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 2.4, 8), new THREE.MeshLambertMaterial({ color: 0x4a3728 }));
       trunk.position.y = 1.2;
       trunk.castShadow = true;
       tree.add(trunk);
-
       const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(2.8, 1), new THREE.MeshLambertMaterial({ color: 0x386641, roughness: 0.8 }));
       crown.position.y = 4.2;
       crown.castShadow = true;
       tree.add(crown);
-
       return tree;
     }
 
-    // Courtyard Trees
     [
-      { x: 18, z: 34 }, { x: 18, z: 14 }, { x: 18, z: -10 },
-      { x: 74, z: 34 }, { x: 74, z: -10 }, { x: -25, z: 14 },
+      { x: 18, z: 38 }, { x: 18, z: 20 }, { x: 18, z: -4 },
+      { x: 74, z: 38 }, { x: 74, z: -4 }, { x: -25, z: 20 },
       { x: -50, z: 20 }, { x: -50, z: -40 }
     ].forEach(pos => {
       scene.add(createBroadleafTree(pos.x, pos.z, 1.1));
     });
 
-    // 4.3 200m Track, Grandstand & Flagpole
+    // 4.3 3D Physical Staircase Mesh Generator (實體多樓層樓梯間)
+    function create3DStaircaseMesh(x, z, totalFloors) {
+      const stairGroup = new THREE.Group();
+      stairGroup.position.set(x, 0, z);
+
+      for (let f = 1; f < totalFloors; f++) {
+        const baseH = (f - 1) * FH;
+        // Stair steps
+        const stepCount = 8;
+        for (let s = 0; s < stepCount; s++) {
+          const stepMesh = new THREE.Mesh(
+            new THREE.BoxGeometry(2.4, 0.22, 0.45),
+            new THREE.MeshLambertMaterial({ color: 0xd1d5db })
+          );
+          stepMesh.position.set(0, baseH + (s + 0.5) * (FH / stepCount), -s * 0.42);
+          stepMesh.castShadow = true;
+          stepGroup.add(stepMesh);
+        }
+
+        // Slanted Handrail (樓梯金屬安全扶手)
+        const rail = new THREE.Mesh(
+          new THREE.BoxGeometry(0.12, 0.12, stepCount * 0.45 * 1.4),
+          new THREE.MeshLambertMaterial({ color: 0x1e3a8a })
+        );
+        rail.position.set(1.2, baseH + FH * 0.5 + 0.9, -stepCount * 0.45 * 0.5);
+        rail.rotation.x = 0.55;
+        stairGroup.add(rail);
+
+        // Landing Floor (樓梯中轉平台)
+        const landing = new THREE.Mesh(
+          new THREE.BoxGeometry(2.8, 0.25, 2.2),
+          new THREE.MeshLambertMaterial({ color: 0xffffff })
+        );
+        landing.position.set(0, f * FH, -stepCount * 0.45);
+        landing.castShadow = true;
+        stairGroup.add(landing);
+      }
+
+      return stairGroup;
+    }
+
+    // 4.4 200m Track & Grandstand
     function createTrackAndPlatform() {
       const trackGroup = new THREE.Group();
       trackGroup.position.set(-85, 0.03, -15);
 
-      // Dark Charcoal PU Track
       const puMat = new THREE.MeshLambertMaterial({ color: 0x2b2d42 });
       const trackShape = new THREE.Shape();
       const r = 32;
@@ -1305,7 +1352,6 @@
       trackMesh.receiveShadow = true;
       trackGroup.add(trackMesh);
 
-      // Infield Soccer Lawn
       const innerShape = new THREE.Shape();
       const ir = 22;
       innerShape.moveTo(-ir, -36);
@@ -1321,14 +1367,12 @@
       innerMesh.receiveShadow = true;
       trackGroup.add(innerMesh);
 
-      // Red Infield Volleyball Court
       const redCourt = new THREE.Mesh(new THREE.PlaneGeometry(16, 28), new THREE.MeshLambertMaterial({ color: 0xd90429 }));
       redCourt.rotation.x = -Math.PI / 2;
       redCourt.position.set(0, 0.04, 14);
       redCourt.receiveShadow = true;
       trackGroup.add(redCourt);
 
-      // Grandstand (司令台) with Blue/White Structure & Red Pitch Roof
       const standGroup = new THREE.Group();
       standGroup.position.set(-32, 0, 8);
 
@@ -1337,14 +1381,12 @@
       standBase.castShadow = true;
       standGroup.add(standBase);
 
-      // Stepped Bleachers
       for (let s = 1; s <= 4; s++) {
         const step = new THREE.Mesh(new THREE.BoxGeometry(16, 0.4, 1.2), new THREE.MeshLambertMaterial({ color: 0xf8fafc }));
         step.position.set(0, s * 0.4, 4 - s * 1.0);
         standGroup.add(step);
       }
 
-      // Pitched Red Metal Roof
       const roofShape = new THREE.Shape();
       roofShape.moveTo(-4.5, 0);
       roofShape.lineTo(0, 2.6);
@@ -1359,7 +1401,6 @@
       roof.castShadow = true;
       standGroup.add(roof);
 
-      // Flagpole & Taiwanese Flag
       const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 13, 8), new THREE.MeshLambertMaterial({ color: 0xf1f5f9 }));
       pole.position.set(0, 6.5, 6);
       pole.castShadow = true;
@@ -1383,18 +1424,16 @@
         buildingName: "200M 操場運動區",
         floor: 1,
         cat: "sports",
-        x: -117, y: 3.5, z: -7,
-        entrance: { x: -115, y: 0.5, z: 0 }
+        node: "stand-podium"
       };
     }
     createTrackAndPlatform();
 
-    // 4.4 Outdoor Basketball & Volleyball Complex
+    // 4.5 Basketball Complex
     function createBasketballComplex() {
       const courtGroup = new THREE.Group();
       courtGroup.position.set(0, 0.04, -36);
 
-      // Orange Floor
       const courtFloor = new THREE.Mesh(
         new THREE.PlaneGeometry(66, 44),
         new THREE.MeshLambertMaterial({ color: 0xf97316 })
@@ -1403,14 +1442,11 @@
       courtFloor.receiveShadow = true;
       courtGroup.add(courtFloor);
 
-      // White Boundary Markings
-      const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const borderLine = new THREE.Mesh(new THREE.PlaneGeometry(62, 40), new THREE.MeshBasicMaterial({ color: 0xea580c }));
       borderLine.rotation.x = -Math.PI / 2;
       borderLine.position.y = 0.01;
       courtGroup.add(borderLine);
 
-      // Green Volleyball Court next to it
       const vbCourt = new THREE.Mesh(
         new THREE.PlaneGeometry(18, 28),
         new THREE.MeshLambertMaterial({ color: 0x16a34a })
@@ -1419,7 +1455,6 @@
       vbCourt.position.set(-42, 0.02, 0);
       courtGroup.add(vbCourt);
 
-      // Basketball Hoops
       function createHoop(x, z) {
         const hoop = new THREE.Group();
         hoop.position.set(x, 0, z);
@@ -1452,18 +1487,16 @@
         buildingName: "綜合運動設施",
         floor: 1,
         cat: "sports",
-        x: 0, y: 0.5, z: -36,
-        entrance: { x: 0, y: 0.5, z: -15 }
+        node: "bb-gate"
       };
     }
     createBasketballComplex();
 
-    // 4.5 蘭亭 (Lan Pavilion) & 訓平池 (生態池水景)
+    // 4.6 蘭亭 & 訓平池
     function createLanPavilion() {
       const gardenGroup = new THREE.Group();
       gardenGroup.position.set(-35, 0, -75);
 
-      // 訓平池 (生態水池)
       const pool = new THREE.Mesh(
         new THREE.CylinderGeometry(9.5, 9.5, 0.8, 32),
         new THREE.MeshLambertMaterial({ color: 0x0284c7, transparent: true, opacity: 0.88, roughness: 0.1 })
@@ -1471,7 +1504,6 @@
       pool.position.set(16, 0.3, 0);
       gardenGroup.add(pool);
 
-      // Water Lily Pads
       for (let i = 0; i < 7; i++) {
         const pad = new THREE.Mesh(new THREE.CircleGeometry(0.7 + Math.random() * 0.4, 12), new THREE.MeshLambertMaterial({ color: 0x15803d }));
         pad.rotation.x = -Math.PI / 2;
@@ -1479,7 +1511,6 @@
         gardenGroup.add(pad);
       }
 
-      // 蘭亭 (古典紅色六角涼亭)
       const pavilion = new THREE.Group();
       pavilion.position.set(-8, 0, 0);
       for (let i = 0; i < 6; i++) {
@@ -1502,17 +1533,15 @@
         buildingName: "校園戶外景觀",
         floor: 1,
         cat: "sports",
-        x: -35, y: 0.5, z: -75,
-        entrance: { x: -35, y: 0.5, z: -60 }
+        node: "lan-pond-gate"
       };
     }
     createLanPavilion();
 
-    // 4.6 Breezeways (通廊雨遮連通道)
+    // 4.7 Breezeways
     function createBreezeway(x, z, width, depth) {
       const bw = new THREE.Group();
       bw.position.set(x, 0, z);
-
       const roof = new THREE.Mesh(new THREE.BoxGeometry(width, 0.4, depth), new THREE.MeshLambertMaterial({ color: 0xe2e8f0 }));
       roof.position.y = 4.2;
       roof.castShadow = true;
@@ -1533,7 +1562,7 @@
     createBreezeway(48, 14, 10, 8);
     createBreezeway(76, 12, 22, 6);
 
-    // 4.7 Parametric Architectural Building Construction
+    // 4.8 Buildings Construction
     BUILDINGS_CONFIG.forEach(cfg => {
       const bldGroup = new THREE.Group();
       bldGroup.position.set(cfg.x, 0, cfg.z);
@@ -1555,7 +1584,7 @@
         floorMesh.receiveShadow = true;
         floorGroup.add(floorMesh);
 
-        // Recessed Dark Window Band & Mullions
+        // Recessed Window Band
         const winBand = new THREE.Mesh(
           new THREE.BoxGeometry(cfg.width + 0.15, 1.4, cfg.depth + 0.15),
           new THREE.MeshLambertMaterial({ color: 0x0f172a, transparent: true, opacity: 0.9 })
@@ -1563,16 +1592,25 @@
         winBand.position.y = fCenterY + 0.2;
         floorGroup.add(winBand);
 
-        // Exterior Cantilevered White Concrete Slab & Balustrade
+        // External Cantilevered Corridor Floor Slab (外挑走廊板)
         const slab = new THREE.Mesh(
-          new THREE.BoxGeometry(cfg.width + 1.2, 0.32, cfg.depth + 1.2),
+          new THREE.BoxGeometry(cfg.width + 1.2, 0.32, cfg.depth + 2.4),
           new THREE.MeshLambertMaterial({ color: 0xffffff })
         );
-        slab.position.y = f * FH;
+        slab.position.set(0, (f - 1) * FH + 0.16, 0.6);
         slab.castShadow = true;
         floorGroup.add(slab);
 
-        // Structural Columns (柱列)
+        // Corridor Safety Balustrade Railing (走廊安全欄杆)
+        const rail = new THREE.Mesh(
+          new THREE.BoxGeometry(cfg.width + 1.2, 1.1, 0.15),
+          new THREE.MeshLambertMaterial({ color: 0xf1f5f9 })
+        );
+        rail.position.set(0, (f - 1) * FH + 0.55, cfg.depth / 2 + 1.7);
+        rail.castShadow = true;
+        floorGroup.add(rail);
+
+        // Structural Columns
         const colCount = Math.max(3, Math.round(cfg.width / 8));
         const colStep = cfg.width / colCount;
         for (let c = 0; c <= colCount; c++) {
@@ -1580,7 +1618,7 @@
             new THREE.BoxGeometry(0.5, FH, 0.5),
             new THREE.MeshLambertMaterial({ color: 0xffffff })
           );
-          colMesh.position.set(-cfg.width / 2 + c * colStep, fCenterY, cfg.depth / 2 + 0.3);
+          colMesh.position.set(-cfg.width / 2 + c * colStep, fCenterY, cfg.depth / 2 + 1.7);
           colMesh.castShadow = true;
           floorGroup.add(colMesh);
         }
@@ -1590,7 +1628,15 @@
         floorMeshes.push(floorGroup);
       }
 
-      // Activity Center Towers & Ventilation Dome
+      // 3D Physical Staircases Attached to Building
+      if (cfg.stairs) {
+        cfg.stairs.forEach(st => {
+          const stMesh = create3DStaircaseMesh(st.x - cfg.x, st.z - cfg.z, st.floors);
+          bldGroup.add(stMesh);
+        });
+      }
+
+      // Activity Center Towers
       if (cfg.isGymSpecial) {
         [-14, 14].forEach(offsetZ => {
           const tower = new THREE.Mesh(
@@ -1640,7 +1686,7 @@
 
       scene.add(bldGroup);
 
-      // Register Rooms & Create 3D Room Name Badges
+      // Register Rooms & 3D Badges
       cfg.rooms.forEach(r => {
         const roomObj = {
           id: r.id,
@@ -1650,14 +1696,11 @@
           buildingName: cfg.name,
           floor: r.floor,
           cat: r.cat || cfg.category || "academic",
-          x: cfg.x + r.rel[0],
-          y: (r.floor - 0.5) * FH,
-          z: cfg.z,
-          entrance: cfg.entrance
+          node: r.node
         };
         ROOMS_DB[r.id] = roomObj;
 
-        // Create 3D Floating Room Badge Element
+        // 3D Floating Room Badge Element
         const badgeDiv = document.createElement("div");
         badgeDiv.className = "room-badge";
         const catColor = CATEGORY_COLORS[roomObj.cat] || "#2563eb";
@@ -1674,7 +1717,7 @@
         roomBadgeElements.push({
           element: badgeDiv,
           floor: r.floor,
-          worldPos: new THREE.Vector3(roomObj.x, (r.floor) * FH + 0.6, roomObj.z + 2.5)
+          nodeId: r.node
         });
       });
 
@@ -1692,62 +1735,150 @@
     });
 
     /* ==========================================================================
-       5. A* NAVIGATION GRAPH & WAYPOINTS
+       5. A* NAVIGATION GRAPH & MULTI-FLOOR STAIRCASE WAYPOINTS
        ========================================================================== */
     const NAV_NODES = {
-      "gate": { id: "gate", x: 0, y: 0.5, z: 98, neighbors: ["statue-plaza"] },
-      "statue-plaza": { id: "statue-plaza", x: 0, y: 0.5, z: 80, neighbors: ["gate", "gym-branch", "admin-f-ent", "blvd-center"] },
-      "gym-branch": { id: "gym-branch", x: -45, y: 0.5, z: 75, neighbors: ["statue-plaza", "gym-ent"] },
-      "gym-ent": { id: "gym-ent", x: -45, y: 0.5, z: 62, neighbors: ["gym-branch", "track-branch", "gym-f1"] },
-      "gym-f1": { id: "gym-f1", x: -58, y: 0.5, z: 62, neighbors: ["gym-ent", "gym-f2"] },
-      "gym-f2": { id: "gym-f2", x: -58, y: 4.5, z: 62, neighbors: ["gym-f1", "gym-f3"] },
-      "gym-f3": { id: "gym-f3", x: -58, y: 9.0, z: 62, neighbors: ["gym-f2"] },
-      "track-branch": { id: "track-branch", x: -85, y: 0.5, z: 25, neighbors: ["gym-ent", "stand-node"] },
-      "stand-node": { id: "stand-node", x: -115, y: 0.5, z: -7, neighbors: ["track-branch"] },
-      "admin-f-ent": { id: "admin-f-ent", x: 8, y: 0.5, z: 46, neighbors: ["statue-plaza", "admin-f1", "admin-b-ent", "blvd-center"] },
-      "admin-f1": { id: "admin-f1", x: 8, y: 1.8, z: 38, neighbors: ["admin-f-ent", "admin-f2"] },
-      "admin-f2": { id: "admin-f2", x: 8, y: 5.4, z: 38, neighbors: ["admin-f1", "admin-f3"] },
-      "admin-f3": { id: "admin-f3", x: 8, y: 9.0, z: 38, neighbors: ["admin-f2"] },
-      "admin-b-ent": { id: "admin-b-ent", x: -28, y: 0.5, z: 46, neighbors: ["admin-f-ent", "admin-b1"] },
-      "admin-b1": { id: "admin-b1", x: -28, y: 1.8, z: 38, neighbors: ["admin-b-ent", "admin-b2"] },
-      "admin-b2": { id: "admin-b2", x: -28, y: 5.4, z: 38, neighbors: ["admin-b1", "admin-b3"] },
-      "admin-b3": { id: "admin-b3", x: -28, y: 9.0, z: 38, neighbors: ["admin-b2"] },
-      "blvd-center": { id: "blvd-center", x: 18, y: 0.5, z: 44, neighbors: ["statue-plaza", "admin-f-ent", "g8-f-ent", "blvd-mid"] },
-      "g8-f-ent": { id: "g8-f-ent", x: 38, y: 0.5, z: 44, neighbors: ["blvd-center", "g8f-f1"] },
-      "g8f-f1": { id: "g8f-f1", x: 48, y: 1.8, z: 44, neighbors: ["g8-f-ent", "g8f-f2"] },
-      "g8f-f2": { id: "g8f-f2", x: 48, y: 5.4, z: 44, neighbors: ["g8f-f1", "g8f-f3"] },
-      "g8f-f3": { id: "g8f-f3", x: 48, y: 9.0, z: 44, neighbors: ["g8f-f2"] },
-      "blvd-mid": { id: "blvd-mid", x: 18, y: 0.5, z: 24, neighbors: ["blvd-center", "g8-m-ent", "blvd-north"] },
-      "g8-m-ent": { id: "g8-m-ent", x: 38, y: 0.5, z: 24, neighbors: ["blvd-mid", "g8m-f1"] },
-      "g8m-f1": { id: "g8m-f1", x: 48, y: 1.8, z: 24, neighbors: ["g8-m-ent", "g8m-f2"] },
-      "g8m-f2": { id: "g8m-f2", x: 48, y: 5.4, z: 24, neighbors: ["g8m-f1", "g8m-f3"] },
-      "g8m-f3": { id: "g8m-f3", x: 48, y: 9.0, z: 24, neighbors: ["g8m-f2"] },
-      "blvd-north": { id: "blvd-north", x: 18, y: 0.5, z: 4, neighbors: ["blvd-mid", "g9-ent", "east-corridor", "bb-court-node"] },
-      "g9-ent": { id: "g9-ent", x: 38, y: 0.5, z: 4, neighbors: ["blvd-north", "g9-f1"] },
-      "g9-f1": { id: "g9-f1", x: 48, y: 1.8, z: 4, neighbors: ["g9-ent", "g9-f2"] },
-      "g9-f2": { id: "g9-f2", x: 48, y: 5.4, z: 4, neighbors: ["g9-f1", "g9-f3"] },
-      "g9-f3": { id: "g9-f3", x: 48, y: 9.0, z: 4, neighbors: ["g9-f2"] },
-      "bb-court-node": { id: "bb-court-node", x: 0, y: 0.5, z: -20, neighbors: ["blvd-north", "lan-node"] },
-      "lan-node": { id: "lan-node", x: -35, y: 0.5, z: -60, neighbors: ["bb-court-node"] },
-      "east-corridor": { id: "east-corridor", x: 76, y: 0.5, z: 12, neighbors: ["blvd-north", "tech-ent", "multi-ent", "art-ent", "new7-ent"] },
-      "tech-ent": { id: "tech-ent", x: 86, y: 0.5, z: 12, neighbors: ["east-corridor", "tech-f1"] },
-      "tech-f1": { id: "tech-f1", x: 96, y: 1.9, z: 12, neighbors: ["tech-ent", "tech-f2"] },
-      "tech-f2": { id: "tech-f2", x: 96, y: 5.7, z: 12, neighbors: ["tech-f1"] },
-      "multi-ent": { id: "multi-ent", x: 86, y: 0.5, z: 54, neighbors: ["east-corridor", "multi-f1"] },
-      "multi-f1": { id: "multi-f1", x: 96, y: 1.9, z: 54, neighbors: ["multi-ent", "multi-f2"] },
-      "multi-f2": { id: "multi-f2", x: 96, y: 5.7, z: 54, neighbors: ["multi-f1"] },
-      "art-ent": { id: "art-ent", x: 86, y: 0.5, z: -28, neighbors: ["east-corridor", "art-f1"] },
-      "art-f1": { id: "art-f1", x: 96, y: 1.8, z: -28, neighbors: ["art-ent", "art-f2"] },
-      "art-f2": { id: "art-f2", x: 96, y: 5.5, z: -28, neighbors: ["art-f1", "art-f3"] },
-      "art-f3": { id: "art-f3", x: 96, y: 9.2, z: -28, neighbors: ["art-f2", "art-f4"] },
-      "art-f4": { id: "art-f4", x: 96, y: 12.9, z: -28, neighbors: ["art-f3"] },
-      "new7-ent": { id: "new7-ent", x: 65, y: 0.5, z: -68, neighbors: ["east-corridor", "new7-f1"] },
-      "new7-f1": { id: "new7-f1", x: 75, y: 1.8, z: -68, neighbors: ["new7-ent", "new7-f2"] },
-      "new7-f2": { id: "new7-f2", x: 75, y: 5.5, z: -68, neighbors: ["new7-f1", "new7-f3"] },
-      "new7-f3": { id: "new7-f3", x: 75, y: 9.2, z: -68, neighbors: ["new7-f2"] },
+      "gate": { id: "gate", x: 0, y: 0, z: 96, neighbors: ["statue-plaza"] },
+      "statue-plaza": { id: "statue-plaza", x: 0, y: 0, z: 78, neighbors: ["gate", "gym-path-1", "admin-f-porch", "blvd-c1"] },
+      
+      "gym-path-1": { id: "gym-path-1", x: -36, y: 0, z: 74, neighbors: ["statue-plaza", "gym-porch", "track-south-gate"] },
+      "gym-porch": { id: "gym-porch", x: -43, y: 0, z: 62, neighbors: ["gym-path-1", "gym-1f-hall", "gym-stair-s-1f"] },
+      "gym-1f-hall": { id: "gym-1f-hall", x: -48, y: 0, z: 62, neighbors: ["gym-porch"] },
+      
+      "gym-stair-s-1f": { id: "gym-stair-s-1f", x: -43, y: 0, z: 48, neighbors: ["gym-porch", "gym-stair-s-mid1"] },
+      "gym-stair-s-mid1": { id: "gym-stair-s-mid1", x: -45, y: 2.25, z: 48, neighbors: ["gym-stair-s-1f", "gym-stair-s-2f"] },
+      "gym-stair-s-2f": { id: "gym-stair-s-2f", x: -48, y: 4.5, z: 48, neighbors: ["gym-stair-s-mid1", "gym-stair-s-mid2"] },
+      "gym-stair-s-mid2": { id: "gym-stair-s-mid2", x: -45, y: 6.75, z: 48, neighbors: ["gym-stair-s-2f", "gym-stair-s-3f"] },
+      "gym-stair-s-3f": { id: "gym-stair-s-3f", x: -48, y: 9.0, z: 48, neighbors: ["gym-stair-s-mid2"] },
+
+      "track-south-gate": { id: "track-south-gate", x: -68, y: 0, z: 30, neighbors: ["gym-path-1", "track-lane-s"] },
+      "track-lane-s": { id: "track-lane-s", x: -85, y: 0, z: 22, neighbors: ["track-south-gate", "stand-front"] },
+      "stand-front": { id: "stand-front", x: -115, y: 0, z: -2, neighbors: ["track-lane-s", "stand-podium"] },
+      "stand-podium": { id: "stand-podium", x: -117, y: 1.8, z: -2, neighbors: ["stand-front"] },
+
+      "admin-f-porch": { id: "admin-f-porch", x: 8, y: 0, z: 52, neighbors: ["statue-plaza", "admin-f-1f-w", "admin-f-1f-e", "admin-bridge-1f", "blvd-c1"] },
+      "admin-f-1f-w": { id: "admin-f-1f-w", x: 0, y: 0, z: 46, neighbors: ["admin-f-porch", "admin-f-stair-w-1f"] },
+      "admin-f-1f-e": { id: "admin-f-1f-e", x: 16, y: 0, z: 46, neighbors: ["admin-f-porch", "admin-f-stair-e-1f"] },
+      
+      "admin-f-stair-w-1f": { id: "admin-f-stair-w-1f", x: -4, y: 0, z: 46, neighbors: ["admin-f-1f-w", "admin-f-stair-w-mid1"] },
+      "admin-f-stair-w-mid1": { id: "admin-f-stair-w-mid1", x: -4, y: 1.8, z: 43, neighbors: ["admin-f-stair-w-1f", "admin-f-stair-w-2f"] },
+      "admin-f-stair-w-2f": { id: "admin-f-stair-w-2f", x: -4, y: 3.6, z: 46, neighbors: ["admin-f-stair-w-mid1", "admin-f-2f-w", "admin-f-stair-w-mid2"] },
+      "admin-f-2f-w": { id: "admin-f-2f-w", x: 2, y: 3.6, z: 46, neighbors: ["admin-f-stair-w-2f", "admin-f-2f-c"] },
+      "admin-f-2f-c": { id: "admin-f-2f-c", x: 8, y: 3.6, z: 46, neighbors: ["admin-f-2f-w", "admin-f-2f-e"] },
+      "admin-f-2f-e": { id: "admin-f-2f-e", x: 14, y: 3.6, z: 46, neighbors: ["admin-f-2f-c", "admin-f-stair-e-2f"] },
+      "admin-f-stair-e-2f": { id: "admin-f-stair-e-2f", x: 20, y: 3.6, z: 46, neighbors: ["admin-f-2f-e"] },
+      
+      "admin-f-stair-w-mid2": { id: "admin-f-stair-w-mid2", x: -4, y: 5.4, z: 43, neighbors: ["admin-f-stair-w-2f", "admin-f-stair-w-3f"] },
+      "admin-f-stair-w-3f": { id: "admin-f-stair-w-3f", x: -4, y: 7.2, z: 46, neighbors: ["admin-f-stair-w-mid2", "admin-f-3f-c"] },
+      "admin-f-3f-c": { id: "admin-f-3f-c", x: 8, y: 7.2, z: 46, neighbors: ["admin-f-stair-w-3f"] },
+
+      "admin-bridge-1f": { id: "admin-bridge-1f", x: -10, y: 0, z: 46, neighbors: ["admin-f-porch", "admin-b-porch"] },
+      "admin-b-porch": { id: "admin-b-porch", x: -28, y: 0, z: 46, neighbors: ["admin-bridge-1f", "admin-b-1f-w", "admin-b-1f-e", "admin-b-stair-w-1f"] },
+      "admin-b-1f-w": { id: "admin-b-1f-w", x: -34, y: 0, z: 46, neighbors: ["admin-b-porch"] },
+      "admin-b-1f-e": { id: "admin-b-1f-e", x: -22, y: 0, z: 46, neighbors: ["admin-b-porch"] },
+      
+      "admin-b-stair-w-1f": { id: "admin-b-stair-w-1f", x: -40, y: 0, z: 46, neighbors: ["admin-b-porch", "admin-b-stair-w-mid1"] },
+      "admin-b-stair-w-mid1": { id: "admin-b-stair-w-mid1", x: -40, y: 1.8, z: 43, neighbors: ["admin-b-stair-w-1f", "admin-b-stair-w-2f"] },
+      "admin-b-stair-w-2f": { id: "admin-b-stair-w-2f", x: -28, y: 3.6, z: 46, neighbors: ["admin-b-stair-w-mid1", "admin-b-stair-w-mid2"] },
+      "admin-b-stair-w-mid2": { id: "admin-b-stair-w-mid2", x: -40, y: 5.4, z: 43, neighbors: ["admin-b-stair-w-2f", "admin-b-stair-w-3f"] },
+      "admin-b-stair-w-3f": { id: "admin-b-stair-w-3f", x: -28, y: 7.2, z: 46, neighbors: ["admin-b-stair-w-mid2"] },
+
+      "blvd-c1": { id: "blvd-c1", x: 18, y: 0, z: 52, neighbors: ["statue-plaza", "admin-f-porch", "g8f-porch", "blvd-c2"] },
+      "g8f-porch": { id: "g8f-porch", x: 30, y: 0, z: 51, neighbors: ["blvd-c1", "g8f-1f-hall", "g8f-stair-w-1f"] },
+      "g8f-1f-hall": { id: "g8f-1f-hall", x: 48, y: 0, z: 51, neighbors: ["g8f-porch"] },
+      
+      "g8f-stair-w-1f": { id: "g8f-stair-w-1f", x: 28, y: 0, z: 51, neighbors: ["g8f-porch", "g8f-stair-w-mid1"] },
+      "g8f-stair-w-mid1": { id: "g8f-stair-w-mid1", x: 28, y: 1.8, z: 47, neighbors: ["g8f-stair-w-1f", "g8f-stair-w-2f"] },
+      "g8f-stair-w-2f": { id: "g8f-stair-w-2f", x: 28, y: 3.6, z: 51, neighbors: ["g8f-stair-w-mid1", "g8f-2f-807", "g8f-stair-w-mid2"] },
+      "g8f-2f-807": { "id": "g8f-2f-807", x: 36, y: 3.6, z: 51, neighbors: ["g8f-stair-w-2f", "g8f-2f-801"] },
+      "g8f-2f-801": { "id": "g8f-2f-801", x: 44, y: 3.6, z: 51, neighbors: ["g8f-2f-807", "g8f-2f-802"] },
+      "g8f-2f-802": { "id": "g8f-2f-802", x: 52, y: 3.6, z: 51, neighbors: ["g8f-2f-801", "g8f-2f-803"] },
+      "g8f-2f-803": { "id": "g8f-2f-803", x: 60, y: 3.6, z: 51, neighbors: ["g8f-2f-802", "g8f-stair-e-2f"] },
+      "g8f-stair-e-2f": { "id": "g8f-stair-e-2f", x: 68, y: 3.6, z: 51, neighbors: ["g8f-2f-803"] },
+
+      "g8f-stair-w-mid2": { "id": "g8f-stair-w-mid2", x: 28, y: 5.4, z: 47, neighbors: ["g8f-stair-w-2f", "g8f-stair-w-3f"] },
+      "g8f-stair-w-3f": { "id": "g8f-stair-w-3f", x: 28, y: 7.2, z: 51, neighbors: ["g8f-stair-w-mid2", "g8f-3f-806"] },
+      "g8f-3f-806": { "id": "g8f-3f-806", x: 38, y: 7.2, z: 51, neighbors: ["g8f-stair-w-3f", "g8f-3f-808"] },
+      "g8f-3f-808": { "id": "g8f-3f-808", x: 48, y: 7.2, z: 51, neighbors: ["g8f-3f-806", "g8f-3f-bg"] },
+      "g8f-3f-bg": { "id": "g8f-3f-bg", x: 58, y: 7.2, z: 51, neighbors: ["g8f-3f-808"] },
+
+      "blvd-c2": { "id": "blvd-c2", x: 18, y: 0, z: 30, neighbors: ["blvd-c1", "g8m-porch", "blvd-c3"] },
+      "g8m-porch": { "id": "g8m-porch", x: 30, y: 0, z: 31, neighbors: ["blvd-c2", "g8m-1f-wood", "g8m-stair-w-1f"] },
+      "g8m-1f-wood": { "id": "g8m-1f-wood", x: 38, y: 0, z: 31, neighbors: ["g8m-porch", "g8m-1f-804"] },
+      "g8m-1f-804": { "id": "g8m-1f-804", x: 48, y: 0, z: 31, neighbors: ["g8m-1f-wood", "g8m-1f-809"] },
+      "g8m-1f-809": { "id": "g8m-1f-809", x: 58, y: 0, z: 31, neighbors: ["g8m-1f-804"] },
+
+      "g8m-stair-w-1f": { "id": "g8m-stair-w-1f", x: 28, y: 0, z: 31, neighbors: ["g8m-porch", "g8m-stair-w-mid1"] },
+      "g8m-stair-w-mid1": { "id": "g8m-stair-w-mid1", x: 28, y: 1.8, z: 27, neighbors: ["g8m-stair-w-1f", "g8m-stair-w-2f"] },
+      "g8m-stair-w-2f": { "id": "g8m-stair-w-2f", x: 48, y: 3.6, z: 31, neighbors: ["g8m-stair-w-mid1", "g8m-stair-w-mid2"] },
+      "g8m-stair-w-mid2": { "id": "g8m-stair-w-mid2", x: 28, y: 5.4, z: 27, neighbors: ["g8m-stair-w-2f", "g8m-stair-w-3f"] },
+      "g8m-stair-w-3f": { "id": "g8m-stair-w-3f", x: 48, y: 7.2, z: 31, neighbors: ["g8m-stair-w-mid2"] },
+
+      "blvd-c3": { "id": "blvd-c3", x: 18, y: 0, z: 10, neighbors: ["blvd-c2", "g9-porch", "bb-gate", "east-corridor-hub"] },
+      "g9-porch": { "id": "g9-porch", x: 30, y: 0, z: 11, neighbors: ["blvd-c3", "g9-1f-908", "g9-stair-w-1f"] },
+      "g9-1f-908": { "id": "g9-1f-908", x: 38, y: 0, z: 11, neighbors: ["g9-porch", "g9-1f-905"] },
+      "g9-1f-905": { "id": "g9-1f-905", x: 48, y: 0, z: 11, neighbors: ["g9-1f-908", "g9-1f-903"] },
+      "g9-1f-903": { "id": "g9-1f-903", x: 58, y: 0, z: 11, neighbors: ["g9-1f-905"] },
+
+      "g9-stair-w-1f": { "id": "g9-stair-w-1f", x: 28, y: 0, z: 11, neighbors: ["g9-porch", "g9-stair-w-mid1"] },
+      "g9-stair-w-mid1": { "id": "g9-stair-w-mid1", x: 28, y: 1.8, z: 7, neighbors: ["g9-stair-w-1f", "g9-stair-w-2f"] },
+      "g9-stair-w-2f": { "id": "g9-stair-w-2f", x: 38, y: 3.6, z: 11, neighbors: ["g9-stair-w-mid1", "g9-2f-904", "g9-stair-w-mid2"] },
+      "g9-2f-904": { "id": "g9-2f-904", x: 48, y: 3.6, z: 11, neighbors: ["g9-2f-907", "g9-2f-902"] },
+      "g9-2f-902": { "id": "g9-2f-902", x: 58, y: 3.6, z: 11, neighbors: ["g9-2f-904"] },
+
+      "g9-stair-w-mid2": { "id": "g9-stair-w-mid2", x: 28, y: 5.4, z: 7, neighbors: ["g9-stair-w-2f", "g9-stair-w-3f"] },
+      "g9-stair-w-3f": { "id": "g9-stair-w-3f", x: 40, y: 7.2, z: 11, neighbors: ["g9-stair-w-mid2", "g9-3f-901"] },
+      "g9-3f-901": { "id": "g9-3f-901", x: 56, y: 7.2, z: 11, neighbors: ["g9-3f-906"] },
+
+      "bb-gate": { "id": "bb-gate", x: 0, y: 0, z: -14, neighbors: ["blvd-c3", "lan-pond-gate"] },
+      "lan-pond-gate": { "id": "lan-pond-gate", x: -35, y: 0, z: -58, neighbors: ["bb-gate"] },
+
+      "east-corridor-hub": { "id": "east-corridor-hub", x: 76, y: 0, z: 12, neighbors: ["blvd-c3", "tech-porch", "multi-porch", "art-porch", "new7-porch"] },
+      
+      "tech-porch": { "id": "tech-porch", x: 86, y: 0, z: 12, neighbors: ["east-corridor-hub", "tech-1f-lt1", "tech-1f-av", "tech-1f-pc", "tech-stair-1f"] },
+      "tech-1f-lt1": { "id": "tech-1f-lt1", x: 88, y: 0, z: 12, neighbors: ["tech-porch"] },
+      "tech-1f-av": { "id": "tech-1f-av", x: 88, y: 0, z: 2, neighbors: ["tech-porch"] },
+      "tech-1f-pc": { "id": "tech-1f-pc", x: 88, y: 0, z: 22, neighbors: ["tech-porch"] },
+      "tech-stair-1f": { "id": "tech-stair-1f", x: 86, y: 0, z: 18, neighbors: ["tech-porch", "tech-stair-mid"] },
+      "tech-stair-mid": { "id": "tech-stair-mid", x: 86, y: 1.9, z: 15, neighbors: ["tech-stair-1f", "tech-2f-hall"] },
+      "tech-2f-hall": { "id": "tech-2f-hall", x: 88, y: 3.8, z: 12, neighbors: ["tech-stair-mid"] },
+
+      "multi-porch": { "id": "multi-porch", x: 86, y: 0, z: 54, neighbors: ["east-corridor-hub", "multi-1f-lib", "multi-1f-food", "multi-1f-hist", "multi-stair-1f"] },
+      "multi-1f-lib": { "id": "multi-1f-lib", x: 88, y: 0, z: 62, neighbors: ["multi-porch"] },
+      "multi-1f-food": { "id": "multi-1f-food", x: 88, y: 0, z: 42, neighbors: ["multi-porch"] },
+      "multi-1f-hist": { "id": "multi-1f-hist", x: 88, y: 0, z: 50, neighbors: ["multi-porch"] },
+      "multi-stair-1f": { "id": "multi-stair-1f", x: 86, y: 0, z: 58, neighbors: ["multi-porch", "multi-stair-mid"] },
+      "multi-stair-mid": { "id": "multi-stair-mid", x: 86, y: 1.9, z: 56, neighbors: ["multi-stair-1f", "multi-2f-hall"] },
+      "multi-2f-hall": { "id": "multi-2f-hall", x: 88, y: 3.8, z: 58, neighbors: ["multi-stair-mid"] },
+
+      "art-porch": { "id": "art-porch", x: 86, y: 0, z: -28, neighbors: ["east-corridor-hub", "art-1f-bw", "art-stair-1f"] },
+      "art-1f-bw": { "id": "art-1f-bw", x: 88, y: 0, z: -20, neighbors: ["art-porch"] },
+      "art-stair-1f": { "id": "art-stair-1f", x: 86, y: 0, z: -28, neighbors: ["art-porch", "art-stair-mid1"] },
+      "art-stair-mid1": { "id": "art-stair-mid1", x: 86, y: 1.85, z: -32, neighbors: ["art-stair-1f", "art-2f-m1"] },
+      "art-2f-m1": { "id": "art-2f-m1", x: 88, y: 3.7, z: -28, neighbors: ["art-stair-mid1", "art-stair-mid2"] },
+      "art-stair-mid2": { "id": "art-stair-mid2", x: 86, y: 5.55, z: -32, neighbors: ["art-2f-m1", "art-3f-m2"] },
+      "art-3f-m2": { "id": "art-3f-m2", x: 88, y: 7.4, z: -28, neighbors: ["art-stair-mid2", "art-stair-mid3"] },
+      "art-stair-mid3": { "id": "art-stair-mid3", x: 86, y: 9.25, z: -32, neighbors: ["art-3f-m2", "art-4f-art"] },
+      "art-4f-art": { "id": "art-4f-art", x: 88, y: 11.1, z: -36, neighbors: ["art-stair-mid3"] },
+
+      "new7-porch": { "id": "new7-porch", x: 65, y: 0, z: -58, neighbors: ["east-corridor-hub", "new7-1f-701", "new7-1f-709", "new7-1f-704", "new7-1f-708", "new7-stair-w-1f"] },
+      "new7-1f-701": { "id": "new7-1f-701", x: 61, y: 0, z: -58, neighbors: ["new7-porch"] },
+      "new7-1f-709": { "id": "new7-1f-709", x: 69, y: 0, z: -58, neighbors: ["new7-porch"] },
+      "new7-1f-704": { "id": "new7-1f-704", x: 81, y: 0, z: -58, neighbors: ["new7-porch"] },
+      "new7-1f-708": { "id": "new7-1f-708", x: 89, y: 0, z: -58, neighbors: ["new7-porch"] },
+
+      "new7-stair-w-1f": { "id": "new7-stair-w-1f", x: 54, y: 0, z: -58, neighbors: ["new7-porch", "new7-stair-w-mid1"] },
+      "new7-stair-w-mid1": { "id": "new7-stair-w-mid1", x: 54, y: 1.85, z: -62, neighbors: ["new7-stair-w-1f", "new7-stair-w-2f"] },
+      "new7-stair-w-2f": { "id": "new7-stair-w-2f", x: 65, y: 3.7, z: -58, neighbors: ["new7-stair-w-mid1", "new7-2f-703", "new7-stair-w-mid2"] },
+      "new7-2f-703": { "id": "new7-2f-703", x: 85, y: 3.7, z: -58, neighbors: ["new7-2f-702"] },
+
+      "new7-stair-w-mid2": { "id": "new7-stair-w-mid2", x: 54, y: 5.55, z: -62, neighbors: ["new7-stair-w-2f", "new7-stair-w-3f"] },
+      "new7-stair-w-3f": { "id": "new7-stair-w-3f", x: 65, y: 7.4, z: -58, neighbors: ["new7-stair-w-mid2", "new7-3f-707"] },
+      "new7-3f-707": { "id": "new7-3f-707", x: 75, y: 7.4, z: -58, neighbors: ["new7-3f-706", "new7-3f-math"] },
+      "new7-3f-math": { "id": "new7-3f-math", x: 87, y: 7.4, z: -58, neighbors: ["new7-3f-707"] }
     };
 
-    // Ensure bidirectional adjacency
+    // Ensure bidirectional connectivity
     Object.keys(NAV_NODES).forEach(nid => {
       const node = NAV_NODES[nid];
       node.neighbors.forEach(neighId => {
@@ -1757,24 +1888,10 @@
       });
     });
 
-    function getNearestCorridorNode(room) {
-      if (room.buildingId === "admin-front") return `admin-f${room.floor}`;
-      if (room.buildingId === "admin-back") return `admin-b${room.floor}`;
-      if (room.buildingId === "grade8-front") return `g8f-f${room.floor}`;
-      if (room.buildingId === "grade8-mid") return `g8m-f${room.floor}`;
-      if (room.buildingId === "grade9-back") return `g9-f${room.floor}`;
-      if (room.buildingId === "tech-building") return `tech-f${room.floor}`;
-      if (room.buildingId === "multi-building") return `multi-f${room.floor}`;
-      if (room.buildingId === "art-building") return `art-f${room.floor}`;
-      if (room.buildingId === "new-grade7") return `new7-f${room.floor}`;
-      if (room.buildingId === "gym-bld") return `gym-ent`;
-      if (room.buildingId === "track") return `stand-node`;
-      if (room.buildingId === "court") return `bb-court-node`;
-      if (room.buildingId === "garden") return `lan-node`;
-      return "statue-plaza";
-    }
-
     function findShortestPath(startNodeId, targetNodeId) {
+      if (!NAV_NODES[startNodeId] || !NAV_NODES[targetNodeId]) return null;
+      if (startNodeId === targetNodeId) return [startNodeId];
+
       const openSet = new Set([startNodeId]);
       const cameFrom = {};
       const gScore = {};
@@ -1832,8 +1949,22 @@
       return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
+    function findClosestNavNode(pos) {
+      let closestId = "gate";
+      let minDist = Infinity;
+      Object.keys(NAV_NODES).forEach(nid => {
+        const n = NAV_NODES[nid];
+        const d = Math.hypot(n.x - pos.x, (n.y || 0) - pos.y, n.z - pos.z);
+        if (d < minDist) {
+          minDist = d;
+          closestId = nid;
+        }
+      });
+      return closestId;
+    }
+
     /* ==========================================================================
-       6. 3D ROUTE & AUTO-WALK
+       6. 3D ROUTE & MULTI-FLOOR AUTO-WALK
        ========================================================================== */
     let navPathMesh = null;
     let navTargetPoint = null;
@@ -2005,20 +2136,21 @@
         return;
       }
 
-      const targetCorridorNode = getNearestCorridorNode(room);
-      const startNode = (avatarGroup && avatarGroup.position.z > 80) ? "gate" : "statue-plaza";
-      const nodePath = findShortestPath(startNode, targetCorridorNode);
+      const targetNodeId = room.node;
+      const startNodeId = avatarGroup ? findClosestNavNode(avatarGroup.position) : "gate";
+      const nodePath = findShortestPath(startNodeId, targetNodeId);
 
       const pathPoints = [];
-      if (nodePath) {
+      if (nodePath && nodePath.length > 0) {
         nodePath.forEach(nid => {
           const n = NAV_NODES[nid];
-          pathPoints.push(new THREE.Vector3(n.x, (n.y || 0.5) + 0.6, n.z));
+          pathPoints.push(new THREE.Vector3(n.x, (n.y || 0) + 0.6, n.z));
         });
       } else {
-        pathPoints.push(new THREE.Vector3(0, 1.2, 98));
+        const destNode = NAV_NODES[targetNodeId] || { x: 0, y: 0, z: 0 };
+        pathPoints.push(new THREE.Vector3(0, 0.6, 96));
+        pathPoints.push(new THREE.Vector3(destNode.x, (destNode.y || 0) + 0.6, destNode.z));
       }
-      pathPoints.push(new THREE.Vector3(room.x, room.y + 1, room.z));
 
       renderNavigationPath(pathPoints);
 
@@ -2029,23 +2161,20 @@
       const meters = Math.round(totalDist);
 
       document.getElementById("hud-target-name").textContent = `[${room.buildingName} ${room.floor}F] ${room.name}`;
-      document.getElementById("hud-route-desc").textContent = `由出發點 → 經由 ${room.buildingName} 通廊至 ${room.floor} 樓`;
+      document.getElementById("hud-route-desc").textContent = `由當前位置 → 經由 ${room.buildingName} 走廊/樓梯至 ${room.floor} 樓`;
       document.getElementById("hud-dist-val").textContent = meters;
       document.getElementById("nav-hud").classList.add("visible");
       btnAutoWalk.textContent = "🚶‍♂️ 自動帶路";
       btnAutoWalk.classList.remove("walking");
 
-      if (avatarGroup) {
-        avatarGroup.position.set(pathPoints[0].x, 0, pathPoints[0].z);
-      }
-
-      setControlMode("avatar");
-
+      // Smoothly adjust floor slice filter if target is on upper floor
       if (room.floor > 1) {
         setFloorFilter(room.floor);
       } else {
         setFloorFilter("all");
       }
+
+      setControlMode("avatar");
     }
 
     function animateCameraTo(targetCamPos, targetLookAt) {
@@ -2090,7 +2219,6 @@
         }
       });
 
-      // Filter 3D Room Badges by Floor
       roomBadgeElements.forEach(rb => {
         if (floorVal === "all") {
           rb.element.style.display = "flex";
@@ -2156,7 +2284,6 @@
       setControlMode("bird");
     };
 
-    // 2D Campus Map Modal (M 鍵)
     const mapModal = document.getElementById("campus-map-modal");
     document.getElementById("btn-map-overlay").onclick = () => mapModal.classList.add("open");
     document.getElementById("btn-close-map-modal").onclick = () => mapModal.classList.remove("open");
@@ -2204,7 +2331,7 @@
         miniCtx.fillRect(bx, bz, bw, bh);
       });
 
-      // Avatar Dot & Orientation Cone
+      // Avatar Dot & Direction Cone
       if (avatarGroup) {
         const ax = toMiniX(avatarGroup.position.x);
         const az = toMiniZ(avatarGroup.position.z);
@@ -2222,7 +2349,6 @@
       }
     }
 
-    // Help Modal
     const helpModal = document.getElementById("help-modal");
     const modalBackdrop = document.getElementById("modal-backdrop");
     document.getElementById("btn-help").onclick = () => {
@@ -2260,20 +2386,21 @@
       let isMoving = false;
       const currentSpeed = (moveInput.sprint ? avatarRunSpeed : avatarSpeed) * delta;
 
-      // 1. AUTO-WALK
+      // 1. AUTO-WALK (自動走動與平滑爬樓梯)
       if (isAutoWalking && currentNavPoints.length > 1) {
         isMoving = true;
         const currentTargetPt = currentNavPoints[autoWalkIndex + 1];
         if (currentTargetPt) {
           const curPos = avatarGroup.position;
-          const targetPos = new THREE.Vector3(currentTargetPt.x, Math.max(0, currentTargetPt.y - 0.5), currentTargetPt.z);
+          // Target position with exact multi-floor height!
+          const targetPos = new THREE.Vector3(currentTargetPt.x, currentTargetPt.y - 0.6, currentTargetPt.z);
           const distToTarget = curPos.distanceTo(targetPos);
 
-          if (distToTarget < 1.2) {
+          if (distToTarget < 1.0) {
             autoWalkIndex++;
             if (autoWalkIndex >= currentNavPoints.length - 1) {
               stopAutoWalk();
-              showToast("🎉 已抵達目的地教室！");
+              showToast("🎉 已順利抵達目的地教室！");
             }
           } else {
             const dir = targetPos.clone().sub(curPos).normalize();
@@ -2311,13 +2438,11 @@
           avatarRightLeg.rotation.x = -Math.sin(walkAnimCycle) * 0.65;
           avatarLeftArm.rotation.x = -Math.sin(walkAnimCycle) * 0.55;
           avatarRightArm.rotation.x = Math.sin(walkAnimCycle) * 0.55;
-          avatarGroup.position.y = Math.abs(Math.sin(walkAnimCycle * 2)) * 0.15;
         } else {
           avatarLeftLeg.rotation.x = 0;
           avatarRightLeg.rotation.x = 0;
           avatarLeftArm.rotation.x = 0;
           avatarRightArm.rotation.x = 0;
-          avatarGroup.position.y = 0;
         }
 
         // Camera Follow in Avatar Mode
@@ -2361,10 +2486,12 @@
         }
       });
 
-      // 3D Floating Room Badges (Visible when zoomed in or in avatar mode)
+      // 3D Floating Room Badges Position Updating
       const camDist = camera.position.distanceTo(controls.target);
       roomBadgeElements.forEach(item => {
-        const wp = item.worldPos.clone();
+        const node = NAV_NODES[item.nodeId];
+        if (!node) return;
+        const wp = new THREE.Vector3(node.x, (node.y || 0) + 2.2, node.z);
         wp.project(camera);
         if (wp.z > 1 || camDist > 140) {
           item.element.style.display = "none";
