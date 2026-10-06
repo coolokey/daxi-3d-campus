@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>桃園市立大溪國中 3D 智慧校園導覽與路徑導航系統</title>
+  <meta name="description" content="桃園市立大溪國中 115 學年度 3D 數位校園地圖：支援走廊漫遊、跨樓層 A* 最短路徑導航、全校鳥瞰與教室線上編輯。">
+  
+  <!-- Favicon SVG inline -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏫</text></svg>">
+  
+  <!-- Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Three.js & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101923;
+      --panel: rgba(16, 25, 35, 0.88);
+      --panel-border: rgba(255, 255, 255, 0.14);
+      --text: #f6f2e8;
+      --muted: #9db0c2;
+      --accent: #ffd23f;
+      --brand: #e63946;
+      --ok: #2a9d8f;
+      --font: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --num: "Barlow Condensed", monospace;
+      --radius: 12px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #7bb4d6;
+      color: var(--text);
+      font-family: var(--font);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #webgl-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      outline: none;
+      touch-action: none;
+    }
+
+    /* Common Panels */
+    .glass {
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Top Navigation Bar */
+    #top-nav {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 8px;
+      z-index: 20;
+      pointer-events: none;
+    }
+    #top-nav > * { pointer-events: auto; }
+
+    .brand-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      transition: filter 0.2s;
+    }
+    .brand-btn:hover { filter: brightness(1.2); }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e63946;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 0 0 2px #fff;
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    /* Search Bar */
+    .search-box {
+      position: relative;
+      flex: 1 1 240px;
+      max-width: 380px;
+      min-width: 180px;
+    }
+    .search-box input {
+      width: 100%;
+      height: 42px;
+      padding: 0 14px 0 38px;
+      border-radius: var(--radius);
+      border: 1px solid var(--panel-border);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      backdrop-filter: blur(10px);
+    }
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 210, 63, 0.25);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      opacity: 0.7;
+      pointer-events: none;
+      font-size: 16px;
+    }
+    #search-results {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 48px;
+      max-height: 280px;
+      overflow-y: auto;
+      list-style: none;
+      margin: 0;
+      padding: 6px;
+      display: none;
+      z-index: 30;
+    }
+    #search-results li {
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    #search-results li:hover { background: rgba(255, 255, 255, 0.15); }
+    #search-results .rm-bld { color: var(--muted); font-size: 11px; }
+
+    /* Actions buttons */
+    .btn-group {
+      display: flex;
+      gap: 6px;
+    }
+    .action-btn {
+      height: 42px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+      border: 1px solid var(--panel-border);
+      background: var(--panel);
+      border-radius: var(--radius);
+      transition: all 0.2s;
+    }
+    .action-btn:hover { background: rgba(255, 255, 255, 0.18); }
+    .action-btn.active {
+      background: var(--accent);
+      color: #101923;
+      border-color: var(--accent);
+    }
+
+    /* Venue Quick Tags */
+    #quick-venues {
+      position: absolute;
+      top: 66px;
+      left: 16px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      z-index: 15;
+      max-width: calc(100% - 32px);
+    }
+    .venue-chip {
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 20px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(16, 25, 35, 0.75);
+      backdrop-filter: blur(8px);
+      transition: all 0.2s;
+    }
+    .venue-chip:hover {
+      background: var(--accent);
+      color: #101923;
+      border-color: var(--accent);
+    }
+
+    /* Floor Selector (Right) */
+    #floor-bar {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 6px;
+      z-index: 20;
+    }
+    .floor-btn {
+      width: 44px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--num);
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .floor-btn:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+    .floor-btn.active {
+      background: var(--text);
+      color: #101923;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    /* Navigation HUD (Bottom Center) */
+    #nav-hud {
+      position: absolute;
+      bottom: calc(20px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(520px, calc(100% - 32px));
+      padding: 14px 18px;
+      display: none;
+      align-items: center;
+      gap: 16px;
+      z-index: 25;
+    }
+    #nav-hud.visible { display: flex; }
+    .nav-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #101923;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .nav-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .nav-title {
+      font-size: 16px;
+      font-weight: 900;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #fff;
+    }
+    .nav-route {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .nav-stat {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .nav-dist {
+      font-family: var(--num);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .nav-dist small { font-size: 13px; margin-left: 2px; }
+    .nav-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--panel-border);
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .nav-close:hover { background: rgba(255,255,255,0.2); }
+
+    /* Minimap (Bottom Left) */
+    #minimap-card {
+      position: absolute;
+      left: 16px;
+      bottom: calc(20px + var(--safe-bottom));
+      width: 140px;
+      height: 140px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      background: #182533;
+      z-index: 15;
+    }
+    #minimap-canvas { width: 100%; height: 100%; display: block; }
+    .minimap-badge {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      background: rgba(0,0,0,0.6);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: var(--num);
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    /* Floating 3D Labels */
+    #labels-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 10;
+    }
+    .building-label {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      padding: 4px 10px 5px;
+      background: rgba(16, 25, 35, 0.85);
+      border-radius: 6px;
+      border-left: 4px solid var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      pointer-events: auto;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.15s, background 0.15s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .building-label:hover {
+      background: var(--accent);
+      color: #101923;
+      transform: translate(-50%, -55%) scale(1.08);
+    }
+
+    /* Virtual Joystick for Mobile */
+    #joystick-zone {
+      position: absolute;
+      left: 20px;
+      bottom: calc(180px + var(--safe-bottom));
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255,255,255,0.3);
+      background: rgba(16, 25, 35, 0.35);
+      display: none;
+      z-index: 25;
+      touch-action: none;
+    }
+    #joystick-stick {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 210, 63, 0.8);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+
+    /* Editor Drawer */
+    #editor-drawer {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: min(420px, 100%);
+      background: #0f1822f5;
+      border-left: 1px solid var(--panel-border);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #editor-drawer.open { transform: translateX(0); }
+    .drawer-header {
+      padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .drawer-title { font-size: 16px; font-weight: 900; }
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    .drawer-footer {
+      padding: 12px 16px calc(14px + var(--safe-bottom));
+      border-top: 1px solid var(--panel-border);
+      display: flex;
+      gap: 10px;
+    }
+    .edit-item {
+      margin-bottom: 12px;
+    }
+    .edit-item label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .edit-item input {
+      width: 100%;
+      height: 36px;
+      padding: 0 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    /* Help Modal */
+    #help-modal {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(460px, calc(100% - 32px));
+      padding: 22px;
+      display: none;
+      z-index: 60;
+    }
+    #help-modal.open { display: block; }
+    #modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: none;
+      z-index: 55;
+    }
+    #modal-backdrop.open { display: block; }
+
+    @media (max-width: 768px) {
+      .brand-title { font-size: 13px; }
+      .search-box { flex: 1 1 100%; order: 3; }
+      #quick-venues { top: 110px; }
+      #minimap-card { width: 100px; height: 100px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3D Canvas -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- 3D Labels Over Canvas -->
+  <div id="labels-container"></div>
+
+  <!-- Top Navigation -->
+  <header id="top-nav">
+    <div class="brand-btn glass" id="btn-home" title="回到校園全景">
+      <div class="brand-logo">🏫</div>
+      <div>
+        <div class="brand-title">大溪國中 3D 校園</div>
+        <div class="brand-subtitle">115 學年度數位導覽系統</div>
+      </div>
+    </div>
+
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="搜尋班級、處室、場館 (例: 701, 教務處, 科技館)..." autocomplete="off">
+      <ul id="search-results" class="glass"></ul>
+    </div>
+
+    <div class="btn-group">
+      <button class="action-btn" id="btn-walk" title="第一人稱漫遊">🚶 <span class="hide-mobile">漫遊</span></button>
+      <button class="action-btn" id="btn-editor" title="學年教室管理">⚙️ <span class="hide-mobile">管理</span></button>
+      <button class="action-btn" id="btn-help" title="操作指引">❓</button>
+    </div>
+  </header>
+
+  <!-- Quick Venues Chips -->
+  <div id="quick-venues">
+    <span class="venue-chip" data-to="academic">教務處</span>
+    <span class="venue-chip" data-to="principal">校長室</span>
+    <span class="venue-chip" data-to="health">健康中心</span>
+    <span class="venue-chip" data-to="tech-lab">科技創客館</span>
+    <span class="venue-chip" data-to="math-lab">數學研究室</span>
+    <span class="venue-chip" data-to="library">樂活圖書館</span>
+    <span class="venue-chip" data-to="gym">學生活動中心</span>
+    <span class="venue-chip" data-to="701">701 教室</span>
+    <span class="venue-chip" data-to="801">801 教室</span>
+    <span class="venue-chip" data-to="901">901 教室</span>
+  </div>
+
+  <!-- Floor Selector -->
+  <div id="floor-bar" class="glass">
+    <button class="floor-btn active" data-f="all">全</button>
+    <button class="floor-btn" data-f="4">4F</button>
+    <button class="floor-btn" data-f="3">3F</button>
+    <button class="floor-btn" data-f="2">2F</button>
+    <button class="floor-btn" data-f="1">1F</button>
+  </div>
+
+  <!-- Minimap Card -->
+  <div id="minimap-card">
+    <canvas id="minimap-canvas"></canvas>
+    <div class="minimap-badge" id="minimap-lbl">大溪國中</div>
+  </div>
+
+  <!-- Virtual Joystick (Mobile) -->
+  <div id="joystick-zone">
+    <div id="joystick-stick"></div>
+  </div>
+
+  <!-- Navigation HUD -->
+  <div id="nav-hud" class="glass">
+    <div class="nav-icon">🚩</div>
+    <div class="nav-info">
+      <div class="nav-title" id="hud-target-name">目的地名稱</div>
+      <div class="nav-route" id="hud-route-desc">由校門沿迎賓林蔭步道直行前往</div>
+    </div>
+    <div class="nav-stat">
+      <div class="nav-dist"><span id="hud-dist-val">85</span><small>m</small></div>
+      <div style="font-size: 11px; color: var(--muted);">預估 1 分鐘</div>
+    </div>
+    <button class="nav-close" id="btn-cancel-nav" title="結束導航">✕</button>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div id="modal-backdrop"></div>
+
+  <!-- Help Modal -->
+  <div id="help-modal" class="glass">
+    <h3 style="margin: 0 0 12px; font-size: 18px;">💡 操作與深度導航指南</h3>
+    <p style="font-size: 13px; color: #d3dce6; line-height: 1.6;">
+      歡迎使用<b>桃園市立大溪國中 3D 智慧校園導覽系統</b>！本系統依據 115 學年度校園平面圖製作，提供全校立體導覽與室內最短路徑尋路。
+    </p>
+    <div style="background: rgba(255,255,255,0.06); padding: 12px; border-radius: 8px; font-size: 13px; margin: 12px 0;">
+      <div><b>🖱️ 電腦操作</b>：滑鼠左鍵旋轉、滾輪縮放、右鍵平移。點選「漫遊」可用 W/A/S/D 行走。</div>
+      <div style="margin-top: 6px;"><b>📱 手機操作</b>：單指旋轉、雙指縮放。漫遊模式具備虛擬搖桿。</div>
+      <div style="margin-top: 6px;"><b>🔗 QR Code 深度導航</b>：網址加上 <code>?to=班級代號</code>（例如 <code>?to=701</code> 或 <code>?to=academic</code>）即可直接自動啟動導航。</div>
+    </div>
+    <div style="text-align: right;">
+      <button class="action-btn" id="btn-close-help" style="background: var(--accent); color: #101923;">知道了</button>
+    </div>
+  </div>
+
+  <!-- Editor Drawer -->
+  <aside id="editor-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">⚙️ 115 學年教室管理</div>
+      <button class="nav-close" id="btn-close-editor">✕</button>
+    </div>
+    <div class="drawer-body" id="editor-list">
+      <!-- Generated via JS -->
+    </div>
+    <div class="drawer-footer">
+      <button class="action-btn" id="btn-save-rooms" style="background: var(--ok); flex: 1;">💾 儲存更新</button>
+      <button class="action-btn" id="btn-export-rooms" style="flex: 1;">📤 匯出 JSON</button>
+    </div>
+  </aside>
+
+  <!-- Main Application Script -->
+  <script>
+    /* ==========================================================================
+       1. DATA DEFINITIONS (大溪國中 115 學年度建築與教室資料庫)
+       ========================================================================== */
+    const FH = 3.8; // Floor Height: 3.8 meters
+
+    const BUILDINGS_CONFIG = [
+      {
+        id: "admin",
+        name: "行政大樓",
+        color: 0xc85a53, // 典雅紅磚色
+        roofColor: 0x9e3d37,
+        x: 5, z: 28, width: 44, depth: 16, floors: 3,
+        entrance: { x: 5, z: 37, y: 0.5 },
+        rooms: [
+          { id: "health", name: "健康中心", floor: 1, rel: [-14, 1] },
+          { id: "general", name: "總務處", floor: 1, rel: [0, 1] },
+          { id: "counsel-1", name: "八九年級導師室", floor: 1, rel: [14, 1] },
+          { id: "principal", name: "校長室", floor: 2, rel: [-14, 2] },
+          { id: "academic", name: "教務處", floor: 2, rel: [0, 2] },
+          { id: "student", name: "學務處", floor: 2, rel: [8, 2] },
+          { id: "counsel", name: "輔導室", floor: 2, rel: [15, 2] },
+          { id: "conference", name: "第一會議室", floor: 3, rel: [0, 3] },
+        ]
+      },
+      {
+        id: "new-bld",
+        name: "七年級新大樓",
+        color: 0x3d7ea6, // 現代科技藍
+        roofColor: 0x2b5b7a,
+        x: 0, z: -12, width: 62, depth: 16, floors: 4,
+        entrance: { x: 0, z: -3, y: 0.5 },
+        rooms: [
+          { id: "701", name: "701 教室", floor: 1, rel: [-22, 1] },
+          { id: "709", name: "709 體育班", floor: 1, rel: [-8, 1] },
+          { id: "g7-office", name: "七年級導師室", floor: 1, rel: [8, 1] },
+          { id: "kindergarten", name: "非營利幼兒園", floor: 1, rel: [22, 1] },
+          { id: "702", name: "702 教室", floor: 2, rel: [-22, 2] },
+          { id: "703", name: "703 教室", floor: 2, rel: [-8, 2] },
+          { id: "704", name: "704 教室", floor: 2, rel: [8, 2] },
+          { id: "705", name: "705 教室", floor: 2, rel: [22, 2] },
+          { id: "706", name: "706 質數研究室", floor: 3, rel: [-22, 3] },
+          { id: "707", name: "707 教室", floor: 3, rel: [-8, 3] },
+          { id: "708", name: "708 教室", floor: 3, rel: [8, 3] },
+          { id: "math-lab", name: "數學研究室 (蔡之民老師)", floor: 3, rel: [22, 3] },
+          { id: "tech-life", name: "生活科技教室", floor: 4, rel: [-14, 4] },
+          { id: "audiovisual", name: "大視聽教室", floor: 4, rel: [14, 4] },
+        ]
+      },
+      {
+        id: "grade8-bld",
+        name: "八年級教學棟",
+        color: 0xd9822b, // 活力橙
+        roofColor: 0xa86018,
+        x: 52, z: 30, width: 38, depth: 16, floors: 3,
+        entrance: { x: 40, z: 30, y: 0.5 },
+        rooms: [
+          { id: "804", name: "804 教室", floor: 1, rel: [-12, 1] },
+          { id: "809", name: "809 體育班", floor: 1, rel: [0, 1] },
+          { id: "woodwork", name: "木藝教室", floor: 1, rel: [12, 1] },
+          { id: "801", name: "801 教室", floor: 2, rel: [-12, 2] },
+          { id: "802", name: "802 教室", floor: 2, rel: [0, 2] },
+          { id: "803", name: "803 教室", floor: 2, rel: [12, 2] },
+          { id: "805", name: "805 教室", floor: 3, rel: [-12, 3] },
+          { id: "806", name: "806 教室", floor: 3, rel: [0, 3] },
+          { id: "807", name: "807 教室", floor: 3, rel: [12, 3] },
+        ]
+      },
+      {
+        id: "grade9-bld",
+        name: "九年級教學棟",
+        color: 0x5a9e6f, // 穩重碧綠
+        roofColor: 0x3d704c,
+        x: 52, z: -12, width: 38, depth: 16, floors: 3,
+        entrance: { x: 40, z: -12, y: 0.5 },
+        rooms: [
+          { id: "906", name: "906 教室", floor: 1, rel: [-12, 1] },
+          { id: "907", name: "907 教室", floor: 1, rel: [0, 1] },
+          { id: "908", name: "908 教室", floor: 1, rel: [12, 1] },
+          { id: "904", name: "904 教室", floor: 2, rel: [-12, 2] },
+          { id: "905", name: "905 教室", floor: 2, rel: [0, 2] },
+          { id: "club-room", name: "社團教室", floor: 2, rel: [12, 2] },
+          { id: "901", name: "901 教室", floor: 3, rel: [-12, 3] },
+          { id: "902", name: "902 教室", floor: 3, rel: [0, 3] },
+          { id: "903", name: "903 教室", floor: 3, rel: [12, 3] },
+        ]
+      },
+      {
+        id: "tech-bld",
+        name: "科技館 / 創客中心",
+        color: 0x2a9d8f, // 科技青色
+        roofColor: 0x1b675e,
+        x: 98, z: 28, width: 34, depth: 16, floors: 2,
+        entrance: { x: 86, z: 28, y: 0.5 },
+        rooms: [
+          { id: "energy-lab", name: "未來能源實驗室", floor: 1, rel: [-8, 1] },
+          { id: "maker-lab", name: "創客自造空間", floor: 1, rel: [8, 1] },
+          { id: "tech-lab", name: "理化第一實驗室 (張致信老師)", floor: 2, rel: [-8, 2] },
+          { id: "digital-lab", name: "數位工程工作台 (陳毅宏老師)", floor: 2, rel: [8, 2] },
+        ]
+      },
+      {
+        id: "art-bld",
+        name: "藝術館",
+        color: 0xb56576, // 藝術洋紅
+        roofColor: 0x82414f,
+        x: 98, z: -12, width: 34, depth: 16, floors: 2,
+        entrance: { x: 86, z: -12, y: 0.5 },
+        rooms: [
+          { id: "fitness", name: "樂活體能教室", floor: 1, rel: [-8, 1] },
+          { id: "dance", name: "韻律舞蹈教室", floor: 1, rel: [8, 1] },
+          { id: "music", name: "音樂美學館", floor: 2, rel: [-8, 2] },
+          { id: "art", name: "視覺藝術創作室", floor: 2, rel: [8, 2] },
+        ]
+      },
+      {
+        id: "library-bld",
+        name: "綜合大樓 / 樂活圖書館",
+        color: 0x6d597a, // 典雅紫檀
+        roofColor: 0x483a52,
+        x: 0, z: -46, width: 50, depth: 18, floors: 2,
+        entrance: { x: 0, z: -36, y: 0.5 },
+        rooms: [
+          { id: "history", name: "校史室", floor: 1, rel: [-16, 1] },
+          { id: "home-eco", name: "家政餐飲烹飪教室", floor: 1, rel: [0, 1] },
+          { id: "coop", name: "員生合作社", floor: 1, rel: [16, 1] },
+          { id: "library", name: "樂活圖書館", floor: 2, rel: [-12, 2] },
+          { id: "computer-lab", name: "多媒體大電腦教室", floor: 2, rel: [12, 2] },
+        ]
+      },
+      {
+        id: "gym-bld",
+        name: "學生活動中心 / 體育館",
+        color: 0x4a7c59, // 運動綠色
+        roofColor: 0x31543b,
+        x: -90, z: 65, width: 52, depth: 36, floors: 1,
+        entrance: { x: -62, z: 65, y: 0.5 },
+        rooms: [
+          { id: "gym", name: "室內挑高綜合球場", floor: 1, rel: [-10, 1] },
+          { id: "grandstand", name: "萬人集會看台與舞台", floor: 1, rel: [10, 1] },
+        ]
+      }
+    ];
+
+    /* ==========================================================================
+       2. THREE.JS SCENE SETUP & LIGHTING
+       ========================================================================== */
+    const canvas = document.getElementById("webgl-canvas");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xb0d5ed);
+    scene.fog = new THREE.FogExp2(0xb0d5ed, 0.0035);
+
+    // Camera
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    const DEFAULT_CAM_POS = new THREE.Vector3(0, 110, 160);
+    const DEFAULT_TARGET = new THREE.Vector3(0, 10, 10);
+    camera.position.copy(DEFAULT_CAM_POS);
+
+    // Orbit Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.target.copy(DEFAULT_TARGET);
+    controls.maxPolarAngle = Math.PI / 2 - 0.02; // Don't go below ground
+    controls.minDistance = 15;
+    controls.maxDistance = 380;
+
+    // Ambient & Directional Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.72);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfffaed, 0.95);
+    sunLight.position.set(80, 140, 70);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 10;
+    sunLight.shadow.camera.far = 400;
+    const shadowD = 160;
+    sunLight.shadow.camera.left = -shadowD;
+    sunLight.shadow.camera.right = shadowD;
+    sunLight.shadow.camera.top = shadowD;
+    sunLight.shadow.camera.bottom = -shadowD;
+    scene.add(sunLight);
+
+    /* ==========================================================================
+       3. PROCEDURAL CAMPUS GENERATION (Ground, Buildings, Track, Trees)
+       ========================================================================== */
+    const buildingMeshes = [];
+    const floorMeshes = []; // For floor slice isolation
+    const labelElements = [];
+    const labelsContainer = document.getElementById("labels-container");
+
+    // 3.1 Ground & Lawn
+    const groundGeo = new THREE.PlaneGeometry(360, 300);
+    const groundMat = new THREE.MeshLambertMaterial({ color: 0x76a053 }); // 校園綠草皮
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // 3.2 Main Boulevard & Walkways (迎賓林蔭大道)
+    const boulevardGeo = new THREE.PlaneGeometry(16, 120);
+    const roadMat = new THREE.MeshLambertMaterial({ color: 0xd9d3c5 }); // 質感人行鋪面
+    const boulevard = new THREE.Mesh(boulevardGeo, roadMat);
+    boulevard.rotation.x = -Math.PI / 2;
+    boulevard.position.set(0, 0.02, 35);
+    boulevard.receiveShadow = true;
+    scene.add(boulevard);
+
+    // East-West Central Plaza (中庭穿堂林蔭大道)
+    const crossRoadGeo = new THREE.PlaneGeometry(240, 14);
+    const crossRoad = new THREE.Mesh(crossRoadGeo, roadMat);
+    crossRoad.rotation.x = -Math.PI / 2;
+    crossRoad.position.set(10, 0.02, 8);
+    crossRoad.receiveShadow = true;
+    scene.add(crossRoad);
+
+    // 3.3 Track & Field (200m 綜合運動場) on West
+    function createAthleticTrack() {
+      const trackGroup = new THREE.Group();
+      trackGroup.position.set(-90, 0.03, -10);
+
+      // Outer Red PU Track
+      const trackWidth = 70, trackHeight = 110;
+      const puMat = new THREE.MeshLambertMaterial({ color: 0xb54334 }); // PU 紅色跑道
+      const trackShape = new THREE.Shape();
+      const r = 26;
+      trackShape.moveTo(-r, -30);
+      trackShape.lineTo(r, -30);
+      trackShape.absarc(0, -30, r, 0, Math.PI, true);
+      trackShape.lineTo(-r, 30);
+      trackShape.absarc(0, 30, r, Math.PI, 0, true);
+      trackShape.closePath();
+
+      const trackGeo = new THREE.ShapeGeometry(trackShape);
+      const trackMesh = new THREE.Mesh(trackGeo, puMat);
+      trackMesh.rotation.x = -Math.PI / 2;
+      trackMesh.receiveShadow = true;
+      trackGroup.add(trackMesh);
+
+      // Infield Soccer Green Field
+      const innerShape = new THREE.Shape();
+      const ir = 18;
+      innerShape.moveTo(-ir, -28);
+      innerShape.lineTo(ir, -28);
+      innerShape.absarc(0, -28, ir, 0, Math.PI, true);
+      innerShape.lineTo(-ir, 28);
+      innerShape.absarc(0, 28, ir, Math.PI, 0, true);
+      innerShape.closePath();
+
+      const innerGeo = new THREE.ShapeGeometry(innerShape);
+      const innerMat = new THREE.MeshLambertMaterial({ color: 0x488b39 }); // 內圈天然草皮
+      const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+      innerMesh.rotation.x = -Math.PI / 2;
+      innerMesh.position.y = 0.02;
+      innerMesh.receiveShadow = true;
+      trackGroup.add(innerMesh);
+
+      // 司令台 (Grandstand)
+      const stageGeo = new THREE.BoxGeometry(16, 3, 7);
+      const stageMat = new THREE.MeshLambertMaterial({ color: 0xecf0f1 });
+      const stage = new THREE.Mesh(stageGeo, stageMat);
+      stage.position.set(-30, 1.5, 0);
+      stage.castShadow = true;
+      stage.receiveShadow = true;
+      trackGroup.add(stage);
+
+      scene.add(trackGroup);
+    }
+    createAthleticTrack();
+
+    // 3.4 Basketball Courts (戶外籃球場)
+    function createBasketballCourts() {
+      const courtGeo = new THREE.PlaneGeometry(42, 28);
+      const courtMat = new THREE.MeshLambertMaterial({ color: 0x227093 }); // 藍綠色籃球場地坪
+      const court = new THREE.Mesh(courtGeo, courtMat);
+      court.rotation.x = -Math.PI / 2;
+      court.position.set(-90, 0.04, -85);
+      court.receiveShadow = true;
+      scene.add(court);
+    }
+    createBasketballCourts();
+
+    // 3.5 Trees (校園景觀林蔭)
+    function createTree(x, z) {
+      const tree = new THREE.Group();
+      tree.position.set(x, 0, z);
+
+      const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, 3, 6);
+      const trunkMat = new THREE.MeshLambertMaterial({ color: 0x5c4033 });
+      const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+      trunk.position.y = 1.5;
+      trunk.castShadow = true;
+      tree.add(trunk);
+
+      const leavesGeo = new THREE.ConeGeometry(2.4, 5, 7);
+      const leavesMat = new THREE.MeshLambertMaterial({ color: 0x2d6a4f });
+      const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+      leaves.position.y = 4.6;
+      leaves.castShadow = true;
+      tree.add(leaves);
+
+      scene.add(tree);
+    }
+    // Trees along Boulevard
+    for (let z = 90; z >= 15; z -= 14) {
+      createTree(-11, z);
+      createTree(11, z);
+    }
+    // Trees in Courtyard
+    createTree(30, 18);
+    createTree(-26, 18);
+    createTree(25, -28);
+    createTree(-35, -28);
+
+    // 3.6 Procedural Building Construction
+    BUILDINGS_CONFIG.forEach(cfg => {
+      const bldGroup = new THREE.Group();
+      bldGroup.position.set(cfg.x, 0, cfg.z);
+
+      const totalH = cfg.floors * FH;
+
+      // Construct individual floors for slicing
+      for (let f = 1; f <= cfg.floors; f++) {
+        const floorGroup = new THREE.Group();
+        floorGroup.name = `floor-${f}`;
+        const fCenterY = (f - 0.5) * FH;
+
+        // Main floor box
+        const floorGeo = new THREE.BoxGeometry(cfg.width, FH - 0.2, cfg.depth);
+        const floorMat = new THREE.MeshLambertMaterial({
+          color: cfg.color,
+          roughness: 0.6
+        });
+        const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+        floorMesh.position.y = fCenterY;
+        floorMesh.castShadow = true;
+        floorMesh.receiveShadow = true;
+        floorGroup.add(floorMesh);
+
+        // Windows Bands
+        const winBandGeo = new THREE.BoxGeometry(cfg.width + 0.2, 1.2, cfg.depth + 0.2);
+        const winMat = new THREE.MeshLambertMaterial({
+          color: 0x1a2e3b,
+          transparent: true,
+          opacity: 0.85
+        });
+        const winBand = new THREE.Mesh(winBandGeo, winMat);
+        winBand.position.y = fCenterY + 0.2;
+        floorGroup.add(winBand);
+
+        // Floor Slab Divider
+        const slabGeo = new THREE.BoxGeometry(cfg.width + 0.8, 0.3, cfg.depth + 0.8);
+        const slabMat = new THREE.MeshLambertMaterial({ color: 0xf4f4f4 });
+        const slab = new THREE.Mesh(slabGeo, slabMat);
+        slab.position.y = f * FH;
+        floorGroup.add(slab);
+
+        floorGroup.userData = { buildingId: cfg.id, floorNum: f };
+        bldGroup.add(floorGroup);
+        floorMeshes.push(floorGroup);
+      }
+
+      // Roof & Parapet
+      const roofGeo = new THREE.BoxGeometry(cfg.width + 0.6, 0.6, cfg.depth + 0.6);
+      const roofMat = new THREE.MeshLambertMaterial({ color: cfg.roofColor });
+      const roofMesh = new THREE.Mesh(roofGeo, roofMat);
+      roofMesh.position.y = totalH + 0.3;
+      roofMesh.castShadow = true;
+      bldGroup.add(roofMesh);
+
+      scene.add(bldGroup);
+      buildingMeshes.push(bldGroup);
+
+      // 3D DOM Building Label
+      const labelDiv = document.createElement("div");
+      labelDiv.className = "building-label";
+      labelDiv.textContent = cfg.name;
+      labelDiv.onclick = () => focusBuilding(cfg);
+      labelsContainer.appendChild(labelDiv);
+
+      labelElements.push({
+        element: labelDiv,
+        worldPos: new THREE.Vector3(cfg.x, totalH + 2.5, cfg.z)
+      });
+    });
+
+    /* ==========================================================================
+       4. NAVIGATION & A* GRAPH TOPOLOGY (路網拓撲與 A* 最短路徑搜尋)
+       ========================================================================== */
+    // Build Master Room Database with Real Coordinates
+    const ROOMS_DB = {};
+    BUILDINGS_CONFIG.forEach(cfg => {
+      cfg.rooms.forEach(r => {
+        const roomX = cfg.x + r.rel[0];
+        const roomY = (r.floor - 0.5) * FH;
+        const roomZ = cfg.z;
+        ROOMS_DB[r.id] = {
+          id: r.id,
+          name: r.name,
+          buildingId: cfg.id,
+          buildingName: cfg.name,
+          floor: r.floor,
+          x: roomX,
+          y: roomY,
+          z: roomZ,
+          entrance: cfg.entrance
+        };
+      });
+    });
+
+    // Navigation Waypoint Nodes
+    const NAV_NODES = {
+      // 校門口起點
+      "gate": { id: "gate", x: 0, y: 0.5, z: 92, neighbors: ["blvd-1"] },
+      // 迎賓大道節點
+      "blvd-1": { id: "blvd-1", x: 0, y: 0.5, z: 65, neighbors: ["gate", "blvd-2", "gym-branch"] },
+      "gym-branch": { id: "gym-branch", x: -50, y: 0.5, z: 65, neighbors: ["blvd-1", "gym-ent"] },
+      "gym-ent": { id: "gym-ent", x: -62, y: 0.5, z: 65, neighbors: ["gym-branch"] },
+      "blvd-2": { id: "blvd-2", x: 0, y: 0.5, z: 35, neighbors: ["blvd-1", "admin-ent", "blvd-3"] },
+      "admin-ent": { id: "admin-ent", x: 5, y: 0.5, z: 37, neighbors: ["blvd-2", "admin-f1"] },
+      "admin-f1": { id: "admin-f1", x: 5, y: 0.5 * FH, z: 28, neighbors: ["admin-ent", "admin-f2"] },
+      "admin-f2": { id: "admin-f2", x: 5, y: 1.5 * FH, z: 28, neighbors: ["admin-f1", "admin-f3"] },
+      "admin-f3": { id: "admin-f3", x: 5, y: 2.5 * FH, z: 28, neighbors: ["admin-f2"] },
+
+      // 中庭穿堂十字路口
+      "blvd-3": { id: "blvd-3", x: 0, y: 0.5, z: 8, neighbors: ["blvd-2", "blvd-4", "east-cross"] },
+      "blvd-4": { id: "blvd-4", x: 0, y: 0.5, z: -3, neighbors: ["blvd-3", "newbld-f1", "blvd-5"] },
+      "newbld-f1": { id: "newbld-f1", x: 0, y: 0.5 * FH, z: -12, neighbors: ["blvd-4", "newbld-f2"] },
+      "newbld-f2": { id: "newbld-f2", x: 0, y: 1.5 * FH, z: -12, neighbors: ["newbld-f1", "newbld-f3"] },
+      "newbld-f3": { id: "newbld-f3", x: 0, y: 2.5 * FH, z: -12, neighbors: ["newbld-f2", "newbld-f4"] },
+      "newbld-f4": { id: "newbld-f4", x: 0, y: 3.5 * FH, z: -12, neighbors: ["newbld-f3"] },
+
+      // 東側分岔 (八九年級棟、科技館、藝術館)
+      "east-cross": { id: "east-cross", x: 38, y: 0.5, z: 8, neighbors: ["blvd-3", "g8-ent", "g9-ent", "east-far"] },
+      "g8-ent": { id: "g8-ent", x: 40, y: 0.5, z: 30, neighbors: ["east-cross", "g8-f1"] },
+      "g8-f1": { id: "g8-f1", x: 52, y: 0.5 * FH, z: 30, neighbors: ["g8-ent", "g8-f2"] },
+      "g8-f2": { id: "g8-f2", x: 52, y: 1.5 * FH, z: 30, neighbors: ["g8-f1", "g8-f3"] },
+      "g8-f3": { id: "g8-f3", x: 52, y: 2.5 * FH, z: 30, neighbors: ["g8-f2"] },
+
+      "g9-ent": { id: "g9-ent", x: 40, y: 0.5, z: -12, neighbors: ["east-cross", "g9-f1"] },
+      "g9-f1": { id: "g9-f1", x: 52, y: 0.5 * FH, z: -12, neighbors: ["g9-ent", "g9-f2"] },
+      "g9-f2": { id: "g9-f2", x: 52, y: 1.5 * FH, z: -12, neighbors: ["g9-f1", "g9-f3"] },
+      "g9-f3": { id: "g9-f3", x: 52, y: 2.5 * FH, z: -12, neighbors: ["g9-f2"] },
+
+      "east-far": { id: "east-far", x: 86, y: 0.5, z: 8, neighbors: ["east-cross", "tech-ent", "art-ent"] },
+      "tech-ent": { id: "tech-ent", x: 86, y: 0.5, z: 28, neighbors: ["east-far", "tech-f1"] },
+      "tech-f1": { id: "tech-f1", x: 98, y: 0.5 * FH, z: 28, neighbors: ["tech-ent", "tech-f2"] },
+      "tech-f2": { id: "tech-f2", x: 98, y: 1.5 * FH, z: 28, neighbors: ["tech-f1"] },
+
+      "art-ent": { id: "art-ent", x: 86, y: 0.5, z: -12, neighbors: ["east-far", "art-f1"] },
+      "art-f1": { id: "art-f1", x: 98, y: 0.5 * FH, z: -12, neighbors: ["art-ent", "art-f2"] },
+      "art-f2": { id: "art-f2", x: 98, y: 1.5 * FH, z: -12, neighbors: ["art-f1"] },
+
+      // 北側綜合大樓 / 圖書館
+      "blvd-5": { id: "blvd-5", x: 0, y: 0.5, z: -36, neighbors: ["blvd-4", "lib-f1"] },
+      "lib-f1": { id: "lib-f1", x: 0, y: 0.5 * FH, z: -46, neighbors: ["blvd-5", "lib-f2"] },
+      "lib-f2": { id: "lib-f2", x: 0, y: 1.5 * FH, z: -46, neighbors: ["lib-f1"] },
+    };
+
+    // Ensure bidirectional neighbors
+    Object.keys(NAV_NODES).forEach(nid => {
+      const node = NAV_NODES[nid];
+      node.neighbors.forEach(neighId => {
+        if (NAV_NODES[neighId] && !NAV_NODES[neighId].neighbors.includes(nid)) {
+          NAV_NODES[neighId].neighbors.push(nid);
+        }
+      });
+    });
+
+    // Helper: Map Room to its closest corridor waypoint
+    function getNearestCorridorNode(room) {
+      if (room.buildingId === "admin") return `admin-f${room.floor}`;
+      if (room.buildingId === "new-bld") return `newbld-f${room.floor}`;
+      if (room.buildingId === "grade8-bld") return `g8-f${room.floor}`;
+      if (room.buildingId === "grade9-bld") return `g9-f${room.floor}`;
+      if (room.buildingId === "tech-bld") return `tech-f${room.floor}`;
+      if (room.buildingId === "art-bld") return `art-f${room.floor}`;
+      if (room.buildingId === "library-bld") return `lib-f${room.floor}`;
+      if (room.buildingId === "gym-bld") return `gym-ent`;
+      return "blvd-1";
+    }
+
+    // A* Pathfinding Algorithm
+    function findShortestPath(startNodeId, targetNodeId) {
+      const openSet = new Set([startNodeId]);
+      const cameFrom = {};
+      const gScore = {};
+      const fScore = {};
+
+      Object.keys(NAV_NODES).forEach(k => {
+        gScore[k] = Infinity;
+        fScore[k] = Infinity;
+      });
+
+      gScore[startNodeId] = 0;
+      fScore[startNodeId] = dist3D(NAV_NODES[startNodeId], NAV_NODES[targetNodeId]);
+
+      while (openSet.size > 0) {
+        let current = null;
+        let lowestF = Infinity;
+        openSet.forEach(nodeId => {
+          if (fScore[nodeId] < lowestF) {
+            lowestF = fScore[nodeId];
+            current = nodeId;
+          }
+        });
+
+        if (current === targetNodeId) {
+          // Reconstruct path
+          const path = [current];
+          while (cameFrom[current]) {
+            current = cameFrom[current];
+            path.unshift(current);
+          }
+          return path;
+        }
+
+        openSet.delete(current);
+        const currNode = NAV_NODES[current];
+
+        currNode.neighbors.forEach(neighborId => {
+          const neighNode = NAV_NODES[neighborId];
+          if (!neighNode) return;
+          const tentativeG = gScore[current] + dist3D(currNode, neighNode);
+          if (tentativeG < gScore[neighborId]) {
+            cameFrom[neighborId] = current;
+            gScore[neighborId] = tentativeG;
+            fScore[neighborId] = tentativeG + dist3D(neighNode, NAV_NODES[targetNodeId]);
+            openSet.add(neighborId);
+          }
+        });
+      }
+      return null;
+    }
+
+    function dist3D(p1, p2) {
+      const dx = p1.x - p2.x;
+      const dy = (p1.y || 0) - (p2.y || 0);
+      const dz = p1.z - p2.z;
+      return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    /* ==========================================================================
+       5. 3D GLOWING NAVIGATION PATH RENDERING (立體發光導航軌跡)
+       ========================================================================== */
+    let navPathMesh = null;
+    let navTargetPoint = null;
+
+    function renderNavigationPath(points) {
+      if (navPathMesh) {
+        scene.remove(navPathMesh);
+        navPathMesh.geometry.dispose();
+        navPathMesh.material.dispose();
+        navPathMesh = null;
+      }
+      if (!points || points.length < 2) return;
+
+      const curve = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.15);
+      const tubeGeo = new THREE.TubeGeometry(curve, 120, 0.45, 8, false);
+      const tubeMat = new THREE.MeshBasicMaterial({
+        color: 0xffd23f,
+        wireframe: false,
+        transparent: true,
+        opacity: 0.95
+      });
+      navPathMesh = new THREE.Mesh(tubeGeo, tubeMat);
+      scene.add(navPathMesh);
+
+      // Add Glowing destination marker
+      if (!navTargetPoint) {
+        const pinGeo = new THREE.CylinderGeometry(0.1, 1.2, 3, 12);
+        const pinMat = new THREE.MeshBasicMaterial({ color: 0xe63946 });
+        navTargetPoint = new THREE.Mesh(pinGeo, pinMat);
+        scene.add(navTargetPoint);
+      }
+      const lastPt = points[points.length - 1];
+      navTargetPoint.position.set(lastPt.x, lastPt.y + 2.5, lastPt.z);
+      navTargetPoint.rotation.x = Math.PI;
+      navTargetPoint.visible = true;
+    }
+
+    function clearNavigation() {
+      if (navPathMesh) {
+        scene.remove(navPathMesh);
+        navPathMesh = null;
+      }
+      if (navTargetPoint) {
+        navTargetPoint.visible = false;
+      }
+      document.getElementById("nav-hud").classList.remove("visible");
+      activeNavRoom = null;
+    }
+
+    /* ==========================================================================
+       6. INTERACTION & NAVIGATION LOGIC
+       ========================================================================== */
+    let activeNavRoom = null;
+
+    function navigateToRoom(roomId) {
+      const room = ROOMS_DB[roomId];
+      if (!room) {
+        alert("找不到此教室或場館: " + roomId);
+        return;
+      }
+      activeNavRoom = room;
+
+      // 1. Calculate A* Path from School Gate to target
+      const targetCorridorNode = getNearestCorridorNode(room);
+      const nodePath = findShortestPath("gate", targetCorridorNode);
+
+      const pathPoints = [];
+      if (nodePath) {
+        nodePath.forEach(nid => {
+          const n = NAV_NODES[nid];
+          pathPoints.push(new THREE.Vector3(n.x, (n.y || 0.5) + 0.6, n.z));
+        });
+      } else {
+        pathPoints.push(new THREE.Vector3(0, 1.2, 92));
+      }
+      // Add final room point
+      pathPoints.push(new THREE.Vector3(room.x, room.y + 1, room.z));
+
+      // 2. Render Glowing 3D Path
+      renderNavigationPath(pathPoints);
+
+      // 3. Calculate Real Walking Distance
+      let totalDist = 0;
+      for (let i = 0; i < pathPoints.length - 1; i++) {
+        totalDist += pathPoints[i].distanceTo(pathPoints[i + 1]);
+      }
+      const meters = Math.round(totalDist);
+
+      // 4. Update HUD
+      document.getElementById("hud-target-name").textContent = `[${room.buildingName} ${room.floor}F] ${room.name}`;
+      document.getElementById("hud-route-desc").textContent = `由正門步道出發 → 經由 ${room.buildingName} 樓梯至 ${room.floor} 樓`;
+      document.getElementById("hud-dist-val").textContent = meters;
+      document.getElementById("nav-hud").classList.add("visible");
+
+      // 5. Smooth Camera Transition to Target Room
+      animateCameraTo(
+        new THREE.Vector3(room.x + 24, room.y + 26, room.z + 32),
+        new THREE.Vector3(room.x, room.y, room.z)
+      );
+
+      // Auto filter floor if target is high
+      if (room.floor > 1) {
+        setFloorFilter(room.floor);
+      } else {
+        setFloorFilter("all");
+      }
+    }
+
+    function animateCameraTo(targetCamPos, targetLookAt) {
+      const startCamPos = camera.position.clone();
+      const startLookAt = controls.target.clone();
+      let progress = 0;
+      const duration = 1200;
+      const startTime = performance.now();
+
+      function tween(now) {
+        const elapsed = now - startTime;
+        progress = Math.min(elapsed / duration, 1);
+        const ease = 0.5 - Math.cos(progress * Math.PI) / 2;
+
+        camera.position.lerpVectors(startCamPos, targetCamPos, ease);
+        controls.target.lerpVectors(startLookAt, targetLookAt, ease);
+
+        if (progress < 1) {
+          requestAnimationFrame(tween);
+        }
+      }
+      requestAnimationFrame(tween);
+    }
+
+    function focusBuilding(cfg) {
+      animateCameraTo(
+        new THREE.Vector3(cfg.x + 40, cfg.floors * FH + 35, cfg.z + 50),
+        new THREE.Vector3(cfg.x, cfg.floors * FH / 2, cfg.z)
+      );
+    }
+
+    /* ==========================================================================
+       7. FLOOR FILTERING (分層剖切檢視)
+       ========================================================================== */
+    function setFloorFilter(floorVal) {
+      document.querySelectorAll(".floor-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.f === String(floorVal));
+      });
+
+      floorMeshes.forEach(grp => {
+        if (floorVal === "all") {
+          grp.visible = true;
+        } else {
+          grp.visible = grp.userData.floorNum <= Number(floorVal);
+        }
+      });
+    }
+
+    document.querySelectorAll(".floor-btn").forEach(btn => {
+      btn.onclick = () => setFloorFilter(btn.dataset.f);
+    });
+
+    /* ==========================================================================
+       8. FIRST PERSON / ORBIT MODE SWITCH
+       ========================================================================== */
+    let isWalkMode = false;
+    const moveState = { forward: 0, backward: 0, left: 0, right: 0 };
+    const btnWalk = document.getElementById("btn-walk");
+
+    btnWalk.onclick = () => {
+      isWalkMode = !isWalkMode;
+      btnWalk.classList.toggle("active", isWalkMode);
+      if (isWalkMode) {
+        controls.enabled = false;
+        camera.position.set(0, 2.2, 85); // Stand at Main Entrance
+        controls.target.set(0, 2.2, 70);
+        document.getElementById("joystick-zone").style.display = "block";
+      } else {
+        controls.enabled = true;
+        document.getElementById("joystick-zone").style.display = "none";
+        controls.target.copy(DEFAULT_TARGET);
+        camera.position.copy(DEFAULT_CAM_POS);
+      }
+    };
+
+    // Keyboard Walking Controls
+    window.addEventListener("keydown", (e) => {
+      if (!isWalkMode) return;
+      if (e.key === "w" || e.key === "ArrowUp") moveState.forward = 1;
+      if (e.key === "s" || e.key === "ArrowDown") moveState.backward = 1;
+      if (e.key === "a" || e.key === "ArrowLeft") moveState.left = 1;
+      if (e.key === "d" || e.key === "ArrowRight") moveState.right = 1;
+    });
+    window.addEventListener("keyup", (e) => {
+      if (e.key === "w" || e.key === "ArrowUp") moveState.forward = 0;
+      if (e.key === "s" || e.key === "ArrowDown") moveState.backward = 0;
+      if (e.key === "a" || e.key === "ArrowLeft") moveState.left = 0;
+      if (e.key === "d" || e.key === "ArrowRight") moveState.right = 0;
+    });
+
+    /* ==========================================================================
+       9. SEARCH & QUICK BUTTONS
+       ========================================================================== */
+    const searchInput = document.getElementById("search-input");
+    const searchResults = document.getElementById("search-results");
+
+    searchInput.addEventListener("input", (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) {
+        searchResults.style.display = "none";
+        return;
+      }
+      const matches = Object.values(ROOMS_DB).filter(r => 
+        r.name.toLowerCase().includes(q) || r.id.toLowerCase().includes(q) || r.buildingName.toLowerCase().includes(q)
+      );
+
+      if (matches.length === 0) {
+        searchResults.innerHTML = `<li style="color: var(--muted); cursor: default;">查無相符教室或場館</li>`;
+      } else {
+        searchResults.innerHTML = matches.slice(0, 8).map(r => `
+          <li onclick="onSelectSearchRoom('${r.id}')">
+            <span><b>${r.name}</b> (${r.floor}F)</span>
+            <span class="rm-bld">${r.buildingName}</span>
+          </li>
+        `).join("");
+      }
+      searchResults.style.display = "block";
+    });
+
+    window.onSelectSearchRoom = (roomId) => {
+      searchResults.style.display = "none";
+      searchInput.value = ROOMS_DB[roomId].name;
+      navigateToRoom(roomId);
+    };
+
+    // Quick Chips
+    document.querySelectorAll(".venue-chip").forEach(chip => {
+      chip.onclick = () => {
+        const toId = chip.dataset.to;
+        navigateToRoom(toId);
+      };
+    });
+
+    document.getElementById("btn-cancel-nav").onclick = clearNavigation;
+    document.getElementById("btn-home").onclick = () => {
+      clearNavigation();
+      setFloorFilter("all");
+      animateCameraTo(DEFAULT_CAM_POS, DEFAULT_TARGET);
+    };
+
+    /* ==========================================================================
+       10. 2D MINIMAP REALTIME CANVAS
+       ========================================================================== */
+    const miniCanvas = document.getElementById("minimap-canvas");
+    const miniCtx = miniCanvas.getContext("2d");
+    miniCanvas.width = 140;
+    miniCanvas.height = 140;
+
+    function renderMinimap() {
+      miniCtx.clearRect(0, 0, 140, 140);
+      
+      // Campus footprint scaling
+      // World: x in [-140, 140], z in [-90, 110]
+      const scaleX = 140 / 280;
+      const scaleZ = 140 / 200;
+
+      const toMiniX = (x) => (x + 140) * scaleX;
+      const toMiniZ = (z) => (z + 90) * scaleZ;
+
+      // Draw Grass
+      miniCtx.fillStyle = "#1e392a";
+      miniCtx.fillRect(0, 0, 140, 140);
+
+      // Draw Track
+      miniCtx.fillStyle = "#a84236";
+      miniCtx.beginPath();
+      miniCtx.arc(toMiniX(-90), toMiniZ(-10), 18, 0, Math.PI * 2);
+      miniCtx.fill();
+
+      // Draw Buildings
+      BUILDINGS_CONFIG.forEach(cfg => {
+        miniCtx.fillStyle = "#4a6984";
+        const bx = toMiniX(cfg.x - cfg.width / 2);
+        const bz = toMiniZ(cfg.z - cfg.depth / 2);
+        const bw = cfg.width * scaleX;
+        const bh = cfg.depth * scaleZ;
+        miniCtx.fillRect(bx, bz, bw, bh);
+      });
+
+      // Draw Player Camera Position
+      const px = toMiniX(camera.position.x);
+      const pz = toMiniZ(camera.position.z);
+      miniCtx.fillStyle = "#ffd23f";
+      miniCtx.beginPath();
+      miniCtx.arc(px, pz, 4, 0, Math.PI * 2);
+      miniCtx.fill();
+
+      // Camera direction triangle
+      const dir = new THREE.Vector3();
+      camera.getWorldDirection(dir);
+      miniCtx.strokeStyle = "#ffd23f";
+      miniCtx.lineWidth = 2;
+      miniCtx.beginPath();
+      miniCtx.moveTo(px, pz);
+      miniCtx.lineTo(px + dir.x * 12, pz + dir.z * 12);
+      miniCtx.stroke();
+    }
+
+    /* ==========================================================================
+       11. ROOM EDITOR DRAWER & LOCALSTORAGE
+       ========================================================================== */
+    const editorDrawer = document.getElementById("editor-drawer");
+    const editorList = document.getElementById("editor-list");
+    const btnEditor = document.getElementById("btn-editor");
+    const btnCloseEditor = document.getElementById("btn-close-editor");
+
+    btnEditor.onclick = () => {
+      populateEditorList();
+      editorDrawer.classList.add("open");
+    };
+    btnCloseEditor.onclick = () => editorDrawer.classList.remove("open");
+
+    function populateEditorList() {
+      editorList.innerHTML = Object.values(ROOMS_DB).map(r => `
+        <div class="edit-item">
+          <label>[${r.buildingName} ${r.floor}F] 教室代碼: ${r.id}</label>
+          <input type="text" data-id="${r.id}" value="${r.name}">
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("btn-save-rooms").onclick = () => {
+      const inputs = editorList.querySelectorAll("input");
+      inputs.forEach(inp => {
+        const id = inp.dataset.id;
+        if (ROOMS_DB[id]) {
+          ROOMS_DB[id].name = inp.value.trim();
+        }
+      });
+      localStorage.setItem("daxi_3d_rooms_115", JSON.stringify(ROOMS_DB));
+      alert("✅ 115 學年度教室資料已成功儲存至本機快存！");
+      editorDrawer.classList.remove("open");
+    };
+
+    document.getElementById("btn-export-rooms").onclick = () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(ROOMS_DB, null, 2));
+      const dlAnchor = document.createElement("a");
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", "daxi_campus_115_rooms.json");
+      dlAnchor.click();
+    };
+
+    // Load custom saved rooms if available
+    const savedRooms = localStorage.getItem("daxi_3d_rooms_115");
+    if (savedRooms) {
+      try {
+        const parsed = JSON.parse(savedRooms);
+        Object.keys(parsed).forEach(k => {
+          if (ROOMS_DB[k]) ROOMS_DB[k].name = parsed[k].name;
+        });
+      } catch (err) {}
+    }
+
+    /* ==========================================================================
+       12. HELP MODAL
+       ========================================================================== */
+    const helpModal = document.getElementById("help-modal");
+    const modalBackdrop = document.getElementById("modal-backdrop");
+    document.getElementById("btn-help").onclick = () => {
+      helpModal.classList.add("open");
+      modalBackdrop.classList.add("open");
+    };
+    document.getElementById("btn-close-help").onclick = () => {
+      helpModal.classList.remove("open");
+      modalBackdrop.classList.remove("open");
+    };
+    modalBackdrop.onclick = () => {
+      helpModal.classList.remove("open");
+      modalBackdrop.classList.remove("open");
+    };
+
+    /* ==========================================================================
+       13. URL DEEP-LINKING (?to=68 or ?to=701)
+       ========================================================================== */
+    function checkUrlQueryTarget() {
+      const params = new URLSearchParams(window.location.search);
+      const to = params.get("to");
+      if (to) {
+        // Direct match or lookup
+        setTimeout(() => {
+          navigateToRoom(to);
+        }, 600);
+      }
+    }
+
+    /* ==========================================================================
+       14. ANIMATION LOOP & RENDER
+       ========================================================================== */
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+
+      // First-person walking movement
+      if (isWalkMode) {
+        const moveSpeed = 16 * delta;
+        const forwardDir = new THREE.Vector3();
+        camera.getWorldDirection(forwardDir);
+        forwardDir.y = 0;
+        forwardDir.normalize();
+
+        const sideDir = new THREE.Vector3();
+        sideDir.crossVectors(camera.up, forwardDir).normalize();
+
+        if (moveState.forward) camera.position.addScaledVector(forwardDir, moveSpeed);
+        if (moveState.backward) camera.position.addScaledVector(forwardDir, -moveSpeed);
+        if (moveState.left) camera.position.addScaledVector(sideDir, moveSpeed);
+        if (moveState.right) camera.position.addScaledVector(sideDir, -moveSpeed);
+      } else {
+        controls.update();
+      }
+
+      // Update 3D Floating Labels onto Screen Coordinates
+      labelElements.forEach(item => {
+        const wp = item.worldPos.clone();
+        wp.project(camera);
+        // Check if behind camera
+        if (wp.z > 1) {
+          item.element.style.display = "none";
+        } else {
+          item.element.style.display = "block";
+          const screenX = (wp.x * 0.5 + 0.5) * window.innerWidth;
+          const screenY = (-(wp.y * 0.5) + 0.5) * window.innerHeight;
+          item.element.style.left = `${screenX}px`;
+          item.element.style.top = `${screenY}px`;
+        }
+      });
+
+      // Animate Destination Pin Pulse
+      if (navTargetPoint && navTargetPoint.visible) {
+        navTargetPoint.position.y += Math.sin(clock.getElapsedTime() * 4) * 0.015;
+      }
+
+      renderMinimap();
+      renderer.render(scene, camera);
+    }
+
+    // Window Resize
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Start App
+    animate();
+    checkUrlQueryTarget();
+  </script>
+</body>
+</html>
