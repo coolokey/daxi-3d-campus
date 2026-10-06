@@ -1,0 +1,213 @@
+{
+  "campus": {
+    "name": "桃園市立大溪國民中學",
+    "shortName": "大溪國中",
+    "englishName": "Taoyuan Municipal Daxi Junior High School",
+    "version": "115學年度官方正式版",
+    "origin": {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "description": "正門迎賓大道圓環中央銅像基座"
+    },
+    "coordinateScale": "1 unit = 1 meter",
+    "bounds": {
+      "minX": -170,
+      "maxX": 130,
+      "minZ": -130,
+      "maxZ": 120
+    }
+  },
+  "buildings": [
+    {
+      "id": "admin-front",
+      "name": "行政大樓 (前棟)",
+      "englishName": "Administration Building (Front)",
+      "category": "admin",
+      "position": { "x": 8, "y": 0, "z": 38 },
+      "rotation": 0,
+      "dimensions": { "width": 28, "depth": 14, "height": 10.8 },
+      "floors": 3,
+      "floorHeight": 3.6,
+      "roofType": "pitched-red",
+      "facadeColor": "#eaeef2",
+      "accentColor": "#c0392b",
+      "entrancePoint": { "x": 8, "y": 0.5, "z": 46 },
+      "safeSpawnPoint": { "x": 8, "y": 0.5, "z": 48 }
+    },
+    {
+      "id": "admin-back",
+      "name": "行政大樓 (後棟)",
+      "englishName": "Administration Building (Back)",
+      "category": "admin",
+      "position": { "x": -28, "y": 0, "z": 38 },
+      "rotation": 0,
+      "dimensions": { "width": 28, "depth": 14, "height": 10.8 },
+      "floors": 3,
+      "floorHeight": 3.6,
+      "roofType": "pitched-red",
+      "facadeColor": "#eaeef2",
+      "accentColor": "#c0392b",
+      "entrancePoint": { "x": -28, "y": 0.5, "z": 46 },
+      "safeSpawnPoint": { "x": -28, "y": 0.5, "z": 48 }
+    },
+    {
+      "id": "gym-bld",
+      "name": "學生活動中心 / 體育館",
+      "englishName": "Student Activity Center & Gymnasium",
+      "category": "sports",
+      "position": { "x": -58, "y": 0, "z": 62 },
+      "rotation": 0,
+      "dimensions": { "width": 32, "depth": 42, "height": 13.5 },
+      "floors": 3,
+      "floorHeight": 4.5,
+      "roofType": "flat-dome",
+      "facadeColor": "#d98a80",
+      "accentColor": "#a93226",
+      "entrancePoint": { "x": -45, "y": 0.5, "z": 62 },
+      "safeSpawnPoint": { "x": -43, "y": 0.5, "z": 62 }
+    },
+    {
+      "id": "grade8-front",
+      "name": "八年級教學棟 (前棟)",
+      "englishName": "Grade 8 Building (Front)",
+      "category": "academic",
+      "position": { "x": 48, "y": 0, "z": 44 },
+      "rotation": 0,
+      "dimensions": { "width": 38, "depth": 12, "height": 10.8 },
+      "floors": 3,
+      "floorHeight": 3.6,
+      "roofType": "pitched-red",
+      "facadeColor": "#f0e6d6",
+      "accentColor": "#d9822b",
+      "entrancePoint": { "x": 38, "y": 0.5, "z": 44 },
+      "safeSpawnPoint": { "x": 34, "y": 0.5, "z": 44 }
+    },
+    {
+      "id": "grade8-mid",
+      "name": "八年級教學棟 (中棟)",
+      "englishName": "Grade 8 Building (Mid)",
+      "category": "academic",
+      "position": { "x": 48, "y": 0, "z": 24 },
+      "rotation": 0,
+      "dimensions": { "width": 38, "depth": 12, "height": 10.8 },
+      "floors": 3,
+      "floorHeight": 3.6,
+      "roofType": "pitched-red",
+      "facadeColor": "#f0e6d6",
+      "accentColor": "#d9822b",
+      "entrancePoint": { "x": 38, "y": 0.5, "z": 24 },
+      "safeSpawnPoint": { "x": 34, "y": 0.5, "z": 24 }
+    },
+    {
+      "id": "grade9-back",
+      "name": "九年級教學棟 (後棟)",
+      "englishName": "Grade 9 Building (Back)",
+      "category": "academic",
+      "position": { "x": 48, "y": 0, "z": 4 },
+      "rotation": 0,
+      "dimensions": { "width": 38, "depth": 12, "height": 10.8 },
+      "floors": 3,
+      "floorHeight": 3.6,
+      "roofType": "pitched-red",
+      "facadeColor": "#e8f4ec",
+      "accentColor": "#27ae60",
+      "entrancePoint": { "x": 38, "y": 0.5, "z": 4 },
+      "safeSpawnPoint": { "x": 34, "y": 0.5, "z": 4 }
+    },
+    {
+      "id": "tech-building",
+      "name": "科技館 (視聽/生科/電腦/理化)",
+      "englishName": "Technology Building",
+      "category": "special",
+      "position": { "x": 96, "y": 0, "z": 12 },
+      "rotation": 0,
+      "dimensions": { "width": 16, "depth": 36, "height": 7.6 },
+      "floors": 2,
+      "floorHeight": 3.8,
+      "roofType": "flat-green",
+      "facadeColor": "#e2f0ed",
+      "accentColor": "#16a085",
+      "entrancePoint": { "x": 86, "y": 0.5, "z": 12 },
+      "safeSpawnPoint": { "x": 84, "y": 0.5, "z": 12 }
+    },
+    {
+      "id": "multi-building",
+      "name": "綜合大樓 (校史室/圖書室/餐飲/機房)",
+      "englishName": "Comprehensive Building & Library",
+      "category": "special",
+      "position": { "x": 96, "y": 0, "z": 54 },
+      "rotation": 0,
+      "dimensions": { "width": 16, "depth": 40, "height": 7.6 },
+      "floors": 2,
+      "floorHeight": 3.8,
+      "roofType": "flat-purple",
+      "facadeColor": "#eeeaf2",
+      "accentColor": "#8e44ad",
+      "entrancePoint": { "x": 86, "y": 0.5, "z": 54 },
+      "safeSpawnPoint": { "x": 84, "y": 0.5, "z": 54 }
+    },
+    {
+      "id": "art-building",
+      "name": "藝術館 (樂活/音樂/美術)",
+      "englishName": "Arts Building",
+      "category": "special",
+      "position": { "x": 96, "y": 0, "z": -28 },
+      "rotation": 0,
+      "dimensions": { "width": 16, "depth": 32, "height": 14.8 },
+      "floors": 4,
+      "floorHeight": 3.7,
+      "roofType": "flat-red",
+      "facadeColor": "#f8e9eb",
+      "accentColor": "#b56576",
+      "entrancePoint": { "x": 86, "y": 0.5, "z": -28 },
+      "safeSpawnPoint": { "x": 84, "y": 0.5, "z": -28 }
+    },
+    {
+      "id": "new-grade7",
+      "name": "七年級新大樓 (東北角新校舍)",
+      "englishName": "Grade 7 New Building",
+      "category": "academic",
+      "position": { "x": 75, "y": 0, "z": -68 },
+      "rotation": 0,
+      "dimensions": { "width": 46, "depth": 16, "height": 11.2 },
+      "floors": 3,
+      "floorHeight": 3.7,
+      "roofType": "pitched-blue",
+      "facadeColor": "#e6f0f7",
+      "accentColor": "#2980b9",
+      "entrancePoint": { "x": 65, "y": 0.5, "z": -68 },
+      "safeSpawnPoint": { "x": 62, "y": 0.5, "z": -68 }
+    }
+  ],
+  "outdoorVenues": [
+    {
+      "id": "track",
+      "name": "200公尺 PU 操場 / 司令台 / 國旗桿",
+      "category": "sports",
+      "position": { "x": -85, "y": 0, "z": -15 },
+      "entrancePoint": { "x": -85, "y": 0.5, "z": 20 }
+    },
+    {
+      "id": "basketball-courts",
+      "name": "戶外綜合籃球場 / 排球場",
+      "category": "sports",
+      "position": { "x": 0, "y": 0, "z": -36 },
+      "entrancePoint": { "x": 0, "y": 0.5, "z": -18 }
+    },
+    {
+      "id": "lan-pavilion-pond",
+      "name": "蘭亭與訓平池 (生態園區)",
+      "category": "landscape",
+      "position": { "x": -35, "y": 0, "z": -75 },
+      "entrancePoint": { "x": -35, "y": 0.5, "z": -58 }
+    },
+    {
+      "id": "main-gate",
+      "name": "學校大門迎賓大道 / 中央銅像圓環 / 警衛室",
+      "category": "entrance",
+      "position": { "x": 0, "y": 0, "z": 92 },
+      "entrancePoint": { "x": 0, "y": 0.5, "z": 96 }
+    }
+  ]
+}
