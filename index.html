@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>桃園市立大溪國中 3D 智慧校園導覽與路徑導航系統</title>
-  <meta name="description" content="桃園市立大溪國中 115 學年度 3D 數位校園地圖：支援走廊漫遊、跨樓層 A* 最短路徑導航、全校鳥瞰與教室線上編輯。">
+  <meta name="description" content="依據大溪國中真實空拍機影像與 115 學年度校園平面圖製作，採用輕量化 WebGL / Three.js 參數化建模，支援 A* 跨樓層室內尋路導航。">
   
   <!-- Favicon SVG inline -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏫</text></svg>">
@@ -96,8 +96,8 @@
     }
     .brand-btn:hover { filter: brightness(1.2); }
     .brand-logo {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       background: #e63946;
       display: grid;
@@ -227,6 +227,20 @@
       background: var(--accent);
       color: #101923;
       border-color: var(--accent);
+    }
+
+    /* Drone Badge */
+    .drone-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(230, 57, 70, 0.85);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 6px;
     }
 
     /* Floor Selector (Right) */
@@ -368,7 +382,7 @@
       position: absolute;
       transform: translate(-50%, -50%);
       padding: 4px 10px 5px;
-      background: rgba(16, 25, 35, 0.85);
+      background: rgba(16, 25, 35, 0.88);
       border-radius: 6px;
       border-left: 4px solid var(--accent);
       color: #fff;
@@ -510,14 +524,14 @@
     <div class="brand-btn glass" id="btn-home" title="回到校園全景">
       <div class="brand-logo">🏫</div>
       <div>
-        <div class="brand-title">大溪國中 3D 校園</div>
-        <div class="brand-subtitle">115 學年度數位導覽系統</div>
+        <div class="brand-title">大溪國中 3D 校園 <span class="drone-badge">🚁 實境空拍比對</span></div>
+        <div class="brand-subtitle">115 學年度智慧校園導覽系統</div>
       </div>
     </div>
 
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="搜尋班級、處室、場館 (例: 701, 教務處, 科技館)..." autocomplete="off">
+      <input type="text" id="search-input" placeholder="搜尋班級、處室、場館 (例: 701, 活動中心, 司令台)..." autocomplete="off">
       <ul id="search-results" class="glass"></ul>
     </div>
 
@@ -530,13 +544,14 @@
 
   <!-- Quick Venues Chips -->
   <div id="quick-venues">
-    <span class="venue-chip" data-to="academic">教務處</span>
-    <span class="venue-chip" data-to="principal">校長室</span>
-    <span class="venue-chip" data-to="health">健康中心</span>
-    <span class="venue-chip" data-to="tech-lab">科技創客館</span>
-    <span class="venue-chip" data-to="math-lab">數學研究室</span>
-    <span class="venue-chip" data-to="library">樂活圖書館</span>
-    <span class="venue-chip" data-to="gym">學生活動中心</span>
+    <span class="venue-chip" data-to="gym">🏟️ 學生活動中心</span>
+    <span class="venue-chip" data-to="grandstand">🚩 司令台</span>
+    <span class="venue-chip" data-to="academic">🏢 教務處</span>
+    <span class="venue-chip" data-to="principal">🎓 校長室</span>
+    <span class="venue-chip" data-to="health">🩺 健康中心</span>
+    <span class="venue-chip" data-to="tech-lab">🧪 科技創客館</span>
+    <span class="venue-chip" data-to="math-lab">📐 數學研究室</span>
+    <span class="venue-chip" data-to="library">📚 樂活圖書館</span>
     <span class="venue-chip" data-to="701">701 教室</span>
     <span class="venue-chip" data-to="801">801 教室</span>
     <span class="venue-chip" data-to="901">901 教室</span>
@@ -567,7 +582,7 @@
     <div class="nav-icon">🚩</div>
     <div class="nav-info">
       <div class="nav-title" id="hud-target-name">目的地名稱</div>
-      <div class="nav-route" id="hud-route-desc">由校門沿迎賓林蔭步道直行前往</div>
+      <div class="nav-route" id="hud-route-desc">由校門沿迎賓大道直行前往</div>
     </div>
     <div class="nav-stat">
       <div class="nav-dist"><span id="hud-dist-val">85</span><small>m</small></div>
@@ -581,14 +596,19 @@
 
   <!-- Help Modal -->
   <div id="help-modal" class="glass">
-    <h3 style="margin: 0 0 12px; font-size: 18px;">💡 操作與深度導航指南</h3>
+    <h3 style="margin: 0 0 12px; font-size: 18px;">💡 實境空拍 3D 校園特色指南</h3>
     <p style="font-size: 13px; color: #d3dce6; line-height: 1.6;">
-      歡迎使用<b>桃園市立大溪國中 3D 智慧校園導覽系統</b>！本系統依據 115 學年度校園平面圖製作，提供全校立體導覽與室內最短路徑尋路。
+      本 3D 校園模型依據<b>真實空拍機實錄影片（DJI Mavic 2）</b>與 115 學年度平面圖忠實比對還原：
     </p>
-    <div style="background: rgba(255,255,255,0.06); padding: 12px; border-radius: 8px; font-size: 13px; margin: 12px 0;">
-      <div><b>🖱️ 電腦操作</b>：滑鼠左鍵旋轉、滾輪縮放、右鍵平移。點選「漫遊」可用 W/A/S/D 行走。</div>
-      <div style="margin-top: 6px;"><b>📱 手機操作</b>：單指旋轉、雙指縮放。漫遊模式具備虛擬搖桿。</div>
-      <div style="margin-top: 6px;"><b>🔗 QR Code 深度導航</b>：網址加上 <code>?to=班級代號</code>（例如 <code>?to=701</code> 或 <code>?to=academic</code>）即可直接自動啟動導航。</div>
+    <ul style="font-size: 12.5px; color: #c4d0dc; padding-left: 18px; line-height: 1.6;">
+      <li><b>學生活動中心</b>：還原粉紅鮭魚磚外牆、圓形頂樓通風設備，以及入口處標誌性的<b>半圓弧圓柱雙塔（樓梯井）</b>。</li>
+      <li><b>200m 運動場</b>：還原實境<b>深碳灰/深青紫黑色 PU 跑道</b>，內圈草坪右側具備<b>雙排紅色地坪球場</b>。</li>
+      <li><b>司令台</b>：還原實境標誌性的<b>亮紅色雙坡金屬斜屋頂</b>。</li>
+      <li><b>教學棟金屬紅斜頂</b>：還原右側教學大樓具辨識度的紅烤漆斜坡屋面。</li>
+      <li><b>護城綠水圳與停車場</b>：真實呈現西側綠水圳防汛駁坎與前庭黃色減速帶停車廣場。</li>
+    </ul>
+    <div style="background: rgba(255,255,255,0.06); padding: 10px; border-radius: 8px; font-size: 12px; margin: 12px 0;">
+      <b>🔗 QR Code 深度導航</b>：網址加上 <code>?to=701</code> 或 <code>?to=gym</code> 等，即可自動產生從校門直達的 3D 發光步行路徑。
     </div>
     <div style="text-align: right;">
       <button class="action-btn" id="btn-close-help" style="background: var(--accent); color: #101923;">知道了</button>
@@ -613,18 +633,34 @@
   <!-- Main Application Script -->
   <script>
     /* ==========================================================================
-       1. DATA DEFINITIONS (大溪國中 115 學年度建築與教室資料庫)
+       1. DATA DEFINITIONS (建築設定：依據空拍影片真實色調與特徵更新)
        ========================================================================== */
-    const FH = 3.8; // Floor Height: 3.8 meters
+    const FH = 3.8; // 樓層高度 3.8 公尺
 
     const BUILDINGS_CONFIG = [
       {
+        id: "gym-bld",
+        name: "學生活動中心 / 體育館",
+        // 空拍機真實特徵：粉紅鮭魚磚牆色調 (Salmon Pink)
+        color: 0xd98a80,
+        roofColor: 0x9fa8a3,
+        x: -90, z: 65, width: 56, depth: 36, floors: 2,
+        isGymSpecial: true, // 具備圓柱雙塔與挑高造型
+        entrance: { x: -62, z: 65, y: 0.5 },
+        rooms: [
+          { id: "gym", name: "室內挑高綜合球場", floor: 1, rel: [-10, 1] },
+          { id: "gym-stage", name: "活動中心大禮堂與舞台", floor: 1, rel: [10, 1] },
+        ]
+      },
+      {
         id: "admin",
         name: "行政大樓",
-        color: 0xc85a53, // 典雅紅磚色
-        roofColor: 0x9e3d37,
-        x: 5, z: 28, width: 44, depth: 16, floors: 3,
-        entrance: { x: 5, z: 37, y: 0.5 },
+        // 空拍機真實特徵：亮紅色金屬斜屋頂
+        color: 0xd9dfe2, // 淺灰白外牆
+        roofColor: 0xd63031, // 亮紅金屬斜頂
+        hasPitchedRoof: true,
+        x: 10, z: 32, width: 44, depth: 16, floors: 3,
+        entrance: { x: 10, z: 42, y: 0.5 },
         rooms: [
           { id: "health", name: "健康中心", floor: 1, rel: [-14, 1] },
           { id: "general", name: "總務處", floor: 1, rel: [0, 1] },
@@ -663,10 +699,11 @@
       {
         id: "grade8-bld",
         name: "八年級教學棟",
-        color: 0xd9822b, // 活力橙
-        roofColor: 0xa86018,
-        x: 52, z: 30, width: 38, depth: 16, floors: 3,
-        entrance: { x: 40, z: 30, y: 0.5 },
+        color: 0xd9822b,
+        roofColor: 0xd63031, // 紅色坡頂
+        hasPitchedRoof: true,
+        x: 56, z: 32, width: 38, depth: 16, floors: 3,
+        entrance: { x: 44, z: 32, y: 0.5 },
         rooms: [
           { id: "804", name: "804 教室", floor: 1, rel: [-12, 1] },
           { id: "809", name: "809 體育班", floor: 1, rel: [0, 1] },
@@ -682,10 +719,11 @@
       {
         id: "grade9-bld",
         name: "九年級教學棟",
-        color: 0x5a9e6f, // 穩重碧綠
-        roofColor: 0x3d704c,
-        x: 52, z: -12, width: 38, depth: 16, floors: 3,
-        entrance: { x: 40, z: -12, y: 0.5 },
+        color: 0x5a9e6f,
+        roofColor: 0xd63031, // 紅色坡頂
+        hasPitchedRoof: true,
+        x: 56, z: -12, width: 38, depth: 16, floors: 3,
+        entrance: { x: 44, z: -12, y: 0.5 },
         rooms: [
           { id: "906", name: "906 教室", floor: 1, rel: [-12, 1] },
           { id: "907", name: "907 教室", floor: 1, rel: [0, 1] },
@@ -701,10 +739,10 @@
       {
         id: "tech-bld",
         name: "科技館 / 創客中心",
-        color: 0x2a9d8f, // 科技青色
+        color: 0x2a9d8f,
         roofColor: 0x1b675e,
-        x: 98, z: 28, width: 34, depth: 16, floors: 2,
-        entrance: { x: 86, z: 28, y: 0.5 },
+        x: 102, z: 30, width: 34, depth: 16, floors: 2,
+        entrance: { x: 90, z: 30, y: 0.5 },
         rooms: [
           { id: "energy-lab", name: "未來能源實驗室", floor: 1, rel: [-8, 1] },
           { id: "maker-lab", name: "創客自造空間", floor: 1, rel: [8, 1] },
@@ -715,10 +753,10 @@
       {
         id: "art-bld",
         name: "藝術館",
-        color: 0xb56576, // 藝術洋紅
+        color: 0xb56576,
         roofColor: 0x82414f,
-        x: 98, z: -12, width: 34, depth: 16, floors: 2,
-        entrance: { x: 86, z: -12, y: 0.5 },
+        x: 102, z: -12, width: 34, depth: 16, floors: 2,
+        entrance: { x: 90, z: -12, y: 0.5 },
         rooms: [
           { id: "fitness", name: "樂活體能教室", floor: 1, rel: [-8, 1] },
           { id: "dance", name: "韻律舞蹈教室", floor: 1, rel: [8, 1] },
@@ -729,7 +767,7 @@
       {
         id: "library-bld",
         name: "綜合大樓 / 樂活圖書館",
-        color: 0x6d597a, // 典雅紫檀
+        color: 0x6d597a,
         roofColor: 0x483a52,
         x: 0, z: -46, width: 50, depth: 18, floors: 2,
         entrance: { x: 0, z: -36, y: 0.5 },
@@ -739,18 +777,6 @@
           { id: "coop", name: "員生合作社", floor: 1, rel: [16, 1] },
           { id: "library", name: "樂活圖書館", floor: 2, rel: [-12, 2] },
           { id: "computer-lab", name: "多媒體大電腦教室", floor: 2, rel: [12, 2] },
-        ]
-      },
-      {
-        id: "gym-bld",
-        name: "學生活動中心 / 體育館",
-        color: 0x4a7c59, // 運動綠色
-        roofColor: 0x31543b,
-        x: -90, z: 65, width: 52, depth: 36, floors: 1,
-        entrance: { x: -62, z: 65, y: 0.5 },
-        rooms: [
-          { id: "gym", name: "室內挑高綜合球場", floor: 1, rel: [-10, 1] },
-          { id: "grandstand", name: "萬人集會看台與舞台", floor: 1, rel: [10, 1] },
         ]
       }
     ];
@@ -767,12 +793,12 @@
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xb0d5ed);
-    scene.fog = new THREE.FogExp2(0xb0d5ed, 0.0035);
+    scene.fog = new THREE.FogExp2(0xb0d5ed, 0.0032);
 
-    // Camera
+    // Camera: Angle matching aerial drone overview shot
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-    const DEFAULT_CAM_POS = new THREE.Vector3(0, 110, 160);
-    const DEFAULT_TARGET = new THREE.Vector3(0, 10, 10);
+    const DEFAULT_CAM_POS = new THREE.Vector3(-45, 95, 140);
+    const DEFAULT_TARGET = new THREE.Vector3(-30, 8, 20);
     camera.position.copy(DEFAULT_CAM_POS);
 
     // Orbit Controls
@@ -780,22 +806,22 @@
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
     controls.target.copy(DEFAULT_TARGET);
-    controls.maxPolarAngle = Math.PI / 2 - 0.02; // Don't go below ground
+    controls.maxPolarAngle = Math.PI / 2 - 0.02;
     controls.minDistance = 15;
     controls.maxDistance = 380;
 
-    // Ambient & Directional Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.72);
+    // Ambient & Sunlight
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.76);
     scene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfffaed, 0.95);
-    sunLight.position.set(80, 140, 70);
+    const sunLight = new THREE.DirectionalLight(0xfffaec, 1.05);
+    sunLight.position.set(70, 150, 90);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
     sunLight.shadow.camera.near = 10;
-    sunLight.shadow.camera.far = 400;
-    const shadowD = 160;
+    sunLight.shadow.camera.far = 420;
+    const shadowD = 170;
     sunLight.shadow.camera.left = -shadowD;
     sunLight.shadow.camera.right = shadowD;
     sunLight.shadow.camera.top = shadowD;
@@ -803,53 +829,133 @@
     scene.add(sunLight);
 
     /* ==========================================================================
-       3. PROCEDURAL CAMPUS GENERATION (Ground, Buildings, Track, Trees)
+       3. REALISTIC ENVIRONMENT (空拍機畫面還原：深色跑道、球場、水圳、前庭停車場)
        ========================================================================== */
     const buildingMeshes = [];
-    const floorMeshes = []; // For floor slice isolation
+    const floorMeshes = [];
     const labelElements = [];
     const labelsContainer = document.getElementById("labels-container");
 
-    // 3.1 Ground & Lawn
-    const groundGeo = new THREE.PlaneGeometry(360, 300);
-    const groundMat = new THREE.MeshLambertMaterial({ color: 0x76a053 }); // 校園綠草皮
+    // 3.1 Ground Green Plane (大溪周圍綠地)
+    const groundGeo = new THREE.PlaneGeometry(380, 320);
+    const groundMat = new THREE.MeshLambertMaterial({ color: 0x5b8a47 });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // 3.2 Main Boulevard & Walkways (迎賓林蔭大道)
-    const boulevardGeo = new THREE.PlaneGeometry(16, 120);
-    const roadMat = new THREE.MeshLambertMaterial({ color: 0xd9d3c5 }); // 質感人行鋪面
-    const boulevard = new THREE.Mesh(boulevardGeo, roadMat);
-    boulevard.rotation.x = -Math.PI / 2;
-    boulevard.position.set(0, 0.02, 35);
-    boulevard.receiveShadow = true;
-    scene.add(boulevard);
+    // 3.2 Natural Water Canal (校園西側護城綠水圳與駁坎)
+    function createCanal() {
+      const canalGroup = new THREE.Group();
+      canalGroup.position.set(-135, 0, 10);
 
-    // East-West Central Plaza (中庭穿堂林蔭大道)
-    const crossRoadGeo = new THREE.PlaneGeometry(240, 14);
-    const crossRoad = new THREE.Mesh(crossRoadGeo, roadMat);
-    crossRoad.rotation.x = -Math.PI / 2;
-    crossRoad.position.set(10, 0.02, 8);
-    crossRoad.receiveShadow = true;
-    scene.add(crossRoad);
+      // Water channel surface
+      const waterGeo = new THREE.PlaneGeometry(16, 260);
+      const waterMat = new THREE.MeshLambertMaterial({ color: 0x3d6b5e, transparent: true, opacity: 0.88 });
+      const water = new THREE.Mesh(waterGeo, waterMat);
+      water.rotation.x = -Math.PI / 2;
+      water.position.y = -0.4;
+      canalGroup.add(water);
 
-    // 3.3 Track & Field (200m 綜合運動場) on West
-    function createAthleticTrack() {
+      // Concrete embankments
+      const bankGeo = new THREE.BoxGeometry(4, 1.2, 260);
+      const bankMat = new THREE.MeshLambertMaterial({ color: 0x8a9296 });
+      const leftBank = new THREE.Mesh(bankGeo, bankMat);
+      leftBank.position.set(-8, 0, 0);
+      const rightBank = new THREE.Mesh(bankGeo, bankMat);
+      rightBank.position.set(8, 0, 0);
+      canalGroup.add(leftBank);
+      canalGroup.add(rightBank);
+
+      scene.add(canalGroup);
+    }
+    createCanal();
+
+    // 3.3 Main Entrance Boulevard & Parking Plaza (前庭壓花地磚、停車場、減速帶)
+    function createPlazaAndParking() {
+      const plazaGroup = new THREE.Group();
+      plazaGroup.position.set(-35, 0.02, 75);
+
+      // Plaza paved tile floor (空拍機顯示的大片灰白地磚停車廣場)
+      const plazaGeo = new THREE.PlaneGeometry(80, 50);
+      const plazaMat = new THREE.MeshLambertMaterial({ color: 0xc8cfd3 });
+      const plaza = new THREE.Mesh(plazaGeo, plazaMat);
+      plaza.rotation.x = -Math.PI / 2;
+      plaza.receiveShadow = true;
+      plazaGroup.add(plaza);
+
+      // Yellow Speed Bumps / Hazard markings (空拍清晰可見的黃色人行/減速黃斜線)
+      for (let i = 0; i < 4; i++) {
+        const stripeGeo = new THREE.PlaneGeometry(14, 1.2);
+        const stripeMat = new THREE.MeshBasicMaterial({ color: 0xffd23f });
+        const stripe = new THREE.Mesh(stripeGeo, stripeMat);
+        stripe.rotation.x = -Math.PI / 2;
+        stripe.position.set(6, 0.03, -12 + i * 4);
+        plazaGroup.add(stripe);
+      }
+
+      // Parking Stall Lines (白色停車格)
+      for (let j = 0; j < 6; j++) {
+        const stallGeo = new THREE.PlaneGeometry(5, 0.2);
+        const stallMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const stall = new THREE.Mesh(stallGeo, stallMat);
+        stall.rotation.x = -Math.PI / 2;
+        stall.position.set(22, 0.03, -16 + j * 6);
+        plazaGroup.add(stall);
+      }
+
+      // Stylized Parked Cars (空拍機前庭停放的車輛)
+      const carColors = [0xffffff, 0x222222, 0xe74c3c, 0xffffff];
+      carColors.forEach((col, idx) => {
+        const car = new THREE.Group();
+        car.position.set(22, 0.8, -16 + idx * 6);
+        const bodyGeo = new THREE.BoxGeometry(4.2, 1.2, 2.2);
+        const bodyMat = new THREE.MeshLambertMaterial({ color: col });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.castShadow = true;
+        car.add(body);
+        plazaGroup.add(car);
+      });
+
+      // Front Gate Pillars with Golden Spheres (空拍機大門兩根帶金色圓球的門柱)
+      function createGatePillar(x, z) {
+        const pGroup = new THREE.Group();
+        pGroup.position.set(x, 0, z);
+        const postGeo = new THREE.BoxGeometry(2, 6, 2);
+        const postMat = new THREE.MeshLambertMaterial({ color: 0xf5f6fa });
+        const post = new THREE.Mesh(postGeo, postMat);
+        post.position.y = 3;
+        post.castShadow = true;
+        pGroup.add(post);
+
+        const sphereGeo = new THREE.SphereGeometry(0.8, 16, 16);
+        const sphereMat = new THREE.MeshLambertMaterial({ color: 0xf1c40f }); // 標誌性金黃圓頂飾球
+        const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+        sphere.position.y = 6.8;
+        pGroup.add(sphere);
+        return pGroup;
+      }
+      plazaGroup.add(createGatePillar(-12, 24));
+      plazaGroup.add(createGatePillar(12, 24));
+
+      scene.add(plazaGroup);
+    }
+    createPlazaAndParking();
+
+    // 3.4 200m Athletic Track & Field (空拍機真實對比：深碳灰跑道 + 紅色雙排球場)
+    function createAuthenticTrack() {
       const trackGroup = new THREE.Group();
-      trackGroup.position.set(-90, 0.03, -10);
+      trackGroup.position.set(-90, 0.03, -15);
 
-      // Outer Red PU Track
-      const trackWidth = 70, trackHeight = 110;
-      const puMat = new THREE.MeshLambertMaterial({ color: 0xb54334 }); // PU 紅色跑道
+      // Outer Deep Charcoal PU Track (空拍顯示的深炭黑/深青黑耐磨跑道)
+      const puMat = new THREE.MeshLambertMaterial({ color: 0x2e3138 });
       const trackShape = new THREE.Shape();
-      const r = 26;
-      trackShape.moveTo(-r, -30);
-      trackShape.lineTo(r, -30);
-      trackShape.absarc(0, -30, r, 0, Math.PI, true);
-      trackShape.lineTo(-r, 30);
-      trackShape.absarc(0, 30, r, Math.PI, 0, true);
+      const r = 27;
+      trackShape.moveTo(-r, -32);
+      trackShape.lineTo(r, -32);
+      trackShape.absarc(0, -32, r, 0, Math.PI, true);
+      trackShape.lineTo(-r, 32);
+      trackShape.absarc(0, 32, r, Math.PI, 0, true);
       trackShape.closePath();
 
       const trackGeo = new THREE.ShapeGeometry(trackShape);
@@ -858,82 +964,112 @@
       trackMesh.receiveShadow = true;
       trackGroup.add(trackMesh);
 
-      // Infield Soccer Green Field
+      // Infield Lush Natural Lawn (中央天然大草坪)
       const innerShape = new THREE.Shape();
-      const ir = 18;
-      innerShape.moveTo(-ir, -28);
-      innerShape.lineTo(ir, -28);
-      innerShape.absarc(0, -28, ir, 0, Math.PI, true);
-      innerShape.lineTo(-ir, 28);
-      innerShape.absarc(0, 28, ir, Math.PI, 0, true);
+      const ir = 19;
+      innerShape.moveTo(-ir, -30);
+      innerShape.lineTo(ir, -30);
+      innerShape.absarc(0, -30, ir, 0, Math.PI, true);
+      innerShape.lineTo(-ir, 30);
+      innerShape.absarc(0, 30, ir, Math.PI, 0, true);
       innerShape.closePath();
 
       const innerGeo = new THREE.ShapeGeometry(innerShape);
-      const innerMat = new THREE.MeshLambertMaterial({ color: 0x488b39 }); // 內圈天然草皮
+      const innerMat = new THREE.MeshLambertMaterial({ color: 0x4fa638 });
       const innerMesh = new THREE.Mesh(innerGeo, innerMat);
       innerMesh.rotation.x = -Math.PI / 2;
       innerMesh.position.y = 0.02;
       innerMesh.receiveShadow = true;
       trackGroup.add(innerMesh);
 
-      // 司令台 (Grandstand)
-      const stageGeo = new THREE.BoxGeometry(16, 3, 7);
-      const stageMat = new THREE.MeshLambertMaterial({ color: 0xecf0f1 });
-      const stage = new THREE.Mesh(stageGeo, stageMat);
-      stage.position.set(-30, 1.5, 0);
-      stage.castShadow = true;
-      stage.receiveShadow = true;
-      trackGroup.add(stage);
+      // Two Red Acrylic Courts (空拍機草皮右半部清晰可見的「雙排亮紅地坪球場」)
+      const redCourtGeo = new THREE.PlaneGeometry(16, 26);
+      const redCourtMat = new THREE.MeshLambertMaterial({ color: 0xc0392b }); // 磚紅色球場
+      const redCourt = new THREE.Mesh(redCourtGeo, redCourtMat);
+      redCourt.rotation.x = -Math.PI / 2;
+      redCourt.position.set(0, 0.04, 12);
+      redCourt.receiveShadow = true;
+      trackGroup.add(redCourt);
 
+      // 司令台 (Grandstand)：空拍清晰捕捉到的「鮮豔紅斜坡人字屋頂」
+      const standGroup = new THREE.Group();
+      standGroup.position.set(-28, 0, 8);
+
+      const standBaseGeo = new THREE.BoxGeometry(14, 3.5, 7);
+      const standBaseMat = new THREE.MeshLambertMaterial({ color: 0x4b7bec }); // 藍白色底座
+      const standBase = new THREE.Mesh(standBaseGeo, standBaseMat);
+      standBase.position.y = 1.75;
+      standBase.castShadow = true;
+      standGroup.add(standBase);
+
+      // 亮紅斜頂 (Red Pitched Roof)
+      const roofShape = new THREE.Shape();
+      roofShape.moveTo(-4, 0);
+      roofShape.lineTo(0, 2.2);
+      roofShape.lineTo(4, 0);
+      roofShape.closePath();
+      const extrudeSettings = { depth: 15, bevelEnabled: false };
+      const roofGeo = new THREE.ExtrudeGeometry(roofShape, extrudeSettings);
+      const roofMat = new THREE.MeshLambertMaterial({ color: 0xd63031 }); // 亮紅瓦面
+      const roof = new THREE.Mesh(roofGeo, roofMat);
+      roof.position.set(0, 3.5, -7.5);
+      roof.rotation.y = Math.PI / 2;
+      roof.castShadow = true;
+      standGroup.add(roof);
+
+      trackGroup.add(standGroup);
       scene.add(trackGroup);
-    }
-    createAthleticTrack();
 
-    // 3.4 Basketball Courts (戶外籃球場)
-    function createBasketballCourts() {
-      const courtGeo = new THREE.PlaneGeometry(42, 28);
-      const courtMat = new THREE.MeshLambertMaterial({ color: 0x227093 }); // 藍綠色籃球場地坪
-      const court = new THREE.Mesh(courtGeo, courtMat);
-      court.rotation.x = -Math.PI / 2;
-      court.position.set(-90, 0.04, -85);
-      court.receiveShadow = true;
-      scene.add(court);
+      // Register grandstand label & room
+      ROOMS_DB["grandstand"] = {
+        id: "grandstand",
+        name: "操場司令台",
+        buildingId: "track",
+        buildingName: "綜合運動場",
+        floor: 1,
+        x: -118, y: 3.5, z: -7,
+        entrance: { x: -118, y: 0.5, z: 0 }
+      };
     }
-    createBasketballCourts();
 
-    // 3.5 Trees (校園景觀林蔭)
-    function createTree(x, z) {
+    // 3.5 Trees (林蔭大道棕櫚樹與綠灌木)
+    function createPalmTree(x, z) {
       const tree = new THREE.Group();
       tree.position.set(x, 0, z);
 
-      const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, 3, 6);
-      const trunkMat = new THREE.MeshLambertMaterial({ color: 0x5c4033 });
+      // Trunk
+      const trunkGeo = new THREE.CylinderGeometry(0.35, 0.55, 6, 7);
+      const trunkMat = new THREE.MeshLambertMaterial({ color: 0x6e503b });
       const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-      trunk.position.y = 1.5;
+      trunk.position.y = 3;
+      trunk.rotation.z = (Math.random() - 0.5) * 0.1;
       trunk.castShadow = true;
       tree.add(trunk);
 
-      const leavesGeo = new THREE.ConeGeometry(2.4, 5, 7);
-      const leavesMat = new THREE.MeshLambertMaterial({ color: 0x2d6a4f });
-      const leaves = new THREE.Mesh(leavesGeo, leavesMat);
-      leaves.position.y = 4.6;
-      leaves.castShadow = true;
-      tree.add(leaves);
-
+      // Palm Crown Leaves (棕櫚展開葉冠)
+      for (let i = 0; i < 7; i++) {
+        const leafGeo = new THREE.ConeGeometry(1.6, 4.5, 4);
+        const leafMat = new THREE.MeshLambertMaterial({ color: 0x27ae60 });
+        const leaf = new THREE.Mesh(leafGeo, leafMat);
+        leaf.position.set(0, 6, 0);
+        leaf.rotation.z = 1.1;
+        leaf.rotation.y = (i / 7) * Math.PI * 2;
+        leaf.castShadow = true;
+        tree.add(leaf);
+      }
       scene.add(tree);
     }
-    // Trees along Boulevard
-    for (let z = 90; z >= 15; z -= 14) {
-      createTree(-11, z);
-      createTree(11, z);
-    }
-    // Trees in Courtyard
-    createTree(30, 18);
-    createTree(-26, 18);
-    createTree(25, -28);
-    createTree(-35, -28);
+    // Trees along parking plaza & boulevard
+    [-18, -4, 10, 24].forEach(x => {
+      createPalmTree(x, 92);
+      createPalmTree(x, 56);
+    });
 
-    // 3.6 Procedural Building Construction
+    /* ==========================================================================
+       4. PROCEDURAL BUILDING CREATION (含空拍活動中心圓柱雙塔與紅斜頂)
+       ========================================================================== */
+    const ROOMS_DB = {};
+
     BUILDINGS_CONFIG.forEach(cfg => {
       const bldGroup = new THREE.Group();
       bldGroup.position.set(cfg.x, 0, cfg.z);
@@ -950,7 +1086,7 @@
         const floorGeo = new THREE.BoxGeometry(cfg.width, FH - 0.2, cfg.depth);
         const floorMat = new THREE.MeshLambertMaterial({
           color: cfg.color,
-          roughness: 0.6
+          roughness: 0.65
         });
         const floorMesh = new THREE.Mesh(floorGeo, floorMat);
         floorMesh.position.y = fCenterY;
@@ -958,7 +1094,7 @@
         floorMesh.receiveShadow = true;
         floorGroup.add(floorMesh);
 
-        // Windows Bands
+        // Windows Band
         const winBandGeo = new THREE.BoxGeometry(cfg.width + 0.2, 1.2, cfg.depth + 0.2);
         const winMat = new THREE.MeshLambertMaterial({
           color: 0x1a2e3b,
@@ -969,7 +1105,7 @@
         winBand.position.y = fCenterY + 0.2;
         floorGroup.add(winBand);
 
-        // Floor Slab Divider
+        // Floor Divider Slab
         const slabGeo = new THREE.BoxGeometry(cfg.width + 0.8, 0.3, cfg.depth + 0.8);
         const slabMat = new THREE.MeshLambertMaterial({ color: 0xf4f4f4 });
         const slab = new THREE.Mesh(slabGeo, slabMat);
@@ -981,16 +1117,78 @@
         floorMeshes.push(floorGroup);
       }
 
-      // Roof & Parapet
-      const roofGeo = new THREE.BoxGeometry(cfg.width + 0.6, 0.6, cfg.depth + 0.6);
-      const roofMat = new THREE.MeshLambertMaterial({ color: cfg.roofColor });
-      const roofMesh = new THREE.Mesh(roofGeo, roofMat);
-      roofMesh.position.y = totalH + 0.3;
-      roofMesh.castShadow = true;
-      bldGroup.add(roofMesh);
+      // 特殊結構 1：學生活動中心「半圓柱雙塔樓梯井」與「頂樓通風排氣機房」
+      if (cfg.isGymSpecial) {
+        // Twin Cylindrical Stair Towers on front right entrance
+        [-14, 14].forEach(offsetZ => {
+          const towerGeo = new THREE.CylinderGeometry(4.5, 4.5, totalH + 1.5, 24);
+          const towerMat = new THREE.MeshLambertMaterial({ color: 0xd98a80 });
+          const tower = new THREE.Mesh(towerGeo, towerMat);
+          tower.position.set(cfg.width / 2 - 1, (totalH + 1.5) / 2, offsetZ);
+          tower.castShadow = true;
+          bldGroup.add(tower);
+
+          // Tower window rings
+          for (let k = 1; k <= 3; k++) {
+            const ringGeo = new THREE.CylinderGeometry(4.6, 4.6, 0.6, 24);
+            const ringMat = new THREE.MeshLambertMaterial({ color: 0x1a2e3b });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.set(cfg.width / 2 - 1, k * 2.4, offsetZ);
+            bldGroup.add(ring);
+          }
+        });
+
+        // Rooftop round ventilation dome (空拍顯示的頂樓圓形排風設備)
+        const domeGeo = new THREE.CylinderGeometry(2.5, 2.5, 2, 16);
+        const domeMat = new THREE.MeshLambertMaterial({ color: 0xc8cfd3 });
+        const dome = new THREE.Mesh(domeGeo, domeMat);
+        dome.position.set(0, totalH + 1, 0);
+        bldGroup.add(dome);
+      }
+
+      // 特殊結構 2：右側大樓紅烤漆防漏金屬斜屋頂 (Pitched Red Metal Roof)
+      if (cfg.hasPitchedRoof) {
+        const roofShape = new THREE.Shape();
+        roofShape.moveTo(-cfg.depth / 2 - 0.6, 0);
+        roofShape.lineTo(0, 3.2);
+        roofShape.lineTo(cfg.depth / 2 + 0.6, 0);
+        roofShape.closePath();
+
+        const extrudeSettings = { depth: cfg.width + 1.2, bevelEnabled: false };
+        const pRoofGeo = new THREE.ExtrudeGeometry(roofShape, extrudeSettings);
+        const pRoofMat = new THREE.MeshLambertMaterial({ color: cfg.roofColor });
+        const pRoof = new THREE.Mesh(pRoofGeo, pRoofMat);
+        pRoof.position.set(cfg.width / 2 + 0.6, totalH + 0.1, 0);
+        pRoof.rotation.y = Math.PI / 2;
+        pRoof.castShadow = true;
+        bldGroup.add(pRoof);
+      } else {
+        // Flat Roof Parapet
+        const roofGeo = new THREE.BoxGeometry(cfg.width + 0.6, 0.6, cfg.depth + 0.6);
+        const roofMat = new THREE.MeshLambertMaterial({ color: cfg.roofColor });
+        const roofMesh = new THREE.Mesh(roofGeo, roofMat);
+        roofMesh.position.y = totalH + 0.3;
+        roofMesh.castShadow = true;
+        bldGroup.add(roofMesh);
+      }
 
       scene.add(bldGroup);
       buildingMeshes.push(bldGroup);
+
+      // Register Rooms DB
+      cfg.rooms.forEach(r => {
+        ROOMS_DB[r.id] = {
+          id: r.id,
+          name: r.name,
+          buildingId: cfg.id,
+          buildingName: cfg.name,
+          floor: r.floor,
+          x: cfg.x + r.rel[0],
+          y: (r.floor - 0.5) * FH,
+          z: cfg.z,
+          entrance: cfg.entrance
+        };
+      });
 
       // 3D DOM Building Label
       const labelDiv = document.createElement("div");
@@ -1001,47 +1199,29 @@
 
       labelElements.push({
         element: labelDiv,
-        worldPos: new THREE.Vector3(cfg.x, totalH + 2.5, cfg.z)
+        worldPos: new THREE.Vector3(cfg.x, totalH + 3.2, cfg.z)
       });
     });
+
+    createAuthenticTrack();
 
     /* ==========================================================================
-       4. NAVIGATION & A* GRAPH TOPOLOGY (路網拓撲與 A* 最短路徑搜尋)
+       5. A* NAVIGATION GRAPH (路網拓撲與最短路徑)
        ========================================================================== */
-    // Build Master Room Database with Real Coordinates
-    const ROOMS_DB = {};
-    BUILDINGS_CONFIG.forEach(cfg => {
-      cfg.rooms.forEach(r => {
-        const roomX = cfg.x + r.rel[0];
-        const roomY = (r.floor - 0.5) * FH;
-        const roomZ = cfg.z;
-        ROOMS_DB[r.id] = {
-          id: r.id,
-          name: r.name,
-          buildingId: cfg.id,
-          buildingName: cfg.name,
-          floor: r.floor,
-          x: roomX,
-          y: roomY,
-          z: roomZ,
-          entrance: cfg.entrance
-        };
-      });
-    });
-
-    // Navigation Waypoint Nodes
     const NAV_NODES = {
-      // 校門口起點
-      "gate": { id: "gate", x: 0, y: 0.5, z: 92, neighbors: ["blvd-1"] },
-      // 迎賓大道節點
-      "blvd-1": { id: "blvd-1", x: 0, y: 0.5, z: 65, neighbors: ["gate", "blvd-2", "gym-branch"] },
-      "gym-branch": { id: "gym-branch", x: -50, y: 0.5, z: 65, neighbors: ["blvd-1", "gym-ent"] },
-      "gym-ent": { id: "gym-ent", x: -62, y: 0.5, z: 65, neighbors: ["gym-branch"] },
-      "blvd-2": { id: "blvd-2", x: 0, y: 0.5, z: 35, neighbors: ["blvd-1", "admin-ent", "blvd-3"] },
-      "admin-ent": { id: "admin-ent", x: 5, y: 0.5, z: 37, neighbors: ["blvd-2", "admin-f1"] },
-      "admin-f1": { id: "admin-f1", x: 5, y: 0.5 * FH, z: 28, neighbors: ["admin-ent", "admin-f2"] },
-      "admin-f2": { id: "admin-f2", x: 5, y: 1.5 * FH, z: 28, neighbors: ["admin-f1", "admin-f3"] },
-      "admin-f3": { id: "admin-f3", x: 5, y: 2.5 * FH, z: 28, neighbors: ["admin-f2"] },
+      // 校門大門
+      "gate": { id: "gate", x: -35, y: 0.5, z: 98, neighbors: ["plaza-center"] },
+      "plaza-center": { id: "plaza-center", x: -35, y: 0.5, z: 75, neighbors: ["gate", "gym-ent", "blvd-1"] },
+      "gym-ent": { id: "gym-ent", x: -62, y: 0.5, z: 65, neighbors: ["plaza-center", "track-ent"] },
+      "track-ent": { id: "track-ent", x: -90, y: 0.5, z: 25, neighbors: ["gym-ent", "stand-node"] },
+      "stand-node": { id: "stand-node", x: -118, y: 0.5, z: 8, neighbors: ["track-ent"] },
+
+      "blvd-1": { id: "blvd-1", x: 10, y: 0.5, z: 65, neighbors: ["plaza-center", "blvd-2"] },
+      "blvd-2": { id: "blvd-2", x: 10, y: 0.5, z: 42, neighbors: ["blvd-1", "admin-f1", "blvd-3"] },
+      
+      "admin-f1": { id: "admin-f1", x: 10, y: 0.5 * FH, z: 32, neighbors: ["blvd-2", "admin-f2"] },
+      "admin-f2": { id: "admin-f2", x: 10, y: 1.5 * FH, z: 32, neighbors: ["admin-f1", "admin-f3"] },
+      "admin-f3": { id: "admin-f3", x: 10, y: 2.5 * FH, z: 32, neighbors: ["admin-f2"] },
 
       // 中庭穿堂十字路口
       "blvd-3": { id: "blvd-3", x: 0, y: 0.5, z: 8, neighbors: ["blvd-2", "blvd-4", "east-cross"] },
@@ -1052,25 +1232,25 @@
       "newbld-f4": { id: "newbld-f4", x: 0, y: 3.5 * FH, z: -12, neighbors: ["newbld-f3"] },
 
       // 東側分岔 (八九年級棟、科技館、藝術館)
-      "east-cross": { id: "east-cross", x: 38, y: 0.5, z: 8, neighbors: ["blvd-3", "g8-ent", "g9-ent", "east-far"] },
-      "g8-ent": { id: "g8-ent", x: 40, y: 0.5, z: 30, neighbors: ["east-cross", "g8-f1"] },
-      "g8-f1": { id: "g8-f1", x: 52, y: 0.5 * FH, z: 30, neighbors: ["g8-ent", "g8-f2"] },
-      "g8-f2": { id: "g8-f2", x: 52, y: 1.5 * FH, z: 30, neighbors: ["g8-f1", "g8-f3"] },
-      "g8-f3": { id: "g8-f3", x: 52, y: 2.5 * FH, z: 30, neighbors: ["g8-f2"] },
+      "east-cross": { id: "east-cross", x: 44, y: 0.5, z: 8, neighbors: ["blvd-3", "g8-ent", "g9-ent", "east-far"] },
+      "g8-ent": { id: "g8-ent", x: 44, y: 0.5, z: 32, neighbors: ["east-cross", "g8-f1"] },
+      "g8-f1": { id: "g8-f1", x: 56, y: 0.5 * FH, z: 32, neighbors: ["g8-ent", "g8-f2"] },
+      "g8-f2": { id: "g8-f2", x: 56, y: 1.5 * FH, z: 32, neighbors: ["g8-f1", "g8-f3"] },
+      "g8-f3": { id: "g8-f3", x: 56, y: 2.5 * FH, z: 32, neighbors: ["g8-f2"] },
 
-      "g9-ent": { id: "g9-ent", x: 40, y: 0.5, z: -12, neighbors: ["east-cross", "g9-f1"] },
-      "g9-f1": { id: "g9-f1", x: 52, y: 0.5 * FH, z: -12, neighbors: ["g9-ent", "g9-f2"] },
-      "g9-f2": { id: "g9-f2", x: 52, y: 1.5 * FH, z: -12, neighbors: ["g9-f1", "g9-f3"] },
-      "g9-f3": { id: "g9-f3", x: 52, y: 2.5 * FH, z: -12, neighbors: ["g9-f2"] },
+      "g9-ent": { id: "g9-ent", x: 44, y: 0.5, z: -12, neighbors: ["east-cross", "g9-f1"] },
+      "g9-f1": { id: "g9-f1", x: 56, y: 0.5 * FH, z: -12, neighbors: ["g9-ent", "g9-f2"] },
+      "g9-f2": { id: "g9-f2", x: 56, y: 1.5 * FH, z: -12, neighbors: ["g9-f1", "g9-f3"] },
+      "g9-f3": { id: "g9-f3", x: 56, y: 2.5 * FH, z: -12, neighbors: ["g9-f2"] },
 
-      "east-far": { id: "east-far", x: 86, y: 0.5, z: 8, neighbors: ["east-cross", "tech-ent", "art-ent"] },
-      "tech-ent": { id: "tech-ent", x: 86, y: 0.5, z: 28, neighbors: ["east-far", "tech-f1"] },
-      "tech-f1": { id: "tech-f1", x: 98, y: 0.5 * FH, z: 28, neighbors: ["tech-ent", "tech-f2"] },
-      "tech-f2": { id: "tech-f2", x: 98, y: 1.5 * FH, z: 28, neighbors: ["tech-f1"] },
+      "east-far": { id: "east-far", x: 90, y: 0.5, z: 8, neighbors: ["east-cross", "tech-ent", "art-ent"] },
+      "tech-ent": { id: "tech-ent", x: 90, y: 0.5, z: 30, neighbors: ["east-far", "tech-f1"] },
+      "tech-f1": { id: "tech-f1", x: 102, y: 0.5 * FH, z: 30, neighbors: ["tech-ent", "tech-f2"] },
+      "tech-f2": { id: "tech-f2", x: 102, y: 1.5 * FH, z: 30, neighbors: ["tech-f1"] },
 
-      "art-ent": { id: "art-ent", x: 86, y: 0.5, z: -12, neighbors: ["east-far", "art-f1"] },
-      "art-f1": { id: "art-f1", x: 98, y: 0.5 * FH, z: -12, neighbors: ["art-ent", "art-f2"] },
-      "art-f2": { id: "art-f2", x: 98, y: 1.5 * FH, z: -12, neighbors: ["art-f1"] },
+      "art-ent": { id: "art-ent", x: 90, y: 0.5, z: -12, neighbors: ["east-far", "art-f1"] },
+      "art-f1": { id: "art-f1", x: 102, y: 0.5 * FH, z: -12, neighbors: ["art-ent", "art-f2"] },
+      "art-f2": { id: "art-f2", x: 102, y: 1.5 * FH, z: -12, neighbors: ["art-f1"] },
 
       // 北側綜合大樓 / 圖書館
       "blvd-5": { id: "blvd-5", x: 0, y: 0.5, z: -36, neighbors: ["blvd-4", "lib-f1"] },
@@ -1088,7 +1268,6 @@
       });
     });
 
-    // Helper: Map Room to its closest corridor waypoint
     function getNearestCorridorNode(room) {
       if (room.buildingId === "admin") return `admin-f${room.floor}`;
       if (room.buildingId === "new-bld") return `newbld-f${room.floor}`;
@@ -1098,10 +1277,11 @@
       if (room.buildingId === "art-bld") return `art-f${room.floor}`;
       if (room.buildingId === "library-bld") return `lib-f${room.floor}`;
       if (room.buildingId === "gym-bld") return `gym-ent`;
-      return "blvd-1";
+      if (room.buildingId === "track") return `stand-node`;
+      return "plaza-center";
     }
 
-    // A* Pathfinding Algorithm
+    // A* Search
     function findShortestPath(startNodeId, targetNodeId) {
       const openSet = new Set([startNodeId]);
       const cameFrom = {};
@@ -1127,7 +1307,6 @@
         });
 
         if (current === targetNodeId) {
-          // Reconstruct path
           const path = [current];
           while (cameFrom[current]) {
             current = cameFrom[current];
@@ -1162,7 +1341,7 @@
     }
 
     /* ==========================================================================
-       5. 3D GLOWING NAVIGATION PATH RENDERING (立體發光導航軌跡)
+       6. 3D GLOWING NAVIGATION PATH RENDERING (立體發光路徑條)
        ========================================================================== */
     let navPathMesh = null;
     let navTargetPoint = null;
@@ -1177,7 +1356,7 @@
       if (!points || points.length < 2) return;
 
       const curve = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.15);
-      const tubeGeo = new THREE.TubeGeometry(curve, 120, 0.45, 8, false);
+      const tubeGeo = new THREE.TubeGeometry(curve, 120, 0.48, 8, false);
       const tubeMat = new THREE.MeshBasicMaterial({
         color: 0xffd23f,
         wireframe: false,
@@ -1187,9 +1366,9 @@
       navPathMesh = new THREE.Mesh(tubeGeo, tubeMat);
       scene.add(navPathMesh);
 
-      // Add Glowing destination marker
+      // Destination Pin
       if (!navTargetPoint) {
-        const pinGeo = new THREE.CylinderGeometry(0.1, 1.2, 3, 12);
+        const pinGeo = new THREE.CylinderGeometry(0.1, 1.3, 3.2, 12);
         const pinMat = new THREE.MeshBasicMaterial({ color: 0xe63946 });
         navTargetPoint = new THREE.Mesh(pinGeo, pinMat);
         scene.add(navTargetPoint);
@@ -1213,7 +1392,7 @@
     }
 
     /* ==========================================================================
-       6. INTERACTION & NAVIGATION LOGIC
+       7. INTERACTION LOGIC & SMOOTH CAMERA TWEEN
        ========================================================================== */
     let activeNavRoom = null;
 
@@ -1225,7 +1404,6 @@
       }
       activeNavRoom = room;
 
-      // 1. Calculate A* Path from School Gate to target
       const targetCorridorNode = getNearestCorridorNode(room);
       const nodePath = findShortestPath("gate", targetCorridorNode);
 
@@ -1236,34 +1414,28 @@
           pathPoints.push(new THREE.Vector3(n.x, (n.y || 0.5) + 0.6, n.z));
         });
       } else {
-        pathPoints.push(new THREE.Vector3(0, 1.2, 92));
+        pathPoints.push(new THREE.Vector3(-35, 1.2, 98));
       }
-      // Add final room point
       pathPoints.push(new THREE.Vector3(room.x, room.y + 1, room.z));
 
-      // 2. Render Glowing 3D Path
       renderNavigationPath(pathPoints);
 
-      // 3. Calculate Real Walking Distance
       let totalDist = 0;
       for (let i = 0; i < pathPoints.length - 1; i++) {
         totalDist += pathPoints[i].distanceTo(pathPoints[i + 1]);
       }
       const meters = Math.round(totalDist);
 
-      // 4. Update HUD
       document.getElementById("hud-target-name").textContent = `[${room.buildingName} ${room.floor}F] ${room.name}`;
-      document.getElementById("hud-route-desc").textContent = `由正門步道出發 → 經由 ${room.buildingName} 樓梯至 ${room.floor} 樓`;
+      document.getElementById("hud-route-desc").textContent = `由大門廣場出發 → 經由 ${room.buildingName} 至 ${room.floor} 樓`;
       document.getElementById("hud-dist-val").textContent = meters;
       document.getElementById("nav-hud").classList.add("visible");
 
-      // 5. Smooth Camera Transition to Target Room
       animateCameraTo(
         new THREE.Vector3(room.x + 24, room.y + 26, room.z + 32),
         new THREE.Vector3(room.x, room.y, room.z)
       );
 
-      // Auto filter floor if target is high
       if (room.floor > 1) {
         setFloorFilter(room.floor);
       } else {
@@ -1295,13 +1467,13 @@
 
     function focusBuilding(cfg) {
       animateCameraTo(
-        new THREE.Vector3(cfg.x + 40, cfg.floors * FH + 35, cfg.z + 50),
+        new THREE.Vector3(cfg.x + 38, cfg.floors * FH + 32, cfg.z + 46),
         new THREE.Vector3(cfg.x, cfg.floors * FH / 2, cfg.z)
       );
     }
 
     /* ==========================================================================
-       7. FLOOR FILTERING (分層剖切檢視)
+       8. FLOOR FILTERING & FIRST PERSON WALK
        ========================================================================== */
     function setFloorFilter(floorVal) {
       document.querySelectorAll(".floor-btn").forEach(btn => {
@@ -1321,9 +1493,6 @@
       btn.onclick = () => setFloorFilter(btn.dataset.f);
     });
 
-    /* ==========================================================================
-       8. FIRST PERSON / ORBIT MODE SWITCH
-       ========================================================================== */
     let isWalkMode = false;
     const moveState = { forward: 0, backward: 0, left: 0, right: 0 };
     const btnWalk = document.getElementById("btn-walk");
@@ -1333,8 +1502,8 @@
       btnWalk.classList.toggle("active", isWalkMode);
       if (isWalkMode) {
         controls.enabled = false;
-        camera.position.set(0, 2.2, 85); // Stand at Main Entrance
-        controls.target.set(0, 2.2, 70);
+        camera.position.set(-35, 2.2, 90); // Stand at Main Entrance Plaza
+        controls.target.set(-35, 2.2, 70);
         document.getElementById("joystick-zone").style.display = "block";
       } else {
         controls.enabled = true;
@@ -1344,7 +1513,6 @@
       }
     };
 
-    // Keyboard Walking Controls
     window.addEventListener("keydown", (e) => {
       if (!isWalkMode) return;
       if (e.key === "w" || e.key === "ArrowUp") moveState.forward = 1;
@@ -1360,7 +1528,7 @@
     });
 
     /* ==========================================================================
-       9. SEARCH & QUICK BUTTONS
+       9. SEARCH, QUICK BUTTONS & MINIMAP
        ========================================================================== */
     const searchInput = document.getElementById("search-input");
     const searchResults = document.getElementById("search-results");
@@ -1394,11 +1562,9 @@
       navigateToRoom(roomId);
     };
 
-    // Quick Chips
     document.querySelectorAll(".venue-chip").forEach(chip => {
       chip.onclick = () => {
-        const toId = chip.dataset.to;
-        navigateToRoom(toId);
+        navigateToRoom(chip.dataset.to);
       };
     });
 
@@ -1409,9 +1575,7 @@
       animateCameraTo(DEFAULT_CAM_POS, DEFAULT_TARGET);
     };
 
-    /* ==========================================================================
-       10. 2D MINIMAP REALTIME CANVAS
-       ========================================================================== */
+    // 2D Minimap Canvas
     const miniCanvas = document.getElementById("minimap-canvas");
     const miniCtx = miniCanvas.getContext("2d");
     miniCanvas.width = 140;
@@ -1419,28 +1583,25 @@
 
     function renderMinimap() {
       miniCtx.clearRect(0, 0, 140, 140);
-      
-      // Campus footprint scaling
-      // World: x in [-140, 140], z in [-90, 110]
-      const scaleX = 140 / 280;
-      const scaleZ = 140 / 200;
+      const scaleX = 140 / 300;
+      const scaleZ = 140 / 220;
 
-      const toMiniX = (x) => (x + 140) * scaleX;
-      const toMiniZ = (z) => (z + 90) * scaleZ;
+      const toMiniX = (x) => (x + 150) * scaleX;
+      const toMiniZ = (z) => (z + 100) * scaleZ;
 
-      // Draw Grass
+      // Grass
       miniCtx.fillStyle = "#1e392a";
       miniCtx.fillRect(0, 0, 140, 140);
 
-      // Draw Track
-      miniCtx.fillStyle = "#a84236";
+      // Deep Track
+      miniCtx.fillStyle = "#2e3138";
       miniCtx.beginPath();
-      miniCtx.arc(toMiniX(-90), toMiniZ(-10), 18, 0, Math.PI * 2);
+      miniCtx.arc(toMiniX(-90), toMiniZ(-15), 18, 0, Math.PI * 2);
       miniCtx.fill();
 
-      // Draw Buildings
+      // Buildings
       BUILDINGS_CONFIG.forEach(cfg => {
-        miniCtx.fillStyle = "#4a6984";
+        miniCtx.fillStyle = cfg.id === "gym-bld" ? "#d98a80" : "#4a6984";
         const bx = toMiniX(cfg.x - cfg.width / 2);
         const bz = toMiniZ(cfg.z - cfg.depth / 2);
         const bw = cfg.width * scaleX;
@@ -1448,7 +1609,7 @@
         miniCtx.fillRect(bx, bz, bw, bh);
       });
 
-      // Draw Player Camera Position
+      // Player Camera Position
       const px = toMiniX(camera.position.x);
       const pz = toMiniZ(camera.position.z);
       miniCtx.fillStyle = "#ffd23f";
@@ -1456,7 +1617,6 @@
       miniCtx.arc(px, pz, 4, 0, Math.PI * 2);
       miniCtx.fill();
 
-      // Camera direction triangle
       const dir = new THREE.Vector3();
       camera.getWorldDirection(dir);
       miniCtx.strokeStyle = "#ffd23f";
@@ -1468,35 +1628,25 @@
     }
 
     /* ==========================================================================
-       11. ROOM EDITOR DRAWER & LOCALSTORAGE
+       10. EDITOR DRAWER & HELP MODAL
        ========================================================================== */
     const editorDrawer = document.getElementById("editor-drawer");
     const editorList = document.getElementById("editor-list");
-    const btnEditor = document.getElementById("btn-editor");
-    const btnCloseEditor = document.getElementById("btn-close-editor");
-
-    btnEditor.onclick = () => {
-      populateEditorList();
-      editorDrawer.classList.add("open");
-    };
-    btnCloseEditor.onclick = () => editorDrawer.classList.remove("open");
-
-    function populateEditorList() {
+    document.getElementById("btn-editor").onclick = () => {
       editorList.innerHTML = Object.values(ROOMS_DB).map(r => `
         <div class="edit-item">
-          <label>[${r.buildingName} ${r.floor}F] 教室代碼: ${r.id}</label>
+          <label>[${r.buildingName} ${r.floor}F] ${r.id}</label>
           <input type="text" data-id="${r.id}" value="${r.name}">
         </div>
       `).join("");
-    }
+      editorDrawer.classList.add("open");
+    };
+    document.getElementById("btn-close-editor").onclick = () => editorDrawer.classList.remove("open");
 
     document.getElementById("btn-save-rooms").onclick = () => {
-      const inputs = editorList.querySelectorAll("input");
-      inputs.forEach(inp => {
+      editorList.querySelectorAll("input").forEach(inp => {
         const id = inp.dataset.id;
-        if (ROOMS_DB[id]) {
-          ROOMS_DB[id].name = inp.value.trim();
-        }
+        if (ROOMS_DB[id]) ROOMS_DB[id].name = inp.value.trim();
       });
       localStorage.setItem("daxi_3d_rooms_115", JSON.stringify(ROOMS_DB));
       alert("✅ 115 學年度教室資料已成功儲存至本機快存！");
@@ -1511,20 +1661,6 @@
       dlAnchor.click();
     };
 
-    // Load custom saved rooms if available
-    const savedRooms = localStorage.getItem("daxi_3d_rooms_115");
-    if (savedRooms) {
-      try {
-        const parsed = JSON.parse(savedRooms);
-        Object.keys(parsed).forEach(k => {
-          if (ROOMS_DB[k]) ROOMS_DB[k].name = parsed[k].name;
-        });
-      } catch (err) {}
-    }
-
-    /* ==========================================================================
-       12. HELP MODAL
-       ========================================================================== */
     const helpModal = document.getElementById("help-modal");
     const modalBackdrop = document.getElementById("modal-backdrop");
     document.getElementById("btn-help").onclick = () => {
@@ -1541,13 +1677,12 @@
     };
 
     /* ==========================================================================
-       13. URL DEEP-LINKING (?to=68 or ?to=701)
+       11. URL DEEP LINKING (?to=gym or ?to=701)
        ========================================================================== */
     function checkUrlQueryTarget() {
       const params = new URLSearchParams(window.location.search);
       const to = params.get("to");
       if (to) {
-        // Direct match or lookup
         setTimeout(() => {
           navigateToRoom(to);
         }, 600);
@@ -1555,7 +1690,7 @@
     }
 
     /* ==========================================================================
-       14. ANIMATION LOOP & RENDER
+       12. ANIMATION LOOP
        ========================================================================== */
     const clock = new THREE.Clock();
 
@@ -1563,7 +1698,6 @@
       requestAnimationFrame(animate);
       const delta = clock.getDelta();
 
-      // First-person walking movement
       if (isWalkMode) {
         const moveSpeed = 16 * delta;
         const forwardDir = new THREE.Vector3();
@@ -1582,11 +1716,9 @@
         controls.update();
       }
 
-      // Update 3D Floating Labels onto Screen Coordinates
       labelElements.forEach(item => {
         const wp = item.worldPos.clone();
         wp.project(camera);
-        // Check if behind camera
         if (wp.z > 1) {
           item.element.style.display = "none";
         } else {
@@ -1598,7 +1730,6 @@
         }
       });
 
-      // Animate Destination Pin Pulse
       if (navTargetPoint && navTargetPoint.visible) {
         navTargetPoint.position.y += Math.sin(clock.getElapsedTime() * 4) * 0.015;
       }
@@ -1607,14 +1738,12 @@
       renderer.render(scene, camera);
     }
 
-    // Window Resize
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Start App
     animate();
     checkUrlQueryTarget();
   </script>
