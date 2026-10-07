@@ -1985,6 +1985,141 @@
     const labelsContainer = document.getElementById("labels-container");
     const ROOMS_DB = {};
 
+    // 4.0 Collision & Multi-Floor Staircase Engine (AABB 碰撞體與階梯升降系統)
+    const WALL_COLLIDERS = [];
+    const STAIR_ZONES = [];
+    const AVATAR_COLLISION_RADIUS = 0.42;
+    const AVATAR_HEIGHT = 1.8;
+
+    function registerWallCollider(minX, maxX, minZ, maxZ, minY, maxY) {
+      WALL_COLLIDERS.push({
+        minX: Math.min(minX, maxX),
+        maxX: Math.max(minX, maxX),
+        minZ: Math.min(minZ, maxZ),
+        maxZ: Math.max(minZ, maxZ),
+        minY: minY !== undefined ? minY : -0.5,
+        maxY: maxY !== undefined ? maxY : 24
+      });
+    }
+
+    function registerStairZone(worldX, worldZ, width, depth, baseY, topY, fromFloor, toFloor, axis = 'z', dir = 1) {
+      STAIR_ZONES.push({
+        worldX, worldZ,
+        minX: worldX - width / 2,
+        maxX: worldX + width / 2,
+        minZ: worldZ - depth / 2,
+        maxZ: worldZ + depth / 2,
+        baseY, topY,
+        fromFloor, toFloor,
+        axis, dir
+      });
+    }
+
+    function checkWallCollision(x, y, z) {
+      const r = AVATAR_COLLISION_RADIUS;
+      const avatarMinX = x - r;
+      const avatarMaxX = x + r;
+      const avatarMinZ = z - r;
+      const avatarMaxZ = z + r;
+      const avatarMinY = y + 0.2;
+      const avatarMaxY = y + AVATAR_HEIGHT - 0.2;
+
+      for (let i = 0; i < WALL_COLLIDERS.length; i++) {
+        const c = WALL_COLLIDERS[i];
+        if (avatarMaxY >= c.minY && avatarMinY <= c.maxY) {
+          if (avatarMaxX > c.minX && avatarMinX < c.maxX &&
+              avatarMaxZ > c.minZ && avatarMinZ < c.maxZ) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function checkStairElevation(x, y, z) {
+      for (let i = 0; i < STAIR_ZONES.length; i++) {
+        const sz = STAIR_ZONES[i];
+        if (x >= sz.minX && x <= sz.maxX && z >= sz.minZ && z <= sz.maxZ) {
+          if (y >= sz.baseY - 0.6 && y <= sz.topY + 0.8) {
+            let t = 0;
+            if (sz.axis === 'z') {
+              t = sz.dir === 1 ? (z - sz.minZ) / (sz.maxZ - sz.minZ) : (sz.maxZ - z) / (sz.maxZ - sz.minZ);
+            } else {
+              t = sz.dir === 1 ? (x - sz.minX) / (sz.maxX - sz.minX) : (sz.maxX - x) / (sz.maxX - sz.minX);
+            }
+            t = Math.max(0, Math.min(1, t));
+            const elev = sz.baseY + t * (sz.topY - sz.baseY);
+            return { onStair: true, elevation: elev, floor: t > 0.6 ? sz.toFloor : sz.fromFloor };
+          }
+        }
+      }
+      return { onStair: false };
+    }
+
+    function getBuildingAt(x, z) {
+      for (let i = 0; i < BUILDINGS_CONFIG.length; i++) {
+        const b = BUILDINGS_CONFIG[i];
+        if (Math.abs(x - b.x) <= b.width / 2 + 0.8 && Math.abs(z - b.z) <= b.depth / 2 + 0.8) {
+          return b;
+        }
+      }
+      return null;
+    }
+
+    function createRoomNameplateTexture(text, bgColor = "#1e3a8a") {
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 64;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = bgColor;
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(4, 4, 248, 56, 8);
+      } else {
+        ctx.rect(4, 4, 248, 56);
+      }
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#fbbf24";
+      ctx.stroke();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 24px 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text.replace(/\s*\(\d+F\)/, ''), 128, 32);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      return tex;
+    }
+
+    function createBuildingTitleTexture(text, bgColor = "#0f172a") {
+      const canvas = document.createElement("canvas");
+      canvas.width = 512;
+      canvas.height = 96;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = bgColor;
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(6, 6, 500, 84, 12);
+      } else {
+        ctx.rect(6, 6, 500, 84);
+      }
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "#f59e0b";
+      ctx.stroke();
+
+      ctx.fillStyle = "#fef08a";
+      ctx.font = "bold 34px 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, 256, 48);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      return tex;
+    }
+
     // 4.1 Ground Lawn & Driveways
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(460, 380),
@@ -2183,39 +2318,63 @@
       scene.add(createBroadleafTree(pos.x, pos.z, 1.05));
     });
 
-    // 4.4 3D Physical Staircase Mesh Generator (實體多樓層樓梯間)
-    function create3DStaircaseMesh(x, z, totalFloors) {
+    // 4.4 3D Physical Staircase Mesh Generator (實體多樓層可攀爬樓梯間)
+    function create3DStaircaseMesh(x, z, totalFloors, bldWorldX, bldWorldZ) {
       const stairGroup = new THREE.Group();
       stairGroup.position.set(x, 0, z);
+      const worldX = (bldWorldX !== undefined) ? bldWorldX + x : x;
+      const worldZ = (bldWorldZ !== undefined) ? bldWorldZ + z : z;
 
       for (let f = 1; f < totalFloors; f++) {
         const baseH = (f - 1) * FH;
-        const stepCount = 8;
+        const stepCount = 10;
+        const stepDepth = 0.4;
+        const stairWidth = 2.4;
+        const flightLength = stepCount * stepDepth;
+
+        // Steps
         for (let s = 0; s < stepCount; s++) {
           const stepMesh = new THREE.Mesh(
-            new THREE.BoxGeometry(2.4, 0.22, 0.45),
+            new THREE.BoxGeometry(stairWidth, 0.22, stepDepth),
             new THREE.MeshLambertMaterial({ color: 0xd1d5db })
           );
-          stepMesh.position.set(0, baseH + (s + 0.5) * (FH / stepCount), -s * 0.42);
+          stepMesh.position.set(0, baseH + (s + 0.5) * (FH / stepCount), -s * stepDepth);
           stepMesh.castShadow = true;
+          stepMesh.receiveShadow = true;
           stairGroup.add(stepMesh);
         }
 
-        const rail = new THREE.Mesh(
-          new THREE.BoxGeometry(0.12, 0.12, stepCount * 0.45 * 1.4),
-          new THREE.MeshLambertMaterial({ color: 0x1e3a8a })
-        );
-        rail.position.set(1.2, baseH + FH * 0.5 + 0.9, -stepCount * 0.45 * 0.5);
-        rail.rotation.x = 0.55;
-        stairGroup.add(rail);
+        // Side Rails & Posts
+        [-stairWidth / 2 + 0.08, stairWidth / 2 - 0.08].forEach(rx => {
+          const rail = new THREE.Mesh(
+            new THREE.BoxGeometry(0.08, 0.08, flightLength * 1.3),
+            new THREE.MeshLambertMaterial({ color: 0x1e3a8a })
+          );
+          rail.position.set(rx, baseH + FH * 0.5 + 0.9, -flightLength * 0.5);
+          rail.rotation.x = 0.65;
+          stairGroup.add(rail);
 
+          const post1 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.0, 8), new THREE.MeshLambertMaterial({ color: 0x64748b }));
+          post1.position.set(rx, baseH + 0.5, 0);
+          stairGroup.add(post1);
+
+          const post2 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.0, 8), new THREE.MeshLambertMaterial({ color: 0x64748b }));
+          post2.position.set(rx, baseH + FH + 0.5, -flightLength);
+          stairGroup.add(post2);
+        });
+
+        // Top Landing Platform (上層休息平台)
         const landing = new THREE.Mesh(
-          new THREE.BoxGeometry(2.8, 0.25, 2.2),
+          new THREE.BoxGeometry(stairWidth + 0.4, 0.25, 2.2),
           new THREE.MeshLambertMaterial({ color: 0xffffff })
         );
-        landing.position.set(0, f * FH, -stepCount * 0.45);
+        landing.position.set(0, f * FH, -flightLength - 0.9);
         landing.castShadow = true;
+        landing.receiveShadow = true;
         stairGroup.add(landing);
+
+        // 註冊攀爬梯區 (Z 軸向內走梯，方向 -1 表示往 -Z 上升)
+        registerStairZone(worldX, worldZ - flightLength * 0.5, stairWidth + 0.6, flightLength + 1.8, baseH, f * FH, f, f + 1, 'z', -1);
       }
 
       return stairGroup;
@@ -2531,59 +2690,349 @@
     }
     createMultiBuildingParking();
 
-    // 4.8 Buildings Construction
+    // 4.8 Buildings Construction (中空可進入建築、大樓入口、走廊、樓梯與隔間空教室)
     BUILDINGS_CONFIG.forEach(cfg => {
       const bldGroup = new THREE.Group();
       bldGroup.position.set(cfg.x, 0, cfg.z);
       const totalH = cfg.floors * FH;
+      const isHoriz = cfg.width >= cfg.depth;
+      const corridorWidth = 2.6;
+
+      // Common architectural materials
+      const extWallMat = new THREE.MeshLambertMaterial({ color: cfg.color, roughness: 0.65 });
+      const intWallMat = new THREE.MeshLambertMaterial({ color: 0xf1f5f9, roughness: 0.8 });
+      const floorMat = new THREE.MeshLambertMaterial({ color: 0xd8dee9, roughness: 0.7 });
+      const corridorFloorMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0, roughness: 0.7 });
+      const ceilingMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc, roughness: 0.9, side: THREE.DoubleSide });
+      const glassMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.55 });
+      const chalkboardMat = new THREE.MeshLambertMaterial({ color: 0x1b4332, roughness: 0.85 });
+      const whiteboardMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc, roughness: 0.3 });
+      const woodTrimMat = new THREE.MeshLambertMaterial({ color: 0xa16207 });
+      const canopyMat = new THREE.MeshLambertMaterial({ color: cfg.roofColor || 0x1e3a8a });
 
       for (let f = 1; f <= cfg.floors; f++) {
         const floorGroup = new THREE.Group();
         floorGroup.name = `floor-${f}`;
+        const fBaseY = (f - 1) * FH;
         const fCenterY = (f - 0.5) * FH;
+        const fTopY = f * FH;
+        const floorRooms = cfg.rooms.filter(r => r.floor === f);
 
-        const floorMesh = new THREE.Mesh(
-          new THREE.BoxGeometry(cfg.width, FH - 0.22, cfg.depth),
-          new THREE.MeshLambertMaterial({ color: cfg.color, roughness: 0.65 })
+        // A. 地板與天花板 (Floor Slab & Ceiling Slab)
+        const slabY = (f === 1) ? 0.08 : fBaseY + 0.1;
+        const floorSlab = new THREE.Mesh(
+          new THREE.BoxGeometry(cfg.width, 0.2, cfg.depth),
+          floorMat
         );
-        floorMesh.position.y = fCenterY;
-        floorMesh.castShadow = true;
-        floorMesh.receiveShadow = true;
-        floorGroup.add(floorMesh);
+        floorSlab.position.set(0, slabY, 0);
+        floorSlab.receiveShadow = true;
+        floorGroup.add(floorSlab);
 
-        const winBand = new THREE.Mesh(
-          new THREE.BoxGeometry(cfg.width + 0.15, 1.4, cfg.depth + 0.15),
-          new THREE.MeshLambertMaterial({ color: 0x0f172a, transparent: true, opacity: 0.9 })
+        const ceilingSlab = new THREE.Mesh(
+          new THREE.BoxGeometry(cfg.width, 0.2, cfg.depth),
+          ceilingMat
         );
-        winBand.position.y = fCenterY + 0.2;
-        floorGroup.add(winBand);
+        ceilingSlab.position.set(0, fTopY - 0.1, 0);
+        floorGroup.add(ceilingSlab);
 
-        const slab = new THREE.Mesh(
-          new THREE.BoxGeometry(cfg.width + 1.2, 0.32, cfg.depth + 2.4),
-          new THREE.MeshLambertMaterial({ color: 0xffffff })
-        );
-        slab.position.set(0, (f - 1) * FH + 0.16, 0.6);
-        slab.castShadow = true;
-        floorGroup.add(slab);
+        // B. 走廊與隔間教室配置 (Corridor & Empty Classrooms Architecture)
+        if (isHoriz) {
+          // 橫向大樓 (東西走向，走廊在北側或南側)
+          const isNorthCorridor = (cfg.id === "grade8-front");
+          const cZ = isNorthCorridor ? (-cfg.depth / 2 + corridorWidth / 2) : (cfg.depth / 2 - corridorWidth / 2);
+          const cWallZ = isNorthCorridor ? (-cfg.depth / 2 + corridorWidth) : (cfg.depth / 2 - corridorWidth);
+          const outerZ = isNorthCorridor ? -cfg.depth / 2 : cfg.depth / 2;
+          const backZ = isNorthCorridor ? cfg.depth / 2 : -cfg.depth / 2;
 
-        const rail = new THREE.Mesh(
-          new THREE.BoxGeometry(cfg.width + 1.2, 1.1, 0.15),
-          new THREE.MeshLambertMaterial({ color: 0xf1f5f9 })
-        );
-        rail.position.set(0, (f - 1) * FH + 0.55, cfg.depth / 2 + 1.7);
-        rail.castShadow = true;
-        floorGroup.add(rail);
-
-        const colCount = Math.max(3, Math.round(cfg.width / 8));
-        const colStep = cfg.width / colCount;
-        for (let c = 0; c <= colCount; c++) {
-          const colMesh = new THREE.Mesh(
-            new THREE.BoxGeometry(0.5, FH, 0.5),
-            new THREE.MeshLambertMaterial({ color: 0xffffff })
+          // 1. 走廊外側陽台護欄與柱列 (Corridor Veranda Railing & Columns)
+          const rail = new THREE.Mesh(
+            new THREE.BoxGeometry(cfg.width, 1.1, 0.16),
+            new THREE.MeshLambertMaterial({ color: 0xf1f5f9 })
           );
-          colMesh.position.set(-cfg.width / 2 + c * colStep, fCenterY, cfg.depth / 2 + 1.7);
-          colMesh.castShadow = true;
-          floorGroup.add(colMesh);
+          rail.position.set(0, fBaseY + 0.55, outerZ);
+          floorGroup.add(rail);
+
+          // 柱列
+          const colCount = Math.max(3, Math.round(cfg.width / 7));
+          const colStep = cfg.width / colCount;
+          for (let c = 0; c <= colCount; c++) {
+            const colMesh = new THREE.Mesh(
+              new THREE.BoxGeometry(0.45, FH, 0.45),
+              new THREE.MeshLambertMaterial({ color: 0xffffff })
+            );
+            colMesh.position.set(-cfg.width / 2 + c * colStep, fCenterY, outerZ);
+            colMesh.castShadow = true;
+            floorGroup.add(colMesh);
+          }
+
+          // 走廊外牆碰撞體 (1F 入口處保持開放無碰撞體，其餘護欄與樓層均阻擋穿透)
+          if (f === 1) {
+            registerWallCollider(cfg.x - cfg.width / 2, cfg.x - 2.0, cfg.z + outerZ - 0.25, cfg.z + outerZ + 0.25, fBaseY, fTopY);
+            registerWallCollider(cfg.x + 2.0, cfg.x + cfg.width / 2, cfg.z + outerZ - 0.25, cfg.z + outerZ + 0.25, fBaseY, fTopY);
+
+            // 1F 大樓主入口門廊雨遮與金字校名門牌 (Entrance Canopy & Title Sign)
+            const canopy = new THREE.Mesh(
+              new THREE.BoxGeometry(5.2, 0.35, 3.2),
+              canopyMat
+            );
+            canopy.position.set(0, fBaseY + 3.4, outerZ + (isNorthCorridor ? -1.6 : 1.6));
+            canopy.castShadow = true;
+            floorGroup.add(canopy);
+
+            [-2.4, 2.4].forEach(px => {
+              const pCol = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 3.4, 12), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+              pCol.position.set(px, fBaseY + 1.7, outerZ + (isNorthCorridor ? -2.8 : 2.8));
+              pCol.castShadow = true;
+              floorGroup.add(pCol);
+            });
+
+            // 大樓入口招牌 (Building Title Plate)
+            const titleMesh = new THREE.Mesh(
+              new THREE.PlaneGeometry(4.0, 0.75),
+              new THREE.MeshBasicMaterial({ map: createBuildingTitleTexture(cfg.name), side: THREE.DoubleSide })
+            );
+            titleMesh.position.set(0, fBaseY + 3.8, outerZ + (isNorthCorridor ? -1.65 : 1.65));
+            if (isNorthCorridor) titleMesh.rotation.y = Math.PI;
+            floorGroup.add(titleMesh);
+          } else {
+            registerWallCollider(cfg.x - cfg.width / 2, cfg.x + cfg.width / 2, cfg.z + outerZ - 0.25, cfg.z + outerZ + 0.25, fBaseY, fTopY);
+          }
+
+          // 2. 背面外牆與窗戶 (Back Exterior Wall & Windows)
+          const backWall = new THREE.Mesh(
+            new THREE.BoxGeometry(cfg.width, FH, 0.3),
+            extWallMat
+          );
+          backWall.position.set(0, fCenterY, backZ);
+          floorGroup.add(backWall);
+
+          const backWindow = new THREE.Mesh(
+            new THREE.BoxGeometry(cfg.width - 1.2, 1.4, 0.35),
+            glassMat
+          );
+          backWindow.position.set(0, fCenterY + 0.2, backZ);
+          floorGroup.add(backWindow);
+          registerWallCollider(cfg.x - cfg.width / 2, cfg.x + cfg.width / 2, cfg.z + backZ - 0.25, cfg.z + backZ + 0.25, fBaseY, fTopY);
+
+          // 3. 東西兩端外側側牆 (West & East End Exterior Walls)
+          [-cfg.width / 2, cfg.width / 2].forEach(wx => {
+            const endWall = new THREE.Mesh(
+              new THREE.BoxGeometry(0.3, FH, cfg.depth),
+              extWallMat
+            );
+            endWall.position.set(wx, fCenterY, 0);
+            floorGroup.add(endWall);
+            registerWallCollider(cfg.x + wx - 0.25, cfg.x + wx + 0.25, cfg.z - cfg.depth / 2, cfg.z + cfg.depth / 2, fBaseY, fTopY);
+          });
+
+          // 4. 隔間教室與內走廊隔間牆 (Partitions & Classrooms)
+          const usableMinX = -cfg.width / 2 + 1.2;
+          const usableMaxX = cfg.width / 2 - 1.2;
+          const usableW = usableMaxX - usableMinX;
+
+          if (floorRooms.length > 0) {
+            const roomW = usableW / floorRooms.length;
+            for (let i = 0; i < floorRooms.length; i++) {
+              const rMinX = usableMinX + i * roomW;
+              const rMaxX = usableMinX + (i + 1) * roomW;
+              const rCenterX = (rMinX + rMaxX) / 2;
+              const room = floorRooms[i];
+
+              // 門兩側之內走廊隔間牆 (Wall segments beside classroom door)
+              const seg1W = Math.max(0.2, (rCenterX - 0.9) - rMinX);
+              const seg1Mesh = new THREE.Mesh(new THREE.BoxGeometry(seg1W, FH, 0.2), intWallMat);
+              seg1Mesh.position.set(rMinX + seg1W / 2, fCenterY, cWallZ);
+              floorGroup.add(seg1Mesh);
+              registerWallCollider(cfg.x + rMinX, cfg.x + rCenterX - 0.9, cfg.z + cWallZ - 0.2, cfg.z + cWallZ + 0.2, fBaseY, fTopY);
+
+              const seg2W = Math.max(0.2, rMaxX - (rCenterX + 0.9));
+              const seg2Mesh = new THREE.Mesh(new THREE.BoxGeometry(seg2W, FH, 0.2), intWallMat);
+              seg2Mesh.position.set(rMaxX - seg2W / 2, fCenterY, cWallZ);
+              floorGroup.add(seg2Mesh);
+              registerWallCollider(cfg.x + rCenterX + 0.9, cfg.x + rMaxX, cfg.z + cWallZ - 0.2, cfg.z + cWallZ + 0.2, fBaseY, fTopY);
+
+              // 門眉過樑 (Door Lintel above 2.4m door)
+              const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.8, FH - 2.4, 0.2), intWallMat);
+              lintel.position.set(rCenterX, fBaseY + 2.4 + (FH - 2.4) / 2, cWallZ);
+              floorGroup.add(lintel);
+
+              // 門牌 (3D Room Nameplate)
+              const nameplate = new THREE.Mesh(
+                new THREE.PlaneGeometry(1.5, 0.38),
+                new THREE.MeshBasicMaterial({ map: createRoomNameplateTexture(room.name, (room.cat === "admin" ? "#991b1b" : "#1e3a8a")), side: THREE.DoubleSide })
+              );
+              nameplate.position.set(rCenterX, fBaseY + 2.65, cWallZ + (isNorthCorridor ? -0.12 : 0.12));
+              if (isNorthCorridor) nameplate.rotation.y = Math.PI;
+              floorGroup.add(nameplate);
+
+              // 隔間牆 (Divider Wall between adjacent rooms)
+              if (i > 0) {
+                const divDepth = Math.abs(backZ - cWallZ);
+                const divMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, FH, divDepth), intWallMat);
+                divMesh.position.set(rMinX, fCenterY, (backZ + cWallZ) / 2);
+                floorGroup.add(divMesh);
+                registerWallCollider(cfg.x + rMinX - 0.2, cfg.x + rMinX + 0.2, cfg.z + Math.min(backZ, cWallZ), cfg.z + Math.max(backZ, cWallZ), fBaseY, fTopY);
+              }
+
+              // 空教室內部細節：黑板 / 白板 (Chalkboard on divider wall)
+              const boardW = Math.min(3.4, roomW - 1.2);
+              const isOffice = (room.cat === "admin");
+              const boardMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(boardW, 1.4, 0.06),
+                isOffice ? whiteboardMat : chalkboardMat
+              );
+              boardMesh.position.set(rCenterX, fBaseY + 1.8, isNorthCorridor ? (cWallZ + 0.8) : (cWallZ - 0.8));
+              floorGroup.add(boardMesh);
+
+              const trim = new THREE.Mesh(new THREE.BoxGeometry(boardW + 0.1, 1.5, 0.04), woodTrimMat);
+              trim.position.copy(boardMesh.position);
+              trim.position.z += isNorthCorridor ? -0.02 : 0.02;
+              floorGroup.add(trim);
+
+              // 天花板柔和照明燈盤 (Ceiling Light Panel)
+              const lightPanel = new THREE.Mesh(
+                new THREE.PlaneGeometry(2.0, 1.0),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+              );
+              lightPanel.rotation.x = Math.PI / 2;
+              lightPanel.position.set(rCenterX, fTopY - 0.12, (backZ + cWallZ) / 2);
+              floorGroup.add(lightPanel);
+            }
+          }
+        } else {
+          // 直立縱向大樓 (南北走向，如九年級棟、八年級中棟、藝術館、活動中心)
+          const isEastCorridor = (cfg.id === "grade9-back");
+          const cX = isEastCorridor ? (cfg.width / 2 - corridorWidth / 2) : (-cfg.width / 2 + corridorWidth / 2);
+          const cWallX = isEastCorridor ? (cfg.width / 2 - corridorWidth) : (-cfg.width / 2 + corridorWidth);
+          const outerX = isEastCorridor ? cfg.width / 2 : -cfg.width / 2;
+          const backX = isEastCorridor ? -cfg.width / 2 : cfg.width / 2;
+
+          // 走廊護欄與柱列
+          const rail = new THREE.Mesh(
+            new THREE.BoxGeometry(0.16, 1.1, cfg.depth),
+            new THREE.MeshLambertMaterial({ color: 0xf1f5f9 })
+          );
+          rail.position.set(outerX, fBaseY + 0.55, 0);
+          floorGroup.add(rail);
+
+          const colCount = Math.max(3, Math.round(cfg.depth / 7));
+          const colStep = cfg.depth / colCount;
+          for (let c = 0; c <= colCount; c++) {
+            const colMesh = new THREE.Mesh(
+              new THREE.BoxGeometry(0.45, FH, 0.45),
+              new THREE.MeshLambertMaterial({ color: 0xffffff })
+            );
+            colMesh.position.set(outerX, fCenterY, -cfg.depth / 2 + c * colStep);
+            colMesh.castShadow = true;
+            floorGroup.add(colMesh);
+          }
+
+          // 外側碰撞體 (1F 入口處保持開放)
+          if (f === 1) {
+            registerWallCollider(cfg.x + outerX - 0.25, cfg.x + outerX + 0.25, cfg.z - cfg.depth / 2, cfg.z - 2.0, fBaseY, fTopY);
+            registerWallCollider(cfg.x + outerX - 0.25, cfg.x + outerX + 0.25, cfg.z + 2.0, cfg.z + cfg.depth / 2, fBaseY, fTopY);
+
+            // 大樓入口雨遮與標誌
+            const canopy = new THREE.Mesh(
+              new THREE.BoxGeometry(3.2, 0.35, 5.2),
+              canopyMat
+            );
+            canopy.position.set(outerX + (isEastCorridor ? 1.6 : -1.6), fBaseY + 3.4, 0);
+            canopy.castShadow = true;
+            floorGroup.add(canopy);
+
+            const titleMesh = new THREE.Mesh(
+              new THREE.PlaneGeometry(4.0, 0.75),
+              new THREE.MeshBasicMaterial({ map: createBuildingTitleTexture(cfg.name), side: THREE.DoubleSide })
+            );
+            titleMesh.position.set(outerX + (isEastCorridor ? 1.65 : -1.65), fBaseY + 3.8, 0);
+            titleMesh.rotation.y = isEastCorridor ? Math.PI / 2 : -Math.PI / 2;
+            floorGroup.add(titleMesh);
+          } else {
+            registerWallCollider(cfg.x + outerX - 0.25, cfg.x + outerX + 0.25, cfg.z - cfg.depth / 2, cfg.z + cfg.depth / 2, fBaseY, fTopY);
+          }
+
+          // 背面外牆與南北兩端外牆
+          const backWall = new THREE.Mesh(new THREE.BoxGeometry(0.3, FH, cfg.depth), extWallMat);
+          backWall.position.set(backX, fCenterY, 0);
+          floorGroup.add(backWall);
+          registerWallCollider(cfg.x + backX - 0.25, cfg.x + backX + 0.25, cfg.z - cfg.depth / 2, cfg.z + cfg.depth / 2, fBaseY, fTopY);
+
+          [-cfg.depth / 2, cfg.depth / 2].forEach(ez => {
+            const endWall = new THREE.Mesh(new THREE.BoxGeometry(cfg.width, FH, 0.3), extWallMat);
+            endWall.position.set(0, fCenterY, ez);
+            floorGroup.add(endWall);
+            registerWallCollider(cfg.x - cfg.width / 2, cfg.x + cfg.width / 2, cfg.z + ez - 0.25, cfg.z + ez + 0.25, fBaseY, fTopY);
+          });
+
+          // 隔間教室 (縱向分割)
+          const usableMinZ = -cfg.depth / 2 + 1.2;
+          const usableMaxZ = cfg.depth / 2 - 1.2;
+          const usableD = usableMaxZ - usableMinZ;
+
+          if (floorRooms.length > 0) {
+            const roomD = usableD / floorRooms.length;
+            for (let i = 0; i < floorRooms.length; i++) {
+              const rMinZ = usableMinZ + i * roomD;
+              const rMaxZ = usableMinZ + (i + 1) * roomD;
+              const rCenterZ = (rMinZ + rMaxZ) / 2;
+              const room = floorRooms[i];
+
+              // 門兩側隔間牆
+              const seg1D = Math.max(0.2, (rCenterZ - 0.9) - rMinZ);
+              const seg1Mesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, FH, seg1D), intWallMat);
+              seg1Mesh.position.set(cWallX, fCenterY, rMinZ + seg1D / 2);
+              floorGroup.add(seg1Mesh);
+              registerWallCollider(cfg.x + cWallX - 0.2, cfg.x + cWallX + 0.2, cfg.z + rMinZ, cfg.z + rCenterZ - 0.9, fBaseY, fTopY);
+
+              const seg2D = Math.max(0.2, rMaxZ - (rCenterZ + 0.9));
+              const seg2Mesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, FH, seg2D), intWallMat);
+              seg2Mesh.position.set(cWallX, fCenterY, rMaxZ - seg2D / 2);
+              floorGroup.add(seg2Mesh);
+              registerWallCollider(cfg.x + cWallX - 0.2, cfg.x + cWallX + 0.2, cfg.z + rCenterZ + 0.9, cfg.z + rMaxZ, fBaseY, fTopY);
+
+              // 門眉過樑
+              const lintel = new THREE.Mesh(new THREE.BoxGeometry(0.2, FH - 2.4, 1.8), intWallMat);
+              lintel.position.set(cWallX, fBaseY + 2.4 + (FH - 2.4) / 2, rCenterZ);
+              floorGroup.add(lintel);
+
+              // 門牌
+              const nameplate = new THREE.Mesh(
+                new THREE.PlaneGeometry(1.5, 0.38),
+                new THREE.MeshBasicMaterial({ map: createRoomNameplateTexture(room.name, (room.cat === "admin" ? "#991b1b" : "#1e3a8a")), side: THREE.DoubleSide })
+              );
+              nameplate.position.set(cWallX + (isEastCorridor ? 0.12 : -0.12), fBaseY + 2.65, rCenterZ);
+              nameplate.rotation.y = isEastCorridor ? -Math.PI / 2 : Math.PI / 2;
+              floorGroup.add(nameplate);
+
+              // 橫向隔間牆
+              if (i > 0) {
+                const divW = Math.abs(backX - cWallX);
+                const divMesh = new THREE.Mesh(new THREE.BoxGeometry(divW, FH, 0.2), intWallMat);
+                divMesh.position.set((backX + cWallX) / 2, fCenterY, rMinZ);
+                floorGroup.add(divMesh);
+                registerWallCollider(cfg.x + Math.min(backX, cWallX), cfg.x + Math.max(backX, cWallX), cfg.z + rMinZ - 0.2, cfg.z + rMinZ + 0.2, fBaseY, fTopY);
+              }
+
+              // 空教室黑板
+              const boardD = Math.min(3.4, roomD - 1.2);
+              const boardMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(0.06, 1.4, boardD),
+                chalkboardMat
+              );
+              boardMesh.position.set(isEastCorridor ? (cWallX - 0.8) : (cWallX + 0.8), fBaseY + 1.8, rCenterZ);
+              floorGroup.add(boardMesh);
+
+              // 天花板照明
+              const lightPanel = new THREE.Mesh(
+                new THREE.PlaneGeometry(1.0, 2.0),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+              );
+              lightPanel.rotation.x = Math.PI / 2;
+              lightPanel.position.set((backX + cWallX) / 2, fTopY - 0.12, rCenterZ);
+              floorGroup.add(lightPanel);
+            }
+          }
         }
 
         floorGroup.userData = { buildingId: cfg.id, floorNum: f };
@@ -2591,13 +3040,15 @@
         floorMeshes.push(floorGroup);
       }
 
+      // 4.9 樓梯間 (Staircases connected to corridors)
       if (cfg.stairs) {
         cfg.stairs.forEach(st => {
-          const stMesh = create3DStaircaseMesh(st.x - cfg.x, st.z - cfg.z, st.floors);
+          const stMesh = create3DStaircaseMesh(st.x - cfg.x, st.z - cfg.z, st.floors, cfg.x, cfg.z);
           bldGroup.add(stMesh);
         });
       }
 
+      // 4.10 體育館圓柱塔特徵 (Gym Special Features)
       if (cfg.isGymSpecial) {
         [-14, 14].forEach(offsetZ => {
           const tower = new THREE.Mesh(
@@ -2631,6 +3082,7 @@
         bldGroup.add(roundTower);
       }
 
+      // 屋頂 (Pitched Roof or Flat Roof)
       if (cfg.hasPitchedRoof) {
         const roofShape = new THREE.Shape();
         roofShape.moveTo(-cfg.depth / 2 - 0.8, 0);
@@ -4012,7 +4464,48 @@
           moveVec.normalize();
           avatarAngle = Math.atan2(moveVec.x, moveVec.z);
           avatarGroup.rotation.y = avatarAngle;
-          avatarGroup.position.addScaledVector(moveVec, currentSpeed);
+
+          const dx = moveVec.x * currentSpeed;
+          const dz = moveVec.z * currentSpeed;
+          const curPos = avatarGroup.position;
+
+          // 1. Sliding Collision Check against Walls (碰壁不能穿牆，支援滑行)
+          let finalX = curPos.x;
+          let finalZ = curPos.z;
+
+          if (!checkWallCollision(curPos.x + dx, curPos.y, curPos.z)) {
+            finalX = curPos.x + dx;
+          }
+          if (!checkWallCollision(finalX, curPos.y, curPos.z + dz)) {
+            finalZ = curPos.z + dz;
+          }
+
+          curPos.x = finalX;
+          curPos.z = finalZ;
+
+          // 2. Staircase Ascend / Descend & Floor Ground Detection (看到樓梯可上樓，進入各樓層走廊)
+          const stairCheck = checkStairElevation(curPos.x, curPos.y, curPos.z);
+          if (stairCheck.onStair) {
+            if (!isJumping) {
+              curPos.y = stairCheck.elevation;
+              jumpBaseY = curPos.y;
+            }
+          } else {
+            const currentBld = getBuildingAt(curPos.x, curPos.z);
+            if (currentBld) {
+              const detectedF = Math.max(1, Math.min(currentBld.floors, Math.floor((curPos.y + 0.8) / FH) + 1));
+              const floorGroundY = (detectedF - 1) * FH;
+              if (!isJumping) {
+                curPos.y = floorGroundY;
+                jumpBaseY = floorGroundY;
+              }
+            } else {
+              if (!isJumping) {
+                curPos.y = 0;
+                jumpBaseY = 0;
+              }
+            }
+          }
         }
       }
 
