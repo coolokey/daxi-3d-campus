@@ -741,6 +741,227 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     }
 
+    /* Avatar Speed & Turn Controls (media_1791355815735.png) */
+    #avatar-bottom-controls {
+      position: absolute;
+      bottom: calc(24px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 35;
+      pointer-events: auto;
+    }
+    .avatar-ctrl-pill {
+      background: #182232;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 9999px;
+      padding: 9px 20px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      -webkit-user-select: none;
+      white-space: nowrap;
+    }
+    .avatar-ctrl-pill:hover {
+      background: #25334a;
+      border-color: rgba(255, 255, 255, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6);
+    }
+    .avatar-ctrl-pill:active {
+      transform: translateY(0);
+    }
+
+    /* Avatar Setting Modals (media_1791355815739.png & media_1791355815762.png) */
+    .avatar-setting-modal {
+      position: absolute;
+      bottom: calc(76px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%) scale(0.94);
+      width: 295px;
+      background: #18202d;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 16px;
+      padding: 16px 20px 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      z-index: 45;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      color: #ffffff;
+    }
+    .avatar-setting-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) scale(1);
+    }
+    .modal-ctrl-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .modal-ctrl-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+    .modal-ctrl-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      font-size: 14px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.15s;
+    }
+    .modal-ctrl-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+    .modal-ctrl-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .modal-ctrl-label {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .modal-ctrl-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: #facc15;
+    }
+    .modal-slider-wrap {
+      width: 100%;
+      margin: 4px 0;
+    }
+    .custom-gold-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 6px;
+      background: #334155;
+      outline: none;
+      cursor: pointer;
+    }
+    .custom-gold-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #facc15;
+      border: 2px solid #18202d;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .custom-gold-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    .custom-gold-slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #facc15;
+      border: 2px solid #18202d;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      cursor: pointer;
+    }
+    .modal-slider-bounds {
+      display: flex;
+      justify-content: space-between;
+      color: #94a3b8;
+      font-size: 11.5px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .modal-ctrl-desc {
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 14px;
+      font-weight: 500;
+    }
+    .modal-field-block {
+      margin-top: 12px;
+    }
+    .modal-field-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 6px;
+    }
+    .custom-select {
+      width: 100%;
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+    .custom-select:focus {
+      border-color: #facc15;
+    }
+    .modal-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .custom-checkbox {
+      width: 16px;
+      height: 16px;
+      accent-color: #facc15;
+      cursor: pointer;
+    }
+    .modal-checkbox-label {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .modal-ctrl-reset-btn {
+      width: 100%;
+      margin-top: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 10px;
+      padding: 9px 0;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .modal-ctrl-reset-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
     /* Mode Toast Tip */
     #mode-toast {
       position: absolute;
@@ -944,6 +1165,67 @@
     <div class="dpad-center">MOVE</div>
     <button class="dpad-btn dpad-right" id="dpad-right">▶</button>
     <button class="dpad-btn dpad-down" id="dpad-down">▼</button>
+  </div>
+
+  <!-- Avatar Controls: Speed & Turn Sensitivity Pills (Reference: media_1791355815735.png) -->
+  <div id="avatar-bottom-controls">
+    <button class="avatar-ctrl-pill" id="btn-speed-ctrl" title="點擊設定移動速度">速度 100%</button>
+    <button class="avatar-ctrl-pill" id="btn-turn-ctrl" title="點擊設定轉頭靈敏度與操作方式">轉頭 100%</button>
+  </div>
+
+  <!-- Speed Settings Modal (Reference: media_1791355815739.png) -->
+  <div class="avatar-setting-modal" id="modal-speed-ctrl">
+    <div class="modal-ctrl-header">
+      <div class="modal-ctrl-title">移動速度</div>
+      <button class="modal-ctrl-close" id="btn-close-speed-modal" title="關閉">✕</button>
+    </div>
+    <div class="modal-ctrl-row">
+      <span class="modal-ctrl-label">移動速度</span>
+      <span class="modal-ctrl-val" id="val-speed-display">100%</span>
+    </div>
+    <div class="modal-slider-wrap">
+      <input type="range" id="slider-speed" min="50" max="200" step="5" value="100" class="custom-gold-slider">
+    </div>
+    <div class="modal-slider-bounds">
+      <span>慢 • 50%</span>
+      <span>快 • 200%</span>
+    </div>
+    <div class="modal-ctrl-desc">
+      走路與跑步同步調整；按「跑」或 Shift 再加速。
+    </div>
+    <button class="modal-ctrl-reset-btn" id="btn-reset-speed">恢復預設</button>
+  </div>
+
+  <!-- Turn Settings Modal (Reference: media_1791355815762.png) -->
+  <div class="avatar-setting-modal" id="modal-turn-ctrl">
+    <div class="modal-ctrl-header">
+      <div class="modal-ctrl-title">轉頭設定</div>
+      <button class="modal-ctrl-close" id="btn-close-turn-modal" title="關閉">✕</button>
+    </div>
+    <div class="modal-ctrl-row">
+      <span class="modal-ctrl-label">轉頭靈敏度</span>
+      <span class="modal-ctrl-val" id="val-turn-display">100%</span>
+    </div>
+    <div class="modal-slider-wrap">
+      <input type="range" id="slider-turn" min="20" max="300" step="5" value="100" class="custom-gold-slider">
+    </div>
+    <div class="modal-slider-bounds">
+      <span>穩 • 20%</span>
+      <span>快 • 300%</span>
+    </div>
+    <div class="modal-field-block">
+      <div class="modal-field-title">滑鼠轉頭方式</div>
+      <select id="select-mouse-turn" class="custom-select">
+        <option value="move">移動滑鼠就轉頭</option>
+        <option value="left" selected>按住滑鼠左鍵轉頭</option>
+        <option value="right">按住滑鼠右鍵轉頭</option>
+      </select>
+    </div>
+    <label class="modal-checkbox-row">
+      <input type="checkbox" id="check-invert-y" class="custom-checkbox">
+      <span class="modal-checkbox-label">上下反轉</span>
+    </label>
+    <button class="modal-ctrl-reset-btn" id="btn-reset-turn">恢復預設</button>
   </div>
 
   <!-- Navigation HUD -->
@@ -1730,6 +2012,9 @@
 
       scene.add(avatarGroup);
     }
+
+    // Initialize 3D student avatar
+    createStudentAvatar();
 
     /* ==========================================================================
        4. CAMPUS ENVIRONMENT, STAIRCASES & ARCHITECTURE
@@ -2891,35 +3176,41 @@
       const btnIcon = document.getElementById("btn-mode-icon");
       const btnText = document.getElementById("btn-mode-text");
       const toggleBtn = document.getElementById("btn-mode-toggle");
+      const bottomCtrls = document.getElementById("avatar-bottom-controls");
 
       if (mode === "avatar") {
         toggleBtn.classList.add("active");
         btnIcon.textContent = "🧑‍🎓";
         btnText.textContent = "第三人稱";
+        toggleBtn.title = "目前為第三人稱漫遊，點擊切換為鳥瞰全景";
         if (avatarGroup) avatarGroup.visible = true;
+        if (bottomCtrls) bottomCtrls.style.display = "flex";
         showToast("切換為「第三人稱視角」！WASD 跑步漫遊。");
         if (avatarGroup) {
-          controls.target.copy(avatarGroup.position.clone().add(new THREE.Vector3(0, 1.8, 0)));
-          const behindPos = avatarGroup.position.clone().add(new THREE.Vector3(0, 7, 15));
-          animateCameraTo(behindPos, controls.target);
+          const targetLookAt = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.8, 0));
+          const behindPos = avatarGroup.position.clone().add(new THREE.Vector3(0, 5.5, 12));
+          animateCameraTo(behindPos, targetLookAt);
         }
       } else if (mode === "firstperson") {
         toggleBtn.classList.add("active");
         btnIcon.textContent = "👀";
         btnText.textContent = "第一人稱";
+        toggleBtn.title = "目前為第一人稱視角，點擊切換為第三人稱";
         if (avatarGroup) avatarGroup.visible = false;
+        if (bottomCtrls) bottomCtrls.style.display = "flex";
         showToast("切換為「第一人稱視角」！滑鼠環顧、WASD 漫遊。");
         if (avatarGroup) {
           const eyePos = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.7, 0));
           const forwardVec = new THREE.Vector3(-Math.sin(avatarAngle) * 10, 0, -Math.cos(avatarAngle) * 10);
-          controls.target.copy(eyePos.clone().add(forwardVec));
-          camera.position.copy(eyePos);
+          animateCameraTo(eyePos, eyePos.clone().add(forwardVec), 600);
         }
       } else {
         toggleBtn.classList.remove("active");
         btnIcon.textContent = "🦅";
         btnText.textContent = "鳥瞰全景";
+        toggleBtn.title = "目前為鳥瞰模式，點擊切換為第三人稱角色漫遊";
         if (avatarGroup) avatarGroup.visible = true;
+        if (bottomCtrls) bottomCtrls.style.display = "none";
         showToast("切換為「全校鳥瞰模式」！可 360° 俯瞰校園全貌。");
         animateCameraTo(OVERVIEW_CAM, OVERVIEW_TARGET);
       }
@@ -3075,28 +3366,232 @@
       }
     }
 
-    function animateCameraTo(targetCamPos, targetLookAt) {
+    let isCameraAnimating = false;
+    function animateCameraTo(targetCamPos, targetLookAt, duration = 800) {
       const startCamPos = camera.position.clone();
       const startLookAt = controls.target.clone();
-      let progress = 0;
-      const duration = 1000;
       const startTime = performance.now();
+      isCameraAnimating = true;
 
       function tween(now) {
         const elapsed = now - startTime;
-        progress = Math.min(elapsed / duration, 1);
+        const progress = Math.min(elapsed / duration, 1);
         const ease = 0.5 - Math.cos(progress * Math.PI) / 2;
 
         camera.position.lerpVectors(startCamPos, targetCamPos, ease);
         controls.target.lerpVectors(startLookAt, targetLookAt, ease);
-        controls.update();
 
         if (progress < 1) {
           requestAnimationFrame(tween);
+        } else {
+          camera.position.copy(targetCamPos);
+          controls.target.copy(targetLookAt);
+          controls.update();
+          isCameraAnimating = false;
         }
       }
       requestAnimationFrame(tween);
     }
+
+    /* ==========================================================================
+       7.1 AVATAR SPEED & TURN CONTROLS (References: media_1791355815735/739/762)
+       ========================================================================== */
+    let avatarSpeedMultiplier = 1.0;
+    let turnSensitivityMultiplier = 1.0;
+    let mouseTurnMode = "left"; // "left" | "right" | "move"
+    let isInvertY = false;
+    let isMouseDownDragging = false;
+
+    const btnSpeedCtrl = document.getElementById("btn-speed-ctrl");
+    const btnTurnCtrl = document.getElementById("btn-turn-ctrl");
+    const modalSpeedCtrl = document.getElementById("modal-speed-ctrl");
+    const modalTurnCtrl = document.getElementById("modal-turn-ctrl");
+    const btnCloseSpeedModal = document.getElementById("btn-close-speed-modal");
+    const btnCloseTurnModal = document.getElementById("btn-close-turn-modal");
+    const sliderSpeed = document.getElementById("slider-speed");
+    const sliderTurn = document.getElementById("slider-turn");
+    const valSpeedDisplay = document.getElementById("val-speed-display");
+    const valTurnDisplay = document.getElementById("val-turn-display");
+    const selectMouseTurn = document.getElementById("select-mouse-turn");
+    const checkInvertY = document.getElementById("check-invert-y");
+    const btnResetSpeed = document.getElementById("btn-reset-speed");
+    const btnResetTurn = document.getElementById("btn-reset-turn");
+
+    function updateSliderFill(slider) {
+      if (!slider) return;
+      const min = parseFloat(slider.min) || 0;
+      const max = parseFloat(slider.max) || 100;
+      const val = parseFloat(slider.value) || 0;
+      const pct = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+      slider.style.background = `linear-gradient(to right, #facc15 0%, #facc15 ${pct}%, #334155 ${pct}%, #334155 100%)`;
+    }
+
+    if (sliderSpeed) {
+      updateSliderFill(sliderSpeed);
+      sliderSpeed.addEventListener("input", () => {
+        const val = parseInt(sliderSpeed.value, 10);
+        if (valSpeedDisplay) valSpeedDisplay.textContent = `${val}%`;
+        if (btnSpeedCtrl) btnSpeedCtrl.textContent = `速度 ${val}%`;
+        avatarSpeedMultiplier = val / 100;
+        updateSliderFill(sliderSpeed);
+      });
+    }
+
+    if (btnResetSpeed) {
+      btnResetSpeed.addEventListener("click", () => {
+        if (sliderSpeed) sliderSpeed.value = 100;
+        if (valSpeedDisplay) valSpeedDisplay.textContent = "100%";
+        if (btnSpeedCtrl) btnSpeedCtrl.textContent = "速度 100%";
+        avatarSpeedMultiplier = 1.0;
+        updateSliderFill(sliderSpeed);
+      });
+    }
+
+    if (sliderTurn) {
+      updateSliderFill(sliderTurn);
+      sliderTurn.addEventListener("input", () => {
+        const val = parseInt(sliderTurn.value, 10);
+        if (valTurnDisplay) valTurnDisplay.textContent = `${val}%`;
+        if (btnTurnCtrl) btnTurnCtrl.textContent = `轉頭 ${val}%`;
+        turnSensitivityMultiplier = val / 100;
+        controls.rotateSpeed = 1.0 * turnSensitivityMultiplier;
+        updateSliderFill(sliderTurn);
+      });
+    }
+
+    function applyMouseModeSettings() {
+      if (mouseTurnMode === "left") {
+        controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+      } else if (mouseTurnMode === "right") {
+        controls.mouseButtons = { LEFT: THREE.MOUSE.NONE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+      } else if (mouseTurnMode === "move") {
+        controls.mouseButtons = { LEFT: THREE.MOUSE.NONE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.NONE };
+      }
+    }
+
+    if (selectMouseTurn) {
+      selectMouseTurn.addEventListener("change", (e) => {
+        mouseTurnMode = e.target.value;
+        applyMouseModeSettings();
+      });
+    }
+
+    if (checkInvertY) {
+      checkInvertY.addEventListener("change", (e) => {
+        isInvertY = e.target.checked;
+      });
+    }
+
+    if (btnResetTurn) {
+      btnResetTurn.addEventListener("click", () => {
+        if (sliderTurn) sliderTurn.value = 100;
+        if (valTurnDisplay) valTurnDisplay.textContent = "100%";
+        if (btnTurnCtrl) btnTurnCtrl.textContent = "轉頭 100%";
+        turnSensitivityMultiplier = 1.0;
+        controls.rotateSpeed = 1.0;
+        updateSliderFill(sliderTurn);
+
+        if (selectMouseTurn) selectMouseTurn.value = "left";
+        mouseTurnMode = "left";
+        applyMouseModeSettings();
+
+        if (checkInvertY) checkInvertY.checked = false;
+        isInvertY = false;
+      });
+    }
+
+    // Modal open/close toggles
+    if (btnSpeedCtrl) {
+      btnSpeedCtrl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (modalTurnCtrl) modalTurnCtrl.classList.remove("open");
+        if (modalSpeedCtrl) modalSpeedCtrl.classList.toggle("open");
+      });
+    }
+
+    if (btnTurnCtrl) {
+      btnTurnCtrl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (modalSpeedCtrl) modalSpeedCtrl.classList.remove("open");
+        if (modalTurnCtrl) modalTurnCtrl.classList.toggle("open");
+      });
+    }
+
+    if (btnCloseSpeedModal) {
+      btnCloseSpeedModal.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (modalSpeedCtrl) modalSpeedCtrl.classList.remove("open");
+      });
+    }
+
+    if (btnCloseTurnModal) {
+      btnCloseTurnModal.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (modalTurnCtrl) modalTurnCtrl.classList.remove("open");
+      });
+    }
+
+    if (modalSpeedCtrl) modalSpeedCtrl.addEventListener("click", (e) => e.stopPropagation());
+    if (modalTurnCtrl) modalTurnCtrl.addEventListener("click", (e) => e.stopPropagation());
+
+    window.addEventListener("click", (e) => {
+      if (modalSpeedCtrl && !e.target.closest("#modal-speed-ctrl") && !e.target.closest("#btn-speed-ctrl")) {
+        modalSpeedCtrl.classList.remove("open");
+      }
+      if (modalTurnCtrl && !e.target.closest("#modal-turn-ctrl") && !e.target.closest("#btn-turn-ctrl")) {
+        modalTurnCtrl.classList.remove("open");
+      }
+    });
+
+    // Custom Mouse Look & Invert Y Rotation Handling
+    function applyManualCameraRotation(deltaX, deltaY) {
+      const rotSens = turnSensitivityMultiplier;
+      const inv = isInvertY ? -1 : 1;
+      const thetaAngle = -deltaX * 0.0035 * rotSens;
+      const phiAngle = -deltaY * 0.0035 * rotSens * inv;
+
+      const offset = camera.position.clone().sub(controls.target);
+      if (Math.abs(thetaAngle) > 0.0001) {
+        offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), thetaAngle);
+      }
+      if (Math.abs(phiAngle) > 0.0001) {
+        const right = new THREE.Vector3().crossVectors(offset, new THREE.Vector3(0, 1, 0)).normalize();
+        offset.applyAxisAngle(right, phiAngle);
+      }
+      const minD = controls.minDistance || 4;
+      const maxD = controls.maxDistance || 300;
+      offset.clampLength(minD, maxD);
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
+    }
+
+    renderer.domElement.addEventListener("mousedown", (e) => {
+      if ((mouseTurnMode === "left" && e.button === 0) || (mouseTurnMode === "right" && e.button === 2)) {
+        isMouseDownDragging = true;
+      }
+    });
+    window.addEventListener("mouseup", () => {
+      isMouseDownDragging = false;
+    });
+    renderer.domElement.addEventListener("contextmenu", (e) => {
+      if (mouseTurnMode === "right") {
+        e.preventDefault();
+      }
+    });
+    renderer.domElement.addEventListener("mousemove", (e) => {
+      if (mouseTurnMode === "move" && (currentMode === "avatar" || currentMode === "firstperson")) {
+        const deltaX = e.movementX || 0;
+        const deltaY = e.movementY || 0;
+        if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
+          applyManualCameraRotation(deltaX, deltaY);
+        }
+      } else if (isInvertY && isMouseDownDragging) {
+        const deltaY = e.movementY || 0;
+        if (Math.abs(deltaY) > 0) {
+          applyManualCameraRotation(0, -deltaY * 2);
+        }
+      }
+    });
 
     function focusBuilding(cfg) {
       animateCameraTo(
@@ -3505,7 +4000,8 @@
       const delta = clock.getDelta();
 
       let isMoving = false;
-      const currentSpeed = (moveInput.sprint ? avatarRunSpeed : avatarSpeed) * delta;
+      const baseSpeed = moveInput.sprint ? avatarRunSpeed : avatarSpeed;
+      const currentSpeed = baseSpeed * avatarSpeedMultiplier * delta;
 
       // 1. AUTO-WALK (平滑爬樓梯與行進，防抖動與超前判定)
       if (isAutoWalking && currentNavPoints.length > 1) {
@@ -3516,7 +4012,7 @@
           const curPos = avatarGroup.position;
           const targetPos = new THREE.Vector3(currentTargetPt.x, (currentTargetPt.y || 0.6) - 0.6, currentTargetPt.z);
           const distToTarget = curPos.distanceTo(targetPos);
-          const stepDist = 14 * delta;
+          const stepDist = 14 * avatarSpeedMultiplier * delta;
 
           if (distToTarget <= stepDist || distToTarget < 1.0) {
             curPos.copy(targetPos);
@@ -3625,8 +4121,10 @@
         }
       }
 
-      // Always update OrbitControls so rotation/zoom NEVER freezes!
-      controls.update();
+      // Always update OrbitControls so rotation/zoom NEVER freezes (skip during smooth camera tween)
+      if (!isCameraAnimating) {
+        controls.update();
+      }
 
       // 3D Floating Building Labels
       labelElements.forEach(item => {
