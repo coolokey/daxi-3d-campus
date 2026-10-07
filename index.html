@@ -1146,7 +1146,8 @@
           { id: "804", code: "8M1-804", name: "804 教室 (1F)", floor: 1, node: "g8m-1f-804", cat: "grade8" },
           { id: "809", code: "8M1-809", name: "809 體育班 (1F)", floor: 1, node: "g8m-1f-809", cat: "grade8" },
           { id: "805", code: "8M2-805", name: "805 教室 (2F)", floor: 2, node: "g8m-2f-805", cat: "grade8" },
-          { id: "drama-room", code: "8M3-D", name: "表演藝術教室 (3F)", floor: 3, node: "g8m-3f-drama", cat: "special" }
+          { id: "drama-room", code: "8M3-D", name: "表演藝術教室 (3F)", floor: 3, node: "g8m-3f-drama", cat: "special" },
+          { id: "native-lang", code: "8M3-NL", name: "本土語教室 (3F)", floor: 3, node: "g8m-3f-nl", cat: "special" }
         ]
       },
 
@@ -1164,14 +1165,15 @@
           { x: 66, z: 11, name: "九年級東側樓梯", floors: 3 }
         ],
         rooms: [
+          { id: "906", code: "9B1-906", name: "906 教室 (1F)", floor: 1, node: "g9-1f-906", cat: "grade9" },
+          { id: "907", code: "9B1-907", name: "907 教室 (1F)", floor: 1, node: "g9-1f-907", cat: "grade9" },
           { id: "908", code: "9B1-908", name: "908 教室 (1F)", floor: 1, node: "g9-1f-908", cat: "grade9" },
-          { id: "905", code: "9B1-905", name: "905 教室 (1F)", floor: 1, node: "g9-1f-905", cat: "grade9" },
-          { id: "903", code: "9B1-903", name: "903 教室 (1F)", floor: 1, node: "g9-1f-903", cat: "grade9" },
-          { id: "907", code: "9B2-907", name: "907 教室 (2F)", floor: 2, node: "g9-2f-907", cat: "grade9" },
           { id: "904", code: "9B2-904", name: "904 教室 (2F)", floor: 2, node: "g9-2f-904", cat: "grade9" },
-          { id: "902", code: "9B2-902", name: "902 教室 (2F)", floor: 2, node: "g9-2f-902", cat: "grade9" },
-          { id: "906", code: "9B3-906", name: "906 教室 (3F)", floor: 3, node: "g9-3f-906", cat: "grade9" },
-          { id: "901", code: "9B3-901", name: "901 教室 (3F)", floor: 3, node: "g9-3f-901", cat: "grade9" }
+          { id: "905", code: "9B2-905", name: "905 教室 (2F)", floor: 2, node: "g9-2f-905", cat: "grade9" },
+          { id: "g9-clubs", code: "9B2-CLB", name: "綜合社團教室 (2F)", floor: 2, node: "g9-2f-clubs", cat: "special" },
+          { id: "901", code: "9B3-901", name: "901 教室 (3F)", floor: 3, node: "g9-3f-901", cat: "grade9" },
+          { id: "902", code: "9B3-902", name: "902 教室 (3F)", floor: 3, node: "g9-3f-902", cat: "grade9" },
+          { id: "903", code: "9B3-903", name: "903 教室 (3F)", floor: 3, node: "g9-3f-903", cat: "grade9" }
         ]
       },
 
@@ -2271,23 +2273,27 @@
       "g8m-stair-w-mid1": { id: "g8m-stair-w-mid1", x: 30, y: 1.8, z: 27, neighbors: ["g8m-stair-w-1f", "g8m-2f-805"] },
       "g8m-2f-805": { id: "g8m-2f-805", x: 48, y: 3.6, z: 26, neighbors: ["g8m-stair-w-mid1", "g8m-stair-w-mid2"] },
       "g8m-stair-w-mid2": { id: "g8m-stair-w-mid2", x: 30, y: 5.4, z: 27, neighbors: ["g8m-2f-805", "g8m-3f-drama"] },
-      "g8m-3f-drama": { id: "g8m-3f-drama", x: 48, y: 7.2, z: 26, neighbors: ["g8m-stair-w-mid2"] },
+      "g8m-3f-drama": { id: "g8m-3f-drama", x: 44, y: 7.2, z: 26, neighbors: ["g8m-stair-w-mid2", "g8m-3f-nl"] },
+      "g8m-3f-nl": { id: "g8m-3f-nl", x: 56, y: 7.2, z: 26, neighbors: ["g8m-3f-drama"] },
 
       // 10. 九年級後棟 (z=6)
-      "g9-porch": { id: "g9-porch", x: 38, y: 0, z: 14, neighbors: ["blvd-c3", "g9-1f-908", "g9-stair-w-1f"] },
-      "g9-1f-908": { id: "g9-1f-908", x: 40, y: 0, z: 6, neighbors: ["g9-porch", "g9-1f-905"] },
-      "g9-1f-905": { id: "g9-1f-905", x: 48, y: 0, z: 6, neighbors: ["g9-1f-908", "g9-1f-903"] },
-      "g9-1f-903": { id: "g9-1f-903", x: 58, y: 0, z: 6, neighbors: ["g9-1f-905"] },
+      "g9-porch": { id: "g9-porch", x: 38, y: 0, z: 14, neighbors: ["blvd-c3", "g9-1f-906", "g9-stair-w-1f"] },
+      "g9-1f-906": { id: "g9-1f-906", x: 38, y: 0, z: 6, neighbors: ["g9-porch", "g9-1f-907"] },
+      "g9-1f-907": { id: "g9-1f-907", x: 48, y: 0, z: 6, neighbors: ["g9-1f-906", "g9-1f-908"] },
+      "g9-1f-908": { id: "g9-1f-908", x: 58, y: 0, z: 6, neighbors: ["g9-1f-907"] },
 
       "g9-stair-w-1f": { id: "g9-stair-w-1f", x: 30, y: 0, z: 11, neighbors: ["g9-porch", "g9-stair-w-mid1"] },
-      "g9-stair-w-mid1": { id: "g9-stair-w-mid1", x: 30, y: 1.8, z: 7, neighbors: ["g9-stair-w-1f", "g9-2f-907"] },
-      "g9-2f-907": { id: "g9-2f-907", x: 38, y: 3.6, z: 6, neighbors: ["g9-stair-w-mid1", "g9-2f-904"] },
-      "g9-2f-904": { id: "g9-2f-904", x: 48, y: 3.6, z: 6, neighbors: ["g9-2f-907", "g9-2f-902", "g9-stair-w-mid2"] },
-      "g9-2f-902": { id: "g9-2f-902", x: 58, y: 3.6, z: 6, neighbors: ["g9-2f-904"] },
+      "g9-stair-w-mid1": { id: "g9-stair-w-mid1", x: 30, y: 1.8, z: 7, neighbors: ["g9-stair-w-1f", "g9-stair-w-2f"] },
+      "g9-stair-w-2f": { id: "g9-stair-w-2f", x: 30, y: 3.6, z: 11, neighbors: ["g9-stair-w-mid1", "g9-2f-904", "g9-stair-w-mid2"] },
+      "g9-2f-904": { id: "g9-2f-904", x: 38, y: 3.6, z: 6, neighbors: ["g9-stair-w-2f", "g9-2f-905"] },
+      "g9-2f-905": { id: "g9-2f-905", x: 48, y: 3.6, z: 6, neighbors: ["g9-2f-904", "g9-2f-clubs"] },
+      "g9-2f-clubs": { id: "g9-2f-clubs", x: 58, y: 3.6, z: 6, neighbors: ["g9-2f-905"] },
 
-      "g9-stair-w-mid2": { id: "g9-stair-w-mid2", x: 30, y: 5.4, z: 7, neighbors: ["g9-2f-904", "g9-3f-906"] },
-      "g9-3f-906": { id: "g9-3f-906", x: 42, y: 7.2, z: 6, neighbors: ["g9-stair-w-mid2", "g9-3f-901"] },
-      "g9-3f-901": { id: "g9-3f-901", x: 54, y: 7.2, z: 6, neighbors: ["g9-3f-906"] },
+      "g9-stair-w-mid2": { id: "g9-stair-w-mid2", x: 30, y: 5.4, z: 7, neighbors: ["g9-stair-w-2f", "g9-stair-w-3f"] },
+      "g9-stair-w-3f": { id: "g9-stair-w-3f", x: 30, y: 7.2, z: 11, neighbors: ["g9-stair-w-mid2", "g9-3f-901"] },
+      "g9-3f-901": { id: "g9-3f-901", x: 38, y: 7.2, z: 6, neighbors: ["g9-stair-w-3f", "g9-3f-902"] },
+      "g9-3f-902": { id: "g9-3f-902", x: 48, y: 7.2, z: 6, neighbors: ["g9-3f-901", "g9-3f-903"] },
+      "g9-3f-903": { id: "g9-3f-903", x: 58, y: 7.2, z: 6, neighbors: ["g9-3f-902"] },
 
       // 11. 北側綜合運動設施 (籃球場)
       "bb-gate": { id: "bb-gate", x: 10, y: 0, z: -36, neighbors: ["blvd-c4", "lan-pond-gate", "new7-porch"] },
@@ -2508,7 +2514,13 @@
     function startAutoWalk() {
       if (!currentNavPoints || currentNavPoints.length < 2) return;
       isAutoWalking = true;
-      autoWalkIndex = 0;
+      const startPt = currentNavPoints[0];
+      const startPos = new THREE.Vector3(startPt.x, (startPt.y || 0.6) - 0.6, startPt.z);
+      if (avatarGroup && avatarGroup.position.distanceTo(startPos) > 2.0) {
+        autoWalkIndex = -1; // Walk to start point first
+      } else {
+        autoWalkIndex = 0;
+      }
       btnAutoWalk.classList.add("walking");
       btnAutoWalk.textContent = "⏹️ 停止帶路";
       showToast("🧑‍🎓 大溪同學啟動自動帶路，正帶您前往目的地！");
@@ -2528,6 +2540,7 @@
     const moveInput = { forward: false, backward: false, left: false, right: false, sprint: false };
     let walkAnimCycle = 0;
     let jumpVelocity = 0;
+    let jumpBaseY = 0;
     let isJumping = false;
 
     function setControlMode(mode) {
@@ -2588,6 +2601,7 @@
     function triggerJump() {
       if (!isJumping && avatarGroup) {
         isJumping = true;
+        jumpBaseY = avatarGroup.position.y;
         jumpVelocity = 7.5;
       }
     }
@@ -3064,7 +3078,39 @@
         miniCtx.strokeStyle = "#ffffff";
         miniCtx.lineWidth = 1.6;
         miniCtx.strokeRect(bx, bz, bw, bh);
+
+        // Building Label Text
+        miniCtx.fillStyle = "#ffffff";
+        miniCtx.font = "900 8.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        miniCtx.textAlign = "center";
+        miniCtx.textBaseline = "middle";
+        let miniName = cfg.name;
+        if (cfg.id === "gym-bld") miniName = "活動中心";
+        else if (cfg.id === "recycle-bld") miniName = "回收";
+        else if (cfg.id === "admin-front") miniName = "行政前";
+        else if (cfg.id === "admin-back") miniName = "行政後";
+        else if (cfg.id === "health-bld") miniName = "健康";
+        else if (cfg.id === "grade8-front") miniName = "8前";
+        else if (cfg.id === "grade8-mid") miniName = "8中";
+        else if (cfg.id === "grade9-back") miniName = "九年級";
+        else if (cfg.id === "art-building") miniName = "藝術";
+        else if (cfg.id === "tech-building") miniName = "科技";
+        else if (cfg.id === "multi-building") miniName = "綜合";
+        else if (cfg.id === "history-bld") miniName = "校史";
+        else if (cfg.id === "new-grade7") miniName = "七年級/特教";
+
+        miniCtx.fillText(miniName, bx + bw / 2, bz + bh / 2);
       });
+
+      // Outdoor Venue Labels
+      miniCtx.fillStyle = "#ffffff";
+      miniCtx.font = "900 9px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      miniCtx.textAlign = "center";
+      miniCtx.textBaseline = "middle";
+      miniCtx.fillText("操場", trackCX, trackCZ);
+      miniCtx.fillText("司令台", standX + standW / 2, standZ + standH / 2);
+      miniCtx.fillText("籃球場", bbX + bbW / 2, bbZ + bbH / 2);
+      miniCtx.fillText("排球場", vbX + vbW / 2, vbZ + vbH / 2);
 
       // 9. Active Navigation Route
       if (currentNavPoints && currentNavPoints.length > 1) {
@@ -3143,6 +3189,8 @@
       const worldZ = mapMinZ + (clickCanvasZ - 16) / 328 * (mapMaxZ - mapMinZ);
 
       if (avatarGroup) {
+        clearNavigation();
+        jumpBaseY = 0;
         avatarGroup.position.set(worldX, 0, worldZ);
         prevAvatarPos.copy(avatarGroup.position);
         if (currentMode !== "bird") {
@@ -3174,16 +3222,20 @@
       let isMoving = false;
       const currentSpeed = (moveInput.sprint ? avatarRunSpeed : avatarSpeed) * delta;
 
-      // 1. AUTO-WALK (平滑爬樓梯與行進)
+      // 1. AUTO-WALK (平滑爬樓梯與行進，防抖動與超前判定)
       if (isAutoWalking && currentNavPoints.length > 1) {
         isMoving = true;
-        const currentTargetPt = currentNavPoints[autoWalkIndex + 1];
+        const targetPtIndex = autoWalkIndex + 1;
+        const currentTargetPt = currentNavPoints[targetPtIndex];
         if (currentTargetPt) {
           const curPos = avatarGroup.position;
-          const targetPos = new THREE.Vector3(currentTargetPt.x, currentTargetPt.y - 0.6, currentTargetPt.z);
+          const targetPos = new THREE.Vector3(currentTargetPt.x, (currentTargetPt.y || 0.6) - 0.6, currentTargetPt.z);
           const distToTarget = curPos.distanceTo(targetPos);
+          const stepDist = 14 * delta;
 
-          if (distToTarget < 1.0) {
+          if (distToTarget <= stepDist || distToTarget < 1.0) {
+            curPos.copy(targetPos);
+            jumpBaseY = curPos.y;
             autoWalkIndex++;
             if (autoWalkIndex >= currentNavPoints.length - 1) {
               stopAutoWalk();
@@ -3191,10 +3243,13 @@
             }
           } else {
             const dir = targetPos.clone().sub(curPos).normalize();
-            curPos.addScaledVector(dir, 14 * delta);
+            curPos.addScaledVector(dir, stepDist);
+            jumpBaseY = curPos.y;
             avatarAngle = Math.atan2(-dir.x, -dir.z);
             avatarGroup.rotation.y = avatarAngle;
           }
+        } else {
+          stopAutoWalk();
         }
       }
       // 2. MANUAL KEYBOARD / DPAD CONTROLS (Camera-Relative Movement)
@@ -3220,12 +3275,12 @@
         }
       }
 
-      // Space-bar Jump Hop
+      // Space-bar Jump Hop (依據當前樓層地面高度落地，不穿破樓板)
       if (avatarGroup && isJumping) {
         avatarGroup.position.y += jumpVelocity * delta;
         jumpVelocity -= 22 * delta;
-        if (avatarGroup.position.y <= 0) {
-          avatarGroup.position.y = 0;
+        if (avatarGroup.position.y <= jumpBaseY) {
+          avatarGroup.position.y = jumpBaseY;
           jumpVelocity = 0;
           isJumping = false;
         }
