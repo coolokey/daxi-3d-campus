@@ -1655,80 +1655,61 @@
     const avatarRunSpeed = 28;
 
     // 1. 五官紋理生成 (參考 media_1791355365994.png：黑亮大眼、高光眼神、腮紅粉頰、微笑小嘴)
-    function createFaceTexture() {
+    // 1. 五官與頭部紋理生成 (完美還原 media_1791355365994.png)
+    function createHeadTexture() {
       const cvs = document.createElement("canvas");
-      cvs.width = 512; cvs.height = 512;
+      cvs.width = 1024; cvs.height = 512;
       const ctx = cvs.getContext("2d");
 
-      // 膚色底層
-      ctx.fillStyle = "#ffd8be";
-      ctx.fillRect(0, 0, 512, 512);
+      // 溫潤白皙膚色基底
+      ctx.fillStyle = "#ffdcc7";
+      ctx.fillRect(0, 0, 1024, 512);
 
-      // 前額齊瀏海 (小黃帽帽沿下自然露出的黑髮)
+      // 後腦勺短黑髮 (兩側延伸至後方，z < 0)
       ctx.fillStyle = "#1e1e24";
+      ctx.fillRect(0, 90, 260, 380);
+      ctx.fillRect(764, 90, 260, 380);
+
+      // 前額齊瀏海 (小黃帽帽沿下自然露出的黑髮弧線)
       ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(512, 0);
-      ctx.lineTo(512, 135);
-      ctx.quadraticCurveTo(384, 175, 256, 142);
-      ctx.quadraticCurveTo(128, 175, 0, 135);
+      ctx.moveTo(300, 120);
+      ctx.lineTo(724, 120);
+      ctx.lineTo(724, 280);
+      ctx.quadraticCurveTo(512, 300, 300, 280);
       ctx.closePath();
       ctx.fill();
 
-      // 自然眉毛
-      ctx.strokeStyle = "#334155";
-      ctx.lineWidth = 6;
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(140, 215);
-      ctx.quadraticCurveTo(175, 202, 210, 212);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(302, 212);
-      ctx.quadraticCurveTo(337, 202, 372, 215);
-      ctx.stroke();
-
-      // 黑亮雙眼 (含雙層白色高光眼神光)
+      // 黑亮雙眼 (黑眼珠 + 白色純淨眼神高光)
       function drawEye(cx, cy) {
         ctx.fillStyle = "#0f172a";
         ctx.beginPath();
-        ctx.ellipse(cx, cy, 26, 35, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx, cy, 18, 22, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // 主高光 (左上方)
+        // 眼神高光
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
-        ctx.arc(cx - 8, cy - 10, 9, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 次高光 (右下方)
-        ctx.beginPath();
-        ctx.arc(cx + 8, cy + 10, 4.5, 0, Math.PI * 2);
+        ctx.arc(cx - 5, cy - 6, 6, 0, Math.PI * 2);
         ctx.fill();
       }
-      drawEye(175, 265);
-      drawEye(337, 265);
+      drawEye(420, 315);
+      drawEye(604, 315);
 
-      // 可愛腮紅 (粉色柔邊漸層)
+      // 可愛粉嫩腮紅
       function drawBlush(cx, cy) {
-        const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 38);
-        grad.addColorStop(0, "rgba(244, 63, 94, 0.78)");
-        grad.addColorStop(0.55, "rgba(251, 113, 133, 0.42)");
-        grad.addColorStop(1, "rgba(254, 205, 211, 0)");
-        ctx.fillStyle = grad;
+        ctx.fillStyle = "rgba(255, 71, 87, 0.85)";
         ctx.beginPath();
-        ctx.arc(cx, cy, 38, 0, Math.PI * 2);
+        ctx.ellipse(cx, cy, 26, 22, 0, 0, Math.PI * 2);
         ctx.fill();
       }
-      drawBlush(132, 318);
-      drawBlush(380, 318);
+      drawBlush(370, 355);
+      drawBlush(654, 355);
 
-      // 微笑小嘴
-      ctx.fillStyle = "#be123c";
+      // 可愛小嘴
+      ctx.fillStyle = "#991b1b";
       ctx.beginPath();
-      ctx.arc(256, 332, 13, 0.1 * Math.PI, 0.9 * Math.PI);
-      ctx.closePath();
+      if (ctx.roundRect) ctx.roundRect(494, 375, 36, 12, 6);
+      else ctx.rect(494, 375, 36, 12);
       ctx.fill();
 
       const tex = new THREE.CanvasTexture(cvs);
@@ -1808,9 +1789,11 @@
     function createStudentAvatar() {
       avatarGroup = new THREE.Group();
       avatarGroup.position.set(0, 0, 96);
+      avatarAngle = Math.PI; // 預設面向校園北側 (朝前)
+      avatarGroup.rotation.y = avatarAngle;
       prevAvatarPos.copy(avatarGroup.position);
 
-      const faceTex = createFaceTexture();
+      const headTex = createHeadTexture();
       const uniformTex = createUniformTorsoTexture();
 
       // 地面陰影
@@ -1847,79 +1830,56 @@
       collar.position.y = 2.05;
       avatarGroup.add(collar);
 
-      // 頭部 (膚色圓形主球體)
+      // 頭部 (圓形球體直接貼附五官與黑髮紋理，完全無紙面片接縫，完美還原 media_1791355365994.png)
       const headGroup = new THREE.Group();
       headGroup.position.y = 2.42;
 
-      const headSkin = new THREE.Mesh(
-        new THREE.SphereGeometry(0.38, 24, 24),
-        new THREE.MeshLambertMaterial({ color: 0xffd8be })
-      );
-      headSkin.castShadow = true;
-      headGroup.add(headSkin);
-
-      // 弧形臉部五官面片 (正面完全貼合，零變形呈現五官、眼神光、腮紅)
-      const faceGeo = new THREE.PlaneGeometry(0.68, 0.68, 8, 8);
-      const pos = faceGeo.attributes.position;
-      for (let i = 0; i < pos.count; i++) {
-        const px = pos.getX(i);
-        const py = pos.getY(i);
-        pos.setZ(i, -(px * px + py * py) * 0.26);
-      }
-      faceGeo.computeVertexNormals();
-
-      const faceMesh = new THREE.Mesh(
-        faceGeo,
-        new THREE.MeshBasicMaterial({ map: faceTex, transparent: true })
-      );
-      faceMesh.position.set(0, 0, 0.385);
-      headGroup.add(faceMesh);
-
-      // 後腦勺短黑髮
-      const hairBack = new THREE.Mesh(
-        new THREE.SphereGeometry(0.395, 20, 16, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.65),
-        new THREE.MeshLambertMaterial({ color: 0x1e1e24 })
-      );
-      headGroup.add(hairBack);
+      const headGeo = new THREE.SphereGeometry(0.38, 32, 32);
+      const headMat = new THREE.MeshLambertMaterial({ map: headTex });
+      const headMesh = new THREE.Mesh(headGeo, headMat);
+      headMesh.rotation.y = -Math.PI / 2; // 正面五官對齊局部 +Z
+      headMesh.castShadow = true;
+      headGroup.add(headMesh);
 
       // 雙側小耳朵
-      const earL = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshLambertMaterial({ color: 0xffd8be }));
-      earL.position.set(-0.39, 0, 0);
+      const skinMat = new THREE.MeshLambertMaterial({ color: 0xffdcc7 });
+      const earL = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 12), skinMat);
+      earL.position.set(-0.38, -0.02, 0);
       headGroup.add(earL);
-      const earR = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshLambertMaterial({ color: 0xffd8be }));
-      earR.position.set(0.39, 0, 0);
+      const earR = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 12), skinMat);
+      earR.position.set(0.38, -0.02, 0);
       headGroup.add(earR);
 
-      // 標誌性小黃帽 (黃色棒球帽，完全還原 media_1791355365994.png)
+      // 標誌性小黃帽 (圓球帽頂 + 前沿遮陽帽舌，完美還原 media_1791355365994.png)
+      const capMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
       const capDome = new THREE.Mesh(
-        new THREE.SphereGeometry(0.41, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.52),
-        new THREE.MeshLambertMaterial({ color: 0xfacc15 })
+        new THREE.SphereGeometry(0.395, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.52),
+        capMat
       );
-      capDome.position.y = 0.05;
+      capDome.position.y = 0.02;
       headGroup.add(capDome);
 
       // 帽頂小圓鈕扣
       const capBtn = new THREE.Mesh(
-        new THREE.SphereGeometry(0.06, 10, 10),
-        new THREE.MeshLambertMaterial({ color: 0xca8a04 })
-      );
-      capBtn.position.y = 0.46;
-      headGroup.add(capBtn);
-
-      // 前向帽沿 (黃色弧形遮陽板)
-      const visor = new THREE.Mesh(
-        new THREE.BoxGeometry(0.54, 0.04, 0.32),
+        new THREE.SphereGeometry(0.045, 12, 12),
         new THREE.MeshLambertMaterial({ color: 0xeab308 })
       );
-      visor.position.set(0, 0.12, 0.36);
-      visor.rotation.x = 0.16;
+      capBtn.position.y = 0.435;
+      headGroup.add(capBtn);
+
+      // 前向遮陽帽沿 (黃色弧形遮陽板，緊密貼合帽頂下緣)
+      const visor = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.36, 0.41, 0.024, 24, 1, false, -Math.PI * 0.30, Math.PI * 0.60),
+        capMat
+      );
+      visor.position.set(0, 0.02, 0.16);
+      visor.rotation.x = 0.10;
       visor.castShadow = true;
       headGroup.add(visor);
 
       avatarGroup.add(headGroup);
 
       // 手臂結構 (左臂 / 右臂：深藍袖身＋水藍側條，膚色小臂與手掌)
-      const skinMat = new THREE.MeshLambertMaterial({ color: 0xffd8be });
       const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
       const stripeMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
 
@@ -3201,7 +3161,7 @@
         showToast("切換為「第一人稱視角」！滑鼠環顧、WASD 漫遊。");
         if (avatarGroup) {
           const eyePos = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.7, 0));
-          const forwardVec = new THREE.Vector3(-Math.sin(avatarAngle) * 10, 0, -Math.cos(avatarAngle) * 10);
+          const forwardVec = new THREE.Vector3(Math.sin(avatarAngle) * 10, 0, Math.cos(avatarAngle) * 10);
           animateCameraTo(eyePos, eyePos.clone().add(forwardVec), 600);
         }
       } else {
@@ -4026,7 +3986,7 @@
             const dir = targetPos.clone().sub(curPos).normalize();
             curPos.addScaledVector(dir, stepDist);
             jumpBaseY = curPos.y;
-            avatarAngle = Math.atan2(-dir.x, -dir.z);
+            avatarAngle = Math.atan2(dir.x, dir.z);
             avatarGroup.rotation.y = avatarAngle;
           }
         } else {
@@ -4050,7 +4010,7 @@
         if (moveVec.lengthSq() > 0.001) {
           isMoving = true;
           moveVec.normalize();
-          avatarAngle = Math.atan2(-moveVec.x, -moveVec.z);
+          avatarAngle = Math.atan2(moveVec.x, moveVec.z);
           avatarGroup.rotation.y = avatarAngle;
           avatarGroup.position.addScaledVector(moveVec, currentSpeed);
         }
