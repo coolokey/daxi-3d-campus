@@ -389,32 +389,234 @@
     }
     .nav-close:hover { background: rgba(255,255,255,0.25); }
 
-    /* Minimap (Bottom Left) */
+    /* High-Definition Cartographic Minimap (Matching media_1791335056310.png) */
     #minimap-card {
       position: absolute;
-      left: 16px;
+      left: 20px;
       bottom: calc(20px + var(--safe-bottom));
-      width: 148px;
-      height: 148px;
-      border-radius: 18px;
+      width: 176px;
+      height: 176px;
+      border-radius: 22px;
       overflow: hidden;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      background: #182533;
-      z-index: 15;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      border: 3.5px solid #ffffff;
+      background: #1e293b;
+      z-index: 25;
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.65);
+      cursor: crosshair;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
     }
-    #minimap-canvas { width: 100%; height: 100%; display: block; }
-    .minimap-badge {
+    #minimap-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 14px 38px rgba(0, 0, 0, 0.75);
+    }
+    #minimap-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .minimap-compass {
       position: absolute;
-      right: 6px;
-      bottom: 6px;
-      background: rgba(0,0,0,0.75);
-      padding: 2px 6px;
+      right: 48px;
+      bottom: 8px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+      border: 1.5px solid #ffffff;
+      pointer-events: none;
+      z-index: 3;
+      user-select: none;
+    }
+    .minimap-floor-badge {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      background: #0f172a;
+      color: #ffffff;
+      font-family: var(--num), -apple-system, sans-serif;
+      font-weight: 900;
+      font-size: 13.5px;
+      padding: 2.5px 8px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      pointer-events: none;
+      z-index: 3;
+      line-height: 1.2;
+      user-select: none;
+    }
+
+    /* Welcome / Operation Guide Card (Direct Reference to media_1791335021168.png) */
+    #welcome-card {
+      position: absolute;
+      left: 20px;
+      top: calc(76px + env(safe-area-inset-top, 0px));
+      width: min(440px, calc(100vw - 32px));
+      max-height: calc(100vh - 96px);
+      overflow-y: auto;
+      background: rgba(24, 32, 47, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 24px;
+      padding: 26px 24px 22px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      z-index: 50;
+      color: #ffffff;
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #welcome-card.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-16px) scale(0.96);
+    }
+    .welcome-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      font-size: 15px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .welcome-close:hover {
+      background: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+    }
+    .welcome-badge {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #fbbf24;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .welcome-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .welcome-desc {
+      font-size: 14.5px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .welcome-desc.sub {
+      margin-bottom: 22px;
+    }
+    .welcome-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .welcome-btn-primary {
+      flex: 1;
+      background: #facc15;
+      color: #0f172a;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(250, 204, 21, 0.35);
+      transition: all 0.2s;
+    }
+    .welcome-btn-primary:hover {
+      background: #fde047;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(250, 204, 21, 0.45);
+    }
+    .welcome-btn-secondary {
+      flex: 1;
+      background: #283344;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .welcome-btn-secondary:hover {
+      background: #334155;
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+    .welcome-shortcuts {
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .shortcut-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .shortcut-key {
+      background: #232d3f;
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 6px;
-      font-family: var(--num);
-      font-size: 10px;
-      color: var(--accent);
-      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      font-weight: 800;
+      font-size: 12px;
+      color: #f8fafc;
+      min-width: 58px;
+      text-align: center;
+      flex-shrink: 0;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.4);
+    }
+    .shortcut-desc {
+      font-size: 13.5px;
+      color: #cbd5e1;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* Floating 3D Ground Landmark Pills (操場, 司令台, 籃球場, 大門...) */
+    .landmark-pill {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      background: #ffffff;
+      color: #1e293b;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      pointer-events: auto;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      z-index: 12;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      user-select: none;
+    }
+    .landmark-pill:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
     }
 
     /* 3D Floating Building & Room Labels */
@@ -634,6 +836,39 @@
   <div id="labels-container"></div>
   <div id="avatar-nametag">🧑‍🎓 大溪同學 (您在此)</div>
 
+  <!-- Welcome / Operation Guide Card (Direct Reference to media_1791335021168.png) -->
+  <div id="welcome-card">
+    <button class="welcome-close" id="btn-close-welcome" title="關閉說明">✕</button>
+    <div class="welcome-badge">115 學年度</div>
+    <h1 class="welcome-title">走進大溪國中</h1>
+    <p class="welcome-desc">帶著小朋友走過每一條走廊、每一座樓梯。搜尋教室，黃色路線會帶你走到門口。</p>
+    <p class="welcome-desc sub">找研習或會議場地：點上方搜尋框，直接選擇常用場地，就能顯示路線。</p>
+    
+    <div class="welcome-actions">
+      <button id="welcome-btn-enter" class="welcome-btn-primary">走進校園</button>
+      <button id="welcome-btn-overview" class="welcome-btn-secondary">先看鳥瞰</button>
+    </div>
+
+    <div class="welcome-shortcuts">
+      <div class="shortcut-item">
+        <span class="shortcut-key">W A S D</span>
+        <span class="shortcut-desc">預設跑步（Shift 加速、空白鍵跳）</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">滑鼠</span>
+        <span class="shortcut-desc">轉頭；手機用左搖桿移動、右半邊滑動轉頭</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">V</span>
+        <span class="shortcut-desc">切換第三人稱／第一人稱</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">M</span>
+        <span class="shortcut-desc">鳥瞰全校、逐層查看</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Top Navigation Bar -->
   <header id="top-nav">
     <div class="brand-btn glass" id="btn-home" title="返回全校鳥瞰視野">
@@ -693,10 +928,11 @@
     <button class="floor-btn" data-f="1" title="檢視 1F 樓層空間">1F</button>
   </div>
 
-  <!-- 2D Minimap -->
-  <div id="minimap-card">
+  <!-- 2D High-Definition Minimap (Reference: media_1791335056310.png) -->
+  <div id="minimap-card" title="點擊小地圖可快速定位傳送">
     <canvas id="minimap-canvas"></canvas>
-    <div class="minimap-badge">MINI MAP</div>
+    <div class="minimap-compass" title="指北標記">北</div>
+    <div class="minimap-floor-badge" id="minimap-floor-badge">1F</div>
   </div>
 
   <!-- On-Screen D-Pad for Mobile & Mouse -->
@@ -1720,6 +1956,36 @@
       });
     });
 
+    // 4.3 Ground Landmark Pills (操場, 司令台, 籃球場, 大門, 停車場, 蘭亭)
+    const LANDMARKS = [
+      { name: "操場", x: -85, y: 1.8, z: -15 },
+      { name: "司令台", x: -32, y: 5.2, z: 8 },
+      { name: "籃球場", x: -30, y: 1.8, z: -45 },
+      { name: "大門", x: 0, y: 3.5, z: 96 },
+      { name: "停車場", x: 54, y: 1.8, z: 66 },
+      { name: "蘭亭", x: -18, y: 2.2, z: 50 },
+      { name: "中庭花園", x: 10, y: 2.0, z: 16 }
+    ];
+    const landmarkElements = [];
+
+    LANDMARKS.forEach(lm => {
+      const pill = document.createElement("div");
+      pill.className = "landmark-pill";
+      pill.textContent = lm.name;
+      pill.title = `點擊聚焦：${lm.name}`;
+      pill.onclick = () => {
+        const targetPos = new THREE.Vector3(lm.x, lm.y, lm.z);
+        const camPos = targetPos.clone().add(new THREE.Vector3(15, 25, 30));
+        animateCameraTo(camPos, targetPos);
+        showToast(`聚焦地標：${lm.name}`);
+      };
+      labelsContainer.appendChild(pill);
+      landmarkElements.push({
+        element: pill,
+        worldPos: new THREE.Vector3(lm.x, lm.y, lm.z)
+      });
+    });
+
     /* ==========================================================================
        5. A* NAVIGATION GRAPH & WAYPOINTS
        ========================================================================== */
@@ -2030,9 +2296,11 @@
     /* ==========================================================================
        7. CONTROL MODES & SMOOTH CAMERA
        ========================================================================== */
-    let currentMode = "bird"; // Start in Overview Mode (鳥瞰全景) for 100% free OrbitControls interaction
+    let currentMode = "bird"; // Start in Overview Mode (鳥瞰全景) with Welcome Card
     const moveInput = { forward: false, backward: false, left: false, right: false, sprint: false };
     let walkAnimCycle = 0;
+    let jumpVelocity = 0;
+    let isJumping = false;
 
     function setControlMode(mode) {
       currentMode = mode;
@@ -2043,25 +2311,61 @@
       if (mode === "avatar") {
         toggleBtn.classList.add("active");
         btnIcon.textContent = "🧑‍🎓";
-        btnText.textContent = "人物漫遊中";
-        showToast("切換為「人物漫遊模式」！可用鍵盤或方向按鈕自由走動。");
-        // Smoothly position camera behind avatar while keeping OrbitControls alive
+        btnText.textContent = "第三人稱";
+        if (avatarGroup) avatarGroup.visible = true;
+        showToast("切換為「第三人稱視角」！WASD 跑步漫遊。");
         if (avatarGroup) {
           controls.target.copy(avatarGroup.position.clone().add(new THREE.Vector3(0, 1.8, 0)));
-          const behindPos = avatarGroup.position.clone().add(new THREE.Vector3(0, 8, 16));
+          const behindPos = avatarGroup.position.clone().add(new THREE.Vector3(0, 7, 15));
           animateCameraTo(behindPos, controls.target);
+        }
+      } else if (mode === "firstperson") {
+        toggleBtn.classList.add("active");
+        btnIcon.textContent = "👀";
+        btnText.textContent = "第一人稱";
+        if (avatarGroup) avatarGroup.visible = false;
+        showToast("切換為「第一人稱視角」！滑鼠環顧、WASD 漫遊。");
+        if (avatarGroup) {
+          const eyePos = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.7, 0));
+          const forwardVec = new THREE.Vector3(-Math.sin(avatarAngle) * 10, 0, -Math.cos(avatarAngle) * 10);
+          controls.target.copy(eyePos.clone().add(forwardVec));
+          camera.position.copy(eyePos);
         }
       } else {
         toggleBtn.classList.remove("active");
         btnIcon.textContent = "🦅";
         btnText.textContent = "鳥瞰全景";
+        if (avatarGroup) avatarGroup.visible = true;
         showToast("切換為「全校鳥瞰模式」！可 360° 俯瞰校園全貌。");
         animateCameraTo(OVERVIEW_CAM, OVERVIEW_TARGET);
       }
     }
 
+    function togglePerspective() {
+      if (currentMode === "firstperson") {
+        setControlMode("avatar");
+      } else {
+        setControlMode("firstperson");
+      }
+    }
+
+    function toggleBirdMode() {
+      if (currentMode === "bird") {
+        setControlMode("avatar");
+      } else {
+        setControlMode("bird");
+      }
+    }
+
+    function triggerJump() {
+      if (!isJumping && avatarGroup) {
+        isJumping = true;
+        jumpVelocity = 7.5;
+      }
+    }
+
     document.getElementById("btn-mode-toggle").onclick = () => {
-      setControlMode(currentMode === "avatar" ? "bird" : "avatar");
+      setControlMode(currentMode === "bird" ? "avatar" : "bird");
     };
 
     function showToast(text) {
@@ -2073,23 +2377,35 @@
 
     window.addEventListener("keydown", (e) => {
       if (e.target.tagName === "INPUT") return;
-      if (e.key === "w" || e.key === "ArrowUp") moveInput.forward = true;
-      if (e.key === "s" || e.key === "ArrowDown") moveInput.backward = true;
-      if (e.key === "a" || e.key === "ArrowLeft") moveInput.left = true;
-      if (e.key === "d" || e.key === "ArrowRight") moveInput.right = true;
+      if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") moveInput.forward = true;
+      if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") moveInput.backward = true;
+      if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") moveInput.left = true;
+      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") moveInput.right = true;
       if (e.shiftKey) moveInput.sprint = true;
+      if (e.code === "Space") {
+        e.preventDefault();
+        triggerJump();
+      }
+      if (e.key === "v" || e.key === "V") {
+        e.preventDefault();
+        togglePerspective();
+      }
+      if (e.key === "m" || e.key === "M") {
+        e.preventDefault();
+        toggleBirdMode();
+      }
 
-      if (["w","s","a","d","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
-        if (currentMode !== "avatar") setControlMode("avatar");
+      if (["w","s","a","d","W","S","A","D","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
+        if (currentMode === "bird") setControlMode("avatar");
       }
     });
 
     window.addEventListener("keyup", (e) => {
       if (e.target.tagName === "INPUT") return;
-      if (e.key === "w" || e.key === "ArrowUp") moveInput.forward = false;
-      if (e.key === "s" || e.key === "ArrowDown") moveInput.backward = false;
-      if (e.key === "a" || e.key === "ArrowLeft") moveInput.left = false;
-      if (e.key === "d" || e.key === "ArrowRight") moveInput.right = false;
+      if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") moveInput.forward = false;
+      if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") moveInput.backward = false;
+      if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") moveInput.left = false;
+      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") moveInput.right = false;
       if (!e.shiftKey) moveInput.sprint = false;
     });
 
@@ -2204,7 +2520,14 @@
       );
     }
 
+    let currentFloorFilter = "all";
     function setFloorFilter(floorVal) {
+      currentFloorFilter = floorVal;
+      const floorBadgeEl = document.getElementById("minimap-floor-badge");
+      if (floorBadgeEl) {
+        floorBadgeEl.textContent = floorVal === "all" ? "1F" : floorVal + "F";
+      }
+
       document.querySelectorAll(".floor-btn").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.f === String(floorVal));
       });
@@ -2276,77 +2599,42 @@
     });
 
     document.getElementById("btn-cancel-nav").onclick = clearNavigation;
+
+    // Welcome Guide Card Handlers (Matching media_1791335021168.png)
+    const welcomeCard = document.getElementById("welcome-card");
+    const btnEnterCampus = document.getElementById("welcome-btn-enter");
+    const btnOverviewCampus = document.getElementById("welcome-btn-overview");
+    const btnCloseWelcome = document.getElementById("btn-close-welcome");
+
+    if (btnEnterCampus) {
+      btnEnterCampus.onclick = () => {
+        welcomeCard.classList.add("hidden");
+        setControlMode("avatar");
+      };
+    }
+    if (btnOverviewCampus) {
+      btnOverviewCampus.onclick = () => {
+        welcomeCard.classList.add("hidden");
+        setControlMode("bird");
+      };
+    }
+    if (btnCloseWelcome) {
+      btnCloseWelcome.onclick = () => {
+        welcomeCard.classList.add("hidden");
+      };
+    }
+
     document.getElementById("btn-home").onclick = () => {
       clearNavigation();
       setFloorFilter("all");
+      welcomeCard.classList.remove("hidden");
       setControlMode("bird");
     };
-
-    const mapModal = document.getElementById("campus-map-modal");
-    document.getElementById("btn-map-overlay").onclick = () => mapModal.classList.add("open");
-    document.getElementById("btn-close-map-modal").onclick = () => mapModal.classList.remove("open");
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "m" || e.key === "M") {
-        mapModal.classList.toggle("open");
-      }
-    });
-
-    // 2D Minimap Canvas
-    const miniCanvas = document.getElementById("minimap-canvas");
-    const miniCtx = miniCanvas.getContext("2d");
-    miniCanvas.width = 148;
-    miniCanvas.height = 148;
-
-    function renderMinimap() {
-      miniCtx.clearRect(0, 0, 148, 148);
-      const scaleX = 148 / 320;
-      const scaleZ = 148 / 240;
-
-      const toMiniX = (x) => (x + 160) * scaleX;
-      const toMiniZ = (z) => (z + 110) * scaleZ;
-
-      miniCtx.fillStyle = "#1e392a";
-      miniCtx.fillRect(0, 0, 148, 148);
-
-      miniCtx.fillStyle = "#2b2d42";
-      miniCtx.beginPath();
-      miniCtx.arc(toMiniX(-85), toMiniZ(-15), 18, 0, Math.PI * 2);
-      miniCtx.fill();
-
-      miniCtx.fillStyle = "#f97316";
-      miniCtx.fillRect(toMiniX(-30), toMiniZ(-45), 26, 16);
-
-      BUILDINGS_CONFIG.forEach(cfg => {
-        miniCtx.fillStyle = cfg.id === "gym-bld" ? "#d98a80" : "#475569";
-        const bx = toMiniX(cfg.x - cfg.width / 2);
-        const bz = toMiniZ(cfg.z - cfg.depth / 2);
-        const bw = cfg.width * scaleX;
-        const bh = cfg.depth * scaleZ;
-        miniCtx.fillRect(bx, bz, bw, bh);
-      });
-
-      if (avatarGroup) {
-        const ax = toMiniX(avatarGroup.position.x);
-        const az = toMiniZ(avatarGroup.position.z);
-        miniCtx.fillStyle = "#fbbf24";
-        miniCtx.beginPath();
-        miniCtx.arc(ax, az, 5, 0, Math.PI * 2);
-        miniCtx.fill();
-
-        miniCtx.strokeStyle = "#fbbf24";
-        miniCtx.lineWidth = 2.5;
-        miniCtx.beginPath();
-        miniCtx.moveTo(ax, az);
-        miniCtx.lineTo(ax - Math.sin(avatarAngle) * 12, az - Math.cos(avatarAngle) * 12);
-        miniCtx.stroke();
-      }
-    }
 
     const helpModal = document.getElementById("help-modal");
     const modalBackdrop = document.getElementById("modal-backdrop");
     document.getElementById("btn-help").onclick = () => {
-      helpModal.classList.add("open");
-      modalBackdrop.classList.add("open");
+      welcomeCard.classList.toggle("hidden");
     };
     document.getElementById("btn-close-help").onclick = () => {
       helpModal.classList.remove("open");
@@ -2357,6 +2645,218 @@
       modalBackdrop.classList.remove("open");
       mapModal.classList.remove("open");
     };
+
+    const mapModal = document.getElementById("campus-map-modal");
+    document.getElementById("btn-map-overlay").onclick = () => mapModal.classList.add("open");
+    document.getElementById("btn-close-map-modal").onclick = () => mapModal.classList.remove("open");
+
+    // 2D High-Definition Minimap (Reference: media_1791335056310.png)
+    const miniCanvas = document.getElementById("minimap-canvas");
+    const miniCtx = miniCanvas.getContext("2d");
+    miniCanvas.width = 360;
+    miniCanvas.height = 360;
+
+    const mapMinX = -135, mapMaxX = 115;
+    const mapMinZ = -88, mapMaxZ = 118;
+    const toMiniX = (x) => 16 + (x - mapMinX) / (mapMaxX - mapMinX) * 328;
+    const toMiniZ = (z) => 16 + (z - mapMinZ) / (mapMaxZ - mapMinZ) * 328;
+
+    function renderMinimap() {
+      miniCtx.clearRect(0, 0, 360, 360);
+
+      // 1. Campus ground base
+      miniCtx.fillStyle = "#1e293b";
+      miniCtx.fillRect(0, 0, 360, 360);
+
+      // 2. Green lawn area
+      miniCtx.fillStyle = "#166534";
+      miniCtx.fillRect(toMiniX(-120), toMiniZ(-75), toMiniX(105) - toMiniX(-120), toMiniZ(94) - toMiniZ(-75));
+
+      // 3. Front Road / Boulevard (z: 94 to 116)
+      miniCtx.fillStyle = "#334155";
+      miniCtx.fillRect(0, toMiniZ(94), 360, toMiniZ(116) - toMiniZ(94));
+
+      // Yellow dashed center lane line along roadway
+      miniCtx.strokeStyle = "#f59e0b";
+      miniCtx.lineWidth = 3;
+      miniCtx.setLineDash([8, 8]);
+      miniCtx.beginPath();
+      miniCtx.moveTo(0, toMiniZ(105));
+      miniCtx.lineTo(360, toMiniZ(105));
+      miniCtx.stroke();
+      miniCtx.setLineDash([]);
+
+      // Zebra crossing stripes right at the school gate
+      miniCtx.fillStyle = "#ffffff";
+      const zebraZ1 = toMiniZ(94);
+      const zebraH = toMiniZ(116) - zebraZ1;
+      for (let i = 0; i < 9; i++) {
+        const stripeX = toMiniX(-30 + i * 4);
+        miniCtx.fillRect(stripeX, zebraZ1, 2.8, zebraH);
+      }
+
+      // 4. Campus Entrance Plaza & Walkways
+      miniCtx.fillStyle = "#475569";
+      miniCtx.fillRect(toMiniX(-20), toMiniZ(35), toMiniX(20) - toMiniX(-20), toMiniZ(95) - toMiniZ(35));
+
+      // 5. East Parking Area & Stalls (x: 35~75, z: 50~86)
+      miniCtx.fillStyle = "#3b4758";
+      miniCtx.fillRect(toMiniX(35), toMiniZ(50), toMiniX(75) - toMiniX(35), toMiniZ(86) - toMiniZ(50));
+      // White Parking Stall Lines
+      miniCtx.strokeStyle = "#cbd5e1";
+      miniCtx.lineWidth = 1.5;
+      miniCtx.beginPath();
+      for (let px = 38; px <= 72; px += 5) {
+        miniCtx.moveTo(toMiniX(px), toMiniZ(54));
+        miniCtx.lineTo(toMiniX(px), toMiniZ(66));
+        miniCtx.moveTo(toMiniX(px), toMiniZ(70));
+        miniCtx.lineTo(toMiniX(px), toMiniZ(82));
+      }
+      miniCtx.stroke();
+
+      // 6. Running Track (Athletic Oval)
+      const trackCX = toMiniX(-85);
+      const trackCZ = toMiniZ(-15);
+      const trackW = 28 * (328 / 250);
+      const trackH = 46 * (328 / 200);
+
+      // Red Track Base
+      miniCtx.fillStyle = "#dc2626";
+      miniCtx.beginPath();
+      miniCtx.ellipse(trackCX, trackCZ, trackW, trackH, 0, 0, Math.PI * 2);
+      miniCtx.fill();
+
+      // Concentric White Running Track Lanes
+      miniCtx.strokeStyle = "rgba(255,255,255,0.7)";
+      miniCtx.lineWidth = 1.2;
+      for (let r = 0.55; r < 0.95; r += 0.12) {
+        miniCtx.beginPath();
+        miniCtx.ellipse(trackCX, trackCZ, trackW * r, trackH * r, 0, 0, Math.PI * 2);
+        miniCtx.stroke();
+      }
+
+      // Inner Grass Field
+      miniCtx.fillStyle = "#22c55e";
+      miniCtx.beginPath();
+      miniCtx.ellipse(trackCX, trackCZ, trackW * 0.5, trackH * 0.5, 0, 0, Math.PI * 2);
+      miniCtx.fill();
+
+      // Red Infield Area
+      miniCtx.fillStyle = "#ea580c";
+      miniCtx.fillRect(trackCX - 12, trackCZ - 5, 24, 18);
+
+      // 7. Basketball Courts (x: -30, z: -45)
+      const bCourtX = toMiniX(-42);
+      const bCourtZ = toMiniZ(-53);
+      const bCourtW = toMiniX(-18) - bCourtX;
+      const bCourtH = toMiniZ(-37) - bCourtZ;
+      miniCtx.fillStyle = "#0284c7";
+      miniCtx.fillRect(bCourtX, bCourtZ, bCourtW, bCourtH);
+      miniCtx.strokeStyle = "#ffffff";
+      miniCtx.lineWidth = 1.5;
+      miniCtx.strokeRect(bCourtX, bCourtZ, bCourtW, bCourtH);
+
+      // 8. Building Footprints
+      BUILDINGS_CONFIG.forEach(cfg => {
+        const bx = toMiniX(cfg.x - cfg.width / 2);
+        const bz = toMiniZ(cfg.z - cfg.depth / 2);
+        const bw = cfg.width * (328 / 250);
+        const bh = cfg.depth * (328 / 200);
+
+        miniCtx.fillStyle = cfg.id === "gym-bld" ? "#b91c1c" : (cfg.id.startsWith("admin") ? "#475569" : "#64748b");
+        miniCtx.fillRect(bx, bz, bw, bh);
+
+        miniCtx.strokeStyle = "#ffffff";
+        miniCtx.lineWidth = 1.6;
+        miniCtx.strokeRect(bx, bz, bw, bh);
+      });
+
+      // 9. Active Navigation Route
+      if (currentNavPoints && currentNavPoints.length > 1) {
+        miniCtx.strokeStyle = "#fbbf24";
+        miniCtx.lineWidth = 5;
+        miniCtx.lineCap = "round";
+        miniCtx.lineJoin = "round";
+        miniCtx.shadowColor = "rgba(251, 191, 36, 0.8)";
+        miniCtx.shadowBlur = 8;
+        miniCtx.beginPath();
+        currentNavPoints.forEach((pt, i) => {
+          const px = toMiniX(pt.x);
+          const pz = toMiniZ(pt.z);
+          if (i === 0) miniCtx.moveTo(px, pz);
+          else miniCtx.lineTo(px, pz);
+        });
+        miniCtx.stroke();
+        miniCtx.shadowColor = "transparent";
+
+        // Dest Pin
+        const lastPt = currentNavPoints[currentNavPoints.length - 1];
+        miniCtx.fillStyle = "#ef4444";
+        miniCtx.beginPath();
+        miniCtx.arc(toMiniX(lastPt.x), toMiniZ(lastPt.z), 6, 0, Math.PI * 2);
+        miniCtx.fill();
+        miniCtx.strokeStyle = "#ffffff";
+        miniCtx.lineWidth = 2;
+        miniCtx.stroke();
+      }
+
+      // 10. Avatar Navigation Arrow Pointer (Matching media_1791335056310.png)
+      if (avatarGroup) {
+        const ax = toMiniX(avatarGroup.position.x);
+        const az = toMiniZ(avatarGroup.position.z);
+
+        miniCtx.save();
+        miniCtx.translate(ax, az);
+        miniCtx.rotate(-avatarAngle);
+
+        // Radar pulse ring around player location
+        miniCtx.beginPath();
+        miniCtx.arc(0, 0, 16, 0, Math.PI * 2);
+        miniCtx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+        miniCtx.lineWidth = 1.8;
+        miniCtx.stroke();
+
+        // Crisp white arrowhead triangle with dark stroke and subtle shadow (Matching media_1791335056310.png)
+        miniCtx.shadowColor = "rgba(0, 0, 0, 0.65)";
+        miniCtx.shadowBlur = 8;
+        miniCtx.beginPath();
+        miniCtx.moveTo(0, -16);
+        miniCtx.lineTo(10, 10);
+        miniCtx.lineTo(0, 4);
+        miniCtx.lineTo(-10, 10);
+        miniCtx.closePath();
+
+        miniCtx.fillStyle = "#ffffff";
+        miniCtx.fill();
+
+        miniCtx.shadowColor = "transparent";
+        miniCtx.strokeStyle = "#0f172a";
+        miniCtx.lineWidth = 3.2;
+        miniCtx.stroke();
+
+        miniCtx.restore();
+      }
+    }
+
+    // Interactive Minimap Clicking
+    miniCanvas.addEventListener("click", (e) => {
+      const rect = miniCanvas.getBoundingClientRect();
+      const clickCanvasX = (e.clientX - rect.left) / rect.width * 360;
+      const clickCanvasZ = (e.clientY - rect.top) / rect.height * 360;
+
+      const worldX = mapMinX + (clickCanvasX - 16) / 328 * (mapMaxX - mapMinX);
+      const worldZ = mapMinZ + (clickCanvasZ - 16) / 328 * (mapMaxZ - mapMinZ);
+
+      if (avatarGroup) {
+        avatarGroup.position.set(worldX, 0, worldZ);
+        prevAvatarPos.copy(avatarGroup.position);
+        if (currentMode !== "bird") {
+          controls.target.copy(avatarGroup.position.clone().add(new THREE.Vector3(0, 1.8, 0)));
+          camera.position.set(worldX, 8, worldZ + 16);
+        }
+        showToast("📍 已傳送至小地圖指定位置！");
+      }
+    });
 
     function checkUrlQueryTarget() {
       const params = new URLSearchParams(window.location.search);
@@ -2403,7 +2903,7 @@
         }
       }
       // 2. MANUAL KEYBOARD / DPAD CONTROLS (Camera-Relative Movement)
-      else if (avatarGroup && currentMode === "avatar") {
+      else if (avatarGroup && (currentMode === "avatar" || currentMode === "firstperson")) {
         const camDir = new THREE.Vector3();
         camera.getWorldDirection(camDir);
         camDir.y = 0;
@@ -2425,6 +2925,17 @@
         }
       }
 
+      // Space-bar Jump Hop
+      if (avatarGroup && isJumping) {
+        avatarGroup.position.y += jumpVelocity * delta;
+        jumpVelocity -= 22 * delta;
+        if (avatarGroup.position.y <= 0) {
+          avatarGroup.position.y = 0;
+          jumpVelocity = 0;
+          isJumping = false;
+        }
+      }
+
       // 3. AVATAR WALKING LIMB ANIMATION
       if (avatarGroup) {
         if (isMoving) {
@@ -2440,18 +2951,35 @@
           avatarRightArm.rotation.x = 0;
         }
 
-        // Camera Follow in Avatar Mode: Follow position delta without overriding user's rotation!
+        // Camera Follow in Avatar / First-Person Mode
         if (currentMode === "avatar" && isMoving) {
           const deltaPos = avatarGroup.position.clone().sub(prevAvatarPos);
           camera.position.add(deltaPos);
           controls.target.add(deltaPos);
+        } else if (currentMode === "firstperson") {
+          camera.position.set(avatarGroup.position.x, avatarGroup.position.y + 1.7, avatarGroup.position.z);
+          if (isMoving) {
+            const deltaPos = avatarGroup.position.clone().sub(prevAvatarPos);
+            controls.target.add(deltaPos);
+          }
         }
         prevAvatarPos.copy(avatarGroup.position);
+
+        // Dynamic Floor Detection for Minimap Badge
+        const currentAvatarY = avatarGroup.position.y;
+        let detectedFloor = "1F";
+        if (currentAvatarY >= 10.0) detectedFloor = "4F";
+        else if (currentAvatarY >= 6.5) detectedFloor = "3F";
+        else if (currentAvatarY >= 2.5) detectedFloor = "2F";
+        const floorBadgeEl = document.getElementById("minimap-floor-badge");
+        if (floorBadgeEl && currentFloorFilter === "all") {
+          floorBadgeEl.textContent = detectedFloor;
+        }
 
         // Nametag Screen Position
         const avatarScreenPos = avatarGroup.position.clone().add(new THREE.Vector3(0, 3.2, 0));
         avatarScreenPos.project(camera);
-        if (avatarScreenPos.z > 1) {
+        if (avatarScreenPos.z > 1 || currentMode === "firstperson") {
           avatarNametag.style.display = "none";
         } else {
           avatarNametag.style.display = "block";
@@ -2469,7 +2997,26 @@
       labelElements.forEach(item => {
         const wp = item.worldPos.clone();
         wp.project(camera);
-        if (wp.z > 1 || currentMode === "avatar") {
+        if (wp.z > 1 || currentMode !== "bird") {
+          item.element.style.display = "none";
+        } else {
+          item.element.style.display = "block";
+          const screenX = (wp.x * 0.5 + 0.5) * window.innerWidth;
+          const screenY = (-(wp.y * 0.5) + 0.5) * window.innerHeight;
+          item.element.style.left = `${screenX}px`;
+          item.element.style.top = `${screenY}px`;
+        }
+      });
+
+      // 3D Floating Landmark Pills (操場, 司令台, 籃球場, 大門, 停車場...)
+      landmarkElements.forEach(item => {
+        if (currentMode !== "bird") {
+          item.element.style.display = "none";
+          return;
+        }
+        const wp = item.worldPos.clone();
+        wp.project(camera);
+        if (wp.z > 1) {
           item.element.style.display = "none";
         } else {
           item.element.style.display = "block";
