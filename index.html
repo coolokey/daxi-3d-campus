@@ -1361,8 +1361,8 @@
     }
     const paverTex = createPaverTexture();
 
-    /* ==========================================================================
-       3. 3D STUDENT AVATAR
+/* ==========================================================================
+       3. 3D STUDENT AVATAR (五官表情與大溪國中校服精準建模)
        ========================================================================== */
     let avatarGroup = null;
     let avatarLeftArm = null, avatarRightArm = null;
@@ -1372,96 +1372,364 @@
     const avatarSpeed = 18;
     const avatarRunSpeed = 28;
 
+    // 1. 五官紋理生成 (參考 media_1791355365994.png：黑亮大眼、高光眼神、腮紅粉頰、微笑小嘴)
+    function createFaceTexture() {
+      const cvs = document.createElement("canvas");
+      cvs.width = 512; cvs.height = 512;
+      const ctx = cvs.getContext("2d");
+
+      // 膚色底層
+      ctx.fillStyle = "#ffd8be";
+      ctx.fillRect(0, 0, 512, 512);
+
+      // 前額齊瀏海 (小黃帽帽沿下自然露出的黑髮)
+      ctx.fillStyle = "#1e1e24";
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(512, 0);
+      ctx.lineTo(512, 135);
+      ctx.quadraticCurveTo(384, 175, 256, 142);
+      ctx.quadraticCurveTo(128, 175, 0, 135);
+      ctx.closePath();
+      ctx.fill();
+
+      // 自然眉毛
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 6;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(140, 215);
+      ctx.quadraticCurveTo(175, 202, 210, 212);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(302, 212);
+      ctx.quadraticCurveTo(337, 202, 372, 215);
+      ctx.stroke();
+
+      // 黑亮雙眼 (含雙層白色高光眼神光)
+      function drawEye(cx, cy) {
+        ctx.fillStyle = "#0f172a";
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 26, 35, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 主高光 (左上方)
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(cx - 8, cy - 10, 9, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 次高光 (右下方)
+        ctx.beginPath();
+        ctx.arc(cx + 8, cy + 10, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      drawEye(175, 265);
+      drawEye(337, 265);
+
+      // 可愛腮紅 (粉色柔邊漸層)
+      function drawBlush(cx, cy) {
+        const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 38);
+        grad.addColorStop(0, "rgba(244, 63, 94, 0.78)");
+        grad.addColorStop(0.55, "rgba(251, 113, 133, 0.42)");
+        grad.addColorStop(1, "rgba(254, 205, 211, 0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 38, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      drawBlush(132, 318);
+      drawBlush(380, 318);
+
+      // 微笑小嘴
+      ctx.fillStyle = "#be123c";
+      ctx.beginPath();
+      ctx.arc(256, 332, 13, 0.1 * Math.PI, 0.9 * Math.PI);
+      ctx.closePath();
+      ctx.fill();
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    // 2. 大溪國中運動外套/校服紋理 (參考 media_1791355647345.png & media_1791355660385.png)
+    function createUniformTorsoTexture() {
+      const cvs = document.createElement("canvas");
+      cvs.width = 512; cvs.height = 512;
+      const ctx = cvs.getContext("2d");
+
+      // 深丈青色基底
+      ctx.fillStyle = "#1e3a8a";
+      ctx.fillRect(0, 0, 512, 512);
+
+      // 兩側與肩膀淺水藍 (Sky Blue) 拼接飾片
+      ctx.fillStyle = "#38bdf8";
+      ctx.beginPath();
+      ctx.moveTo(0, 0); ctx.lineTo(100, 0); ctx.lineTo(80, 512); ctx.lineTo(0, 512);
+      ctx.closePath(); ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(512, 0); ctx.lineTo(412, 0); ctx.lineTo(432, 512); ctx.lineTo(512, 512);
+      ctx.closePath(); ctx.fill();
+
+      // 白色/淺灰立領內襯
+      ctx.fillStyle = "#f1f5f9";
+      ctx.beginPath();
+      ctx.moveTo(195, 0); ctx.lineTo(256, 75); ctx.lineTo(317, 0);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = "#0f172a"; ctx.lineWidth = 3; ctx.stroke();
+
+      // 中央金屬拉鍊軌道
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(256, 68); ctx.lineTo(256, 512);
+      ctx.stroke();
+
+      // 拉鍊拉頭
+      ctx.fillStyle = "#e2e8f0";
+      ctx.fillRect(252, 135, 8, 14);
+
+      // 右胸學號名牌 (淡藍底藍框，11011 大溪國中)
+      ctx.fillStyle = "#7dd3fc";
+      ctx.fillRect(125, 145, 92, 44);
+      ctx.strokeStyle = "#0284c7";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(125, 145, 92, 44);
+      ctx.fillStyle = "#0c4a6e";
+      ctx.font = "bold 13px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("11011", 171, 164);
+      ctx.font = "bold 13px sans-serif";
+      ctx.fillText("大溪國中", 171, 181);
+
+      // 左胸金色草寫 Dxjh 校名刺繡
+      ctx.fillStyle = "#fbbf24";
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur = 4;
+      ctx.font = "italic bold 32px 'Brush Script MT', 'Palatino', serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Dxjh", 355, 172);
+      ctx.shadowColor = "transparent";
+
+      // 下擺縮口羅紋
+      ctx.fillStyle = "#1e295b";
+      ctx.fillRect(0, 482, 512, 30);
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
     function createStudentAvatar() {
       avatarGroup = new THREE.Group();
       avatarGroup.position.set(0, 0, 96);
       prevAvatarPos.copy(avatarGroup.position);
 
+      const faceTex = createFaceTexture();
+      const uniformTex = createUniformTorsoTexture();
+
+      // 地面陰影
       const shadow = new THREE.Mesh(
-        new THREE.CircleGeometry(0.7, 16),
+        new THREE.CircleGeometry(0.68, 16),
         new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35 })
       );
       shadow.rotation.x = -Math.PI / 2;
       shadow.position.y = 0.04;
       avatarGroup.add(shadow);
 
+      // 身體軀幹 (Box 搭配六面材質，胸前為校服貼圖)
+      const torsoMatArray = [
+        new THREE.MeshLambertMaterial({ color: 0x38bdf8 }), // +X (水藍側邊)
+        new THREE.MeshLambertMaterial({ color: 0x38bdf8 }), // -X (水藍側邊)
+        new THREE.MeshLambertMaterial({ color: 0x1e3a8a }), // +Y (肩膀)
+        new THREE.MeshLambertMaterial({ color: 0x1e295b }), // -Y (下擺)
+        new THREE.MeshLambertMaterial({ map: uniformTex }),   // +Z (大溪國中校服正面)
+        new THREE.MeshLambertMaterial({ color: 0x1e3a8a })  // -Z (深藍背面)
+      ];
       const torso = new THREE.Mesh(
-        new THREE.BoxGeometry(0.8, 1.1, 0.45),
-        new THREE.MeshLambertMaterial({ color: 0xf8fafc })
+        new THREE.BoxGeometry(0.82, 1.15, 0.46),
+        torsoMatArray
       );
       torso.position.y = 1.45;
       torso.castShadow = true;
       avatarGroup.add(torso);
 
-      const tie = new THREE.Mesh(
-        new THREE.BoxGeometry(0.16, 0.5, 0.04),
-        new THREE.MeshLambertMaterial({ color: 0x2563eb })
+      // 立領結構 (內白外深藍)
+      const collar = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.24, 0.28, 0.16, 16),
+        new THREE.MeshLambertMaterial({ color: 0x1e3a8a })
       );
-      tie.position.set(0, 1.6, 0.24);
-      avatarGroup.add(tie);
+      collar.position.y = 2.05;
+      avatarGroup.add(collar);
 
-      const bag = new THREE.Mesh(
-        new THREE.BoxGeometry(0.68, 0.8, 0.32),
-        new THREE.MeshLambertMaterial({ color: 0x1e293b })
+      // 頭部 (膚色圓形主球體)
+      const headGroup = new THREE.Group();
+      headGroup.position.y = 2.42;
+
+      const headSkin = new THREE.Mesh(
+        new THREE.SphereGeometry(0.38, 24, 24),
+        new THREE.MeshLambertMaterial({ color: 0xffd8be })
       );
-      bag.position.set(0, 1.45, -0.32);
-      bag.castShadow = true;
-      avatarGroup.add(bag);
+      headSkin.castShadow = true;
+      headGroup.add(headSkin);
 
-      const head = new THREE.Mesh(
-        new THREE.SphereGeometry(0.38, 16, 16),
-        new THREE.MeshLambertMaterial({ color: 0xffd1b3 })
+      // 弧形臉部五官面片 (正面完全貼合，零變形呈現五官、眼神光、腮紅)
+      const faceGeo = new THREE.PlaneGeometry(0.68, 0.68, 8, 8);
+      const pos = faceGeo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const px = pos.getX(i);
+        const py = pos.getY(i);
+        pos.setZ(i, -(px * px + py * py) * 0.26);
+      }
+      faceGeo.computeVertexNormals();
+
+      const faceMesh = new THREE.Mesh(
+        faceGeo,
+        new THREE.MeshBasicMaterial({ map: faceTex, transparent: true })
       );
-      head.position.y = 2.3;
-      head.castShadow = true;
-      avatarGroup.add(head);
+      faceMesh.position.set(0, 0, 0.385);
+      headGroup.add(faceMesh);
 
-      const hair = new THREE.Mesh(
-        new THREE.SphereGeometry(0.41, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2),
-        new THREE.MeshLambertMaterial({ color: 0x1f2421 })
+      // 後腦勺短黑髮
+      const hairBack = new THREE.Mesh(
+        new THREE.SphereGeometry(0.395, 20, 16, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.65),
+        new THREE.MeshLambertMaterial({ color: 0x1e1e24 })
       );
-      hair.position.y = 2.32;
-      hair.rotation.x = -0.2;
-      avatarGroup.add(hair);
+      headGroup.add(hairBack);
 
-      const pantsMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
-      const skinMat = new THREE.MeshLambertMaterial({ color: 0xffd1b3 });
+      // 雙側小耳朵
+      const earL = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshLambertMaterial({ color: 0xffd8be }));
+      earL.position.set(-0.39, 0, 0);
+      headGroup.add(earL);
+      const earR = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshLambertMaterial({ color: 0xffd8be }));
+      earR.position.set(0.39, 0, 0);
+      headGroup.add(earR);
 
-      avatarLeftLeg = new THREE.Group();
-      avatarLeftLeg.position.set(-0.24, 0.9, 0);
-      const legL = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.11, 0.9, 8), pantsMat);
-      legL.position.y = -0.45;
-      legL.castShadow = true;
-      avatarLeftLeg.add(legL);
-      avatarGroup.add(avatarLeftLeg);
+      // 標誌性小黃帽 (黃色棒球帽，完全還原 media_1791355365994.png)
+      const capDome = new THREE.Mesh(
+        new THREE.SphereGeometry(0.41, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.52),
+        new THREE.MeshLambertMaterial({ color: 0xfacc15 })
+      );
+      capDome.position.y = 0.05;
+      headGroup.add(capDome);
 
-      avatarRightLeg = new THREE.Group();
-      avatarRightLeg.position.set(0.24, 0.9, 0);
-      const legR = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.11, 0.9, 8), pantsMat);
-      legR.position.y = -0.45;
-      legR.castShadow = true;
-      avatarRightLeg.add(legR);
-      avatarGroup.add(avatarRightLeg);
+      // 帽頂小圓鈕扣
+      const capBtn = new THREE.Mesh(
+        new THREE.SphereGeometry(0.06, 10, 10),
+        new THREE.MeshLambertMaterial({ color: 0xca8a04 })
+      );
+      capBtn.position.y = 0.46;
+      headGroup.add(capBtn);
 
-      avatarLeftArm = new THREE.Group();
-      avatarLeftArm.position.set(-0.52, 1.9, 0);
-      const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.8, 8), skinMat);
-      armL.position.y = -0.4;
-      armL.castShadow = true;
-      avatarLeftArm.add(armL);
+      // 前向帽沿 (黃色弧形遮陽板)
+      const visor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.54, 0.04, 0.32),
+        new THREE.MeshLambertMaterial({ color: 0xeab308 })
+      );
+      visor.position.set(0, 0.12, 0.36);
+      visor.rotation.x = 0.16;
+      visor.castShadow = true;
+      headGroup.add(visor);
+
+      avatarGroup.add(headGroup);
+
+      // 手臂結構 (左臂 / 右臂：深藍袖身＋水藍側條，膚色小臂與手掌)
+      const skinMat = new THREE.MeshLambertMaterial({ color: 0xffd8be });
+      const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
+      const stripeMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
+
+      function buildArm(isLeft) {
+        const armGroup = new THREE.Group();
+        const sideSign = isLeft ? -1 : 1;
+        armGroup.position.set(sideSign * 0.52, 1.95, 0);
+
+        // 短袖肩膀
+        const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.125, 0.115, 0.36, 12), sleeveMat);
+        sleeve.position.y = -0.18;
+        sleeve.castShadow = true;
+        armGroup.add(sleeve);
+
+        // 水藍色肩飾條
+        const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.36, 0.12), stripeMat);
+        stripe.position.set(sideSign * 0.11, -0.18, 0);
+        armGroup.add(stripe);
+
+        // 膚色前臂
+        const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.44, 12), skinMat);
+        forearm.position.y = -0.54;
+        forearm.castShadow = true;
+        armGroup.add(forearm);
+
+        // 手掌
+        const hand = new THREE.Mesh(new THREE.SphereGeometry(0.105, 10, 10), skinMat);
+        hand.position.y = -0.78;
+        hand.castShadow = true;
+        armGroup.add(hand);
+
+        return armGroup;
+      }
+
+      avatarLeftArm = buildArm(true);
       avatarGroup.add(avatarLeftArm);
-
-      avatarRightArm = new THREE.Group();
-      avatarRightArm.position.set(0.52, 1.9, 0);
-      const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.8, 8), skinMat);
-      armR.position.y = -0.4;
-      armR.castShadow = true;
-      avatarRightArm.add(armR);
+      avatarRightArm = buildArm(false);
       avatarGroup.add(avatarRightArm);
+
+      // 腿部結構 (深藍運動短褲＋側邊白條，膚色膝腿，純白運動短襪，黑底白邊運動鞋)
+      const shortsMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
+      const whiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+      const shoeBodyMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+
+      function buildLeg(isLeft) {
+        const legGroup = new THREE.Group();
+        const sideSign = isLeft ? -1 : 1;
+        legGroup.position.set(sideSign * 0.22, 0.9, 0);
+
+        // 大溪國中運動短褲
+        const shorts = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.145, 0.44, 12), shortsMat);
+        shorts.position.y = -0.22;
+        shorts.castShadow = true;
+        legGroup.add(shorts);
+
+        // 短褲外側白邊飾條 (如 media_1791355660385.png)
+        const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.44, 0.11), whiteMat);
+        stripe.position.set(sideSign * 0.145, -0.22, 0);
+        legGroup.add(stripe);
+
+        // 膚色小腿
+        const calf = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.105, 0.32, 12), skinMat);
+        calf.position.y = -0.52;
+        calf.castShadow = true;
+        legGroup.add(calf);
+
+        // 白色學生運動襪 (純白襪筒)
+        const sock = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.115, 0.22, 12), whiteMat);
+        sock.position.y = -0.68;
+        sock.castShadow = true;
+        legGroup.add(sock);
+
+        // 運動鞋 (深藍黑鞋身＋白色橡膠大底，完全符合 media_1791355365994.png)
+        const shoeBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.18, 0.44), shoeBodyMat);
+        shoeBody.position.set(0, -0.81, 0.08);
+        shoeBody.castShadow = true;
+        legGroup.add(shoeBody);
+
+        const shoeSole = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.07, 0.46), whiteMat);
+        shoeSole.position.set(0, -0.87, 0.08);
+        legGroup.add(shoeSole);
+
+        return legGroup;
+      }
+
+      avatarLeftLeg = buildLeg(true);
+      avatarGroup.add(avatarLeftLeg);
+      avatarRightLeg = buildLeg(false);
+      avatarGroup.add(avatarRightLeg);
 
       scene.add(avatarGroup);
     }
-    createStudentAvatar();
 
     /* ==========================================================================
        4. CAMPUS ENVIRONMENT, STAIRCASES & ARCHITECTURE
