@@ -2559,7 +2559,7 @@
     // 4.0 Collision & Multi-Floor Surface Engine (參考大勇國小與 3D 物理行走系統)
     const WALL_COLLIDERS = [];
     const WALK_SURFACES = [];
-    const AVATAR_COLLISION_RADIUS = 0.24;
+    const AVATAR_COLLISION_RADIUS = 0.28;
     const AVATAR_HEIGHT = 1.45;
 
     function registerWallCollider(minX, maxX, minZ, maxZ, minY, maxY) {
@@ -2627,14 +2627,19 @@
       const avatarMaxX = x + r;
       const avatarMinZ = z - r;
       const avatarMaxZ = z + r;
-      const avatarMinY = y + 0.2;
-      const avatarMaxY = y + AVATAR_HEIGHT - 0.2;
+      const avatarMinY = y + 0.15;
+      const avatarMaxY = y + AVATAR_HEIGHT - 0.15;
 
-      // 若人物在階梯坡面範圍內，直接開放暢通行走，不受兩側隔間誤擋
+      // 若人物在階梯坡面範圍內，只在該階梯實際高度附近放行，不破壞其他實體牆壁
       for (let i = 0; i < WALK_SURFACES.length; i++) {
         const s = WALK_SURFACES[i];
         if (s.ax && x >= s.x0 && x <= s.x1 && z >= s.z0 && z <= s.z1) {
-          return false;
+          let f = ((s.ax === "x" ? x : z) - s.c0) / (s.c1 - s.c0);
+          f = Math.max(0, Math.min(1, f));
+          const rampY = s.h0 + (s.h1 - s.h0) * f;
+          if (Math.abs(y - rampY) < 1.2) {
+            return false;
+          }
         }
       }
 
@@ -2657,10 +2662,12 @@
           let f = ((s.ax === "x" ? x : z) - s.c0) / (s.c1 - s.c0);
           f = Math.max(0, Math.min(1, f));
           const elev = s.h0 + (s.h1 - s.h0) * f;
-          return { onStair: true, elevation: elev };
+          if (Math.abs(y - elev) < 1.8) {
+            return { onStair: true, elevation: elev };
+          }
         }
       }
-      return { onStair: false };
+      return { onStair: false, elevation: 0 };
     }
 
     function getBuildingAt(x, z) {
@@ -2944,6 +2951,11 @@
 
       scene.add(guardGroup);
 
+      // 警衛室與大門柱實體碰撞阻擋體 (防止穿透警衛室與校門)
+      registerWallCollider(6 - 3.0, 6 + 3.0, 86 - 3.0, 86 + 3.0, 0, 5.0);
+      registerWallCollider(-21 - 1.5, -21 + 1.5, 86 - 1.5, 86 + 1.5, 0, 7.0);
+      registerWallCollider(1 - 1.5, 1 + 1.5, 86 - 1.5, 86 + 1.5, 0, 7.0);
+
       ROOMS_DB["guard"] = {
         id: "guard",
         code: "GATE-01",
@@ -3040,6 +3052,9 @@
       statueGroup.add(bronze);
 
       scene.add(statueGroup);
+
+      // 蔣公銅像基座碰撞體 (防止穿透銅像基座)
+      registerWallCollider(-36 - 1.6, -36 + 1.6, 32 - 1.6, 32 + 1.6, 0, 6.0);
 
       ROOMS_DB["statue"] = {
         id: "statue",
@@ -3880,10 +3895,10 @@
             floorGroup.add(colMesh);
           }
 
-          // 走廊外牆碰撞體 (1F 入口處保持開放無碰撞體，其餘護欄與樓層均阻擋穿透)
+          // 走廊外牆碰撞體 (1F 入口處保持 4m 寬大門暢通開放，其餘護欄與樓層均阻擋穿透)
           if (f === 1) {
-            registerWallCollider(cfg.x - cfg.width / 2, cfg.x - 2.0, cfg.z + outerZ - 0.25, cfg.z + outerZ + 0.25, fBaseY, fTopY);
-            registerWallCollider(cfg.x + 2.0, cfg.x + cfg.width / 2, cfg.z + outerZ - 0.25, cfg.z + outerZ + 0.25, fBaseY, fTopY);
+            registerWallCollider(cfg.x - cfg.width / 2 - 0.4, cfg.x - 2.0, cfg.z + outerZ - 0.45, cfg.z + outerZ + 0.45, fBaseY, fTopY);
+            registerWallCollider(cfg.x + 2.0, cfg.x + cfg.width / 2 + 0.4, cfg.z + outerZ - 0.45, cfg.z + outerZ + 0.45, fBaseY, fTopY);
 
             // 1F 大樓主入口門廊雨遮與金字校名門牌 (Entrance Canopy & Title Sign)
             const canopy = new THREE.Mesh(
@@ -3947,7 +3962,7 @@
               });
             }
           } else {
-            registerWallCollider(cfg.x - cfg.width / 2, cfg.x + cfg.width / 2, cfg.z + outerZ - 0.25, cfg.z + outerZ + 0.25, fBaseY, fTopY);
+            registerWallCollider(cfg.x - cfg.width / 2 - 0.4, cfg.x + cfg.width / 2 + 0.4, cfg.z + outerZ - 0.45, cfg.z + outerZ + 0.45, fBaseY, fTopY);
           }
 
           // 2. 背面外牆與窗戶 (Back Exterior Wall & Windows)
@@ -3964,7 +3979,7 @@
           );
           backWindow.position.set(0, fCenterY + 0.2, backZ);
           floorGroup.add(backWindow);
-          registerWallCollider(cfg.x - cfg.width / 2, cfg.x + cfg.width / 2, cfg.z + backZ - 0.25, cfg.z + backZ + 0.25, fBaseY, fTopY);
+          registerWallCollider(cfg.x - cfg.width / 2 - 0.4, cfg.x + cfg.width / 2 + 0.4, cfg.z + backZ - 0.45, cfg.z + backZ + 0.45, fBaseY, fTopY);
 
           // 3. 東西兩端外側側牆 (West & East End Exterior Walls)
           [-cfg.width / 2, cfg.width / 2].forEach(wx => {
@@ -3974,7 +3989,7 @@
             );
             endWall.position.set(wx, fCenterY, 0);
             floorGroup.add(endWall);
-            registerWallCollider(cfg.x + wx - 0.25, cfg.x + wx + 0.25, cfg.z - cfg.depth / 2, cfg.z + cfg.depth / 2, fBaseY, fTopY);
+            registerWallCollider(cfg.x + wx - 0.45, cfg.x + wx + 0.45, cfg.z - cfg.depth / 2 - 0.4, cfg.z + cfg.depth / 2 + 0.4, fBaseY, fTopY);
           });
 
           // 4. 隔間教室與內走廊隔間牆 (Partitions & Classrooms)
@@ -4001,13 +4016,13 @@
               const seg1Mesh = new THREE.Mesh(new THREE.BoxGeometry(seg1W, FH, 0.2), intWallMat);
               seg1Mesh.position.set(rMinX + seg1W / 2, fCenterY, cWallZ);
               floorGroup.add(seg1Mesh);
-              registerWallCollider(cfg.x + rMinX, cfg.x + rCenterX - 0.9, cfg.z + cWallZ - 0.2, cfg.z + cWallZ + 0.2, fBaseY, fTopY);
+              registerWallCollider(cfg.x + rMinX, cfg.x + rCenterX - 0.9, cfg.z + cWallZ - 0.35, cfg.z + cWallZ + 0.35, fBaseY, fTopY);
 
               const seg2W = Math.max(0.2, rMaxX - (rCenterX + 0.9));
               const seg2Mesh = new THREE.Mesh(new THREE.BoxGeometry(seg2W, FH, 0.2), intWallMat);
               seg2Mesh.position.set(rMaxX - seg2W / 2, fCenterY, cWallZ);
               floorGroup.add(seg2Mesh);
-              registerWallCollider(cfg.x + rCenterX + 0.9, cfg.x + rMaxX, cfg.z + cWallZ - 0.2, cfg.z + cWallZ + 0.2, fBaseY, fTopY);
+              registerWallCollider(cfg.x + rCenterX + 0.9, cfg.x + rMaxX, cfg.z + cWallZ - 0.35, cfg.z + cWallZ + 0.35, fBaseY, fTopY);
 
               // 門眉過樑 (Door Lintel above 2.4m door)
               const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.8, FH - 2.4, 0.2), intWallMat);
@@ -4069,10 +4084,10 @@
             floorGroup.add(colMesh);
           }
 
-          // 外側碰撞體 (1F 入口處保持開放)
+          // 外側碰撞體 (1F 入口處保持 4m 寬大門暢通開放，其餘護欄與樓層均阻擋穿透)
           if (f === 1) {
-            registerWallCollider(cfg.x + outerX - 0.25, cfg.x + outerX + 0.25, cfg.z - cfg.depth / 2, cfg.z - 2.0, fBaseY, fTopY);
-            registerWallCollider(cfg.x + outerX - 0.25, cfg.x + outerX + 0.25, cfg.z + 2.0, cfg.z + cfg.depth / 2, fBaseY, fTopY);
+            registerWallCollider(cfg.x + outerX - 0.45, cfg.x + outerX + 0.45, cfg.z - cfg.depth / 2 - 0.4, cfg.z - 2.0, fBaseY, fTopY);
+            registerWallCollider(cfg.x + outerX - 0.45, cfg.x + outerX + 0.45, cfg.z + 2.0, cfg.z + cfg.depth / 2 + 0.4, fBaseY, fTopY);
 
             // 大樓入口雨遮與標誌
             const canopy = new THREE.Mesh(
@@ -4091,20 +4106,20 @@
             titleMesh.rotation.y = isEastCorridor ? Math.PI / 2 : -Math.PI / 2;
             floorGroup.add(titleMesh);
           } else {
-            registerWallCollider(cfg.x + outerX - 0.25, cfg.x + outerX + 0.25, cfg.z - cfg.depth / 2, cfg.z + cfg.depth / 2, fBaseY, fTopY);
+            registerWallCollider(cfg.x + outerX - 0.45, cfg.x + outerX + 0.45, cfg.z - cfg.depth / 2 - 0.4, cfg.z + cfg.depth / 2 + 0.4, fBaseY, fTopY);
           }
 
           // 背面外牆與南北兩端外牆
           const backWall = new THREE.Mesh(new THREE.BoxGeometry(0.3, FH, cfg.depth), extWallMat);
           backWall.position.set(backX, fCenterY, 0);
           floorGroup.add(backWall);
-          registerWallCollider(cfg.x + backX - 0.25, cfg.x + backX + 0.25, cfg.z - cfg.depth / 2, cfg.z + cfg.depth / 2, fBaseY, fTopY);
+          registerWallCollider(cfg.x + backX - 0.45, cfg.x + backX + 0.45, cfg.z - cfg.depth / 2 - 0.4, cfg.z + cfg.depth / 2 + 0.4, fBaseY, fTopY);
 
           [-cfg.depth / 2, cfg.depth / 2].forEach(ez => {
             const endWall = new THREE.Mesh(new THREE.BoxGeometry(cfg.width, FH, 0.3), extWallMat);
             endWall.position.set(0, fCenterY, ez);
             floorGroup.add(endWall);
-            registerWallCollider(cfg.x - cfg.width / 2, cfg.x + cfg.width / 2, cfg.z + ez - 0.25, cfg.z + ez + 0.25, fBaseY, fTopY);
+            registerWallCollider(cfg.x - cfg.width / 2 - 0.4, cfg.x + cfg.width / 2 + 0.4, cfg.z + ez - 0.45, cfg.z + ez + 0.45, fBaseY, fTopY);
           });
 
           // 隔間教室 (縱向分割)
@@ -4131,13 +4146,13 @@
               const seg1Mesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, FH, seg1D), intWallMat);
               seg1Mesh.position.set(cWallX, fCenterY, rMinZ + seg1D / 2);
               floorGroup.add(seg1Mesh);
-              registerWallCollider(cfg.x + cWallX - 0.2, cfg.x + cWallX + 0.2, cfg.z + rMinZ, cfg.z + rCenterZ - 0.9, fBaseY, fTopY);
+              registerWallCollider(cfg.x + cWallX - 0.35, cfg.x + cWallX + 0.35, cfg.z + rMinZ, cfg.z + rCenterZ - 0.9, fBaseY, fTopY);
 
               const seg2D = Math.max(0.2, rMaxZ - (rCenterZ + 0.9));
               const seg2Mesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, FH, seg2D), intWallMat);
               seg2Mesh.position.set(cWallX, fCenterY, rMaxZ - seg2D / 2);
               floorGroup.add(seg2Mesh);
-              registerWallCollider(cfg.x + cWallX - 0.2, cfg.x + cWallX + 0.2, cfg.z + rCenterZ + 0.9, cfg.z + rMaxZ, fBaseY, fTopY);
+              registerWallCollider(cfg.x + cWallX - 0.35, cfg.x + cWallX + 0.35, cfg.z + rCenterZ + 0.9, cfg.z + rMaxZ, fBaseY, fTopY);
 
               // 門眉過樑
               const lintel = new THREE.Mesh(new THREE.BoxGeometry(0.2, FH - 2.4, 1.8), intWallMat);
@@ -4159,7 +4174,7 @@
                 const divMesh = new THREE.Mesh(new THREE.BoxGeometry(divW, FH, 0.2), intWallMat);
                 divMesh.position.set((backX + cWallX) / 2, fCenterY, rMinZ);
                 floorGroup.add(divMesh);
-                registerWallCollider(cfg.x + Math.min(backX, cWallX), cfg.x + Math.max(backX, cWallX), cfg.z + rMinZ - 0.2, cfg.z + rMinZ + 0.2, fBaseY, fTopY);
+                registerWallCollider(cfg.x + Math.min(backX, cWallX), cfg.x + Math.max(backX, cWallX), cfg.z + rMinZ - 0.3, cfg.z + rMinZ + 0.3, fBaseY, fTopY);
               }
 
               // 依據照片精緻擺設家具（木質課桌椅、黑板、講台、壁櫃、OA屏風等）
@@ -6035,31 +6050,52 @@ miniCanvas.addEventListener("click", (e) => {
           const dz = (fwdZ * moveFwd + rightZ * moveSide) * currentSpeed;
           const curPos = avatarGroup.position;
 
-          const nextX = curPos.x + dx;
-          const nextZ = curPos.z + dz;
+          // 連續微步碰撞檢測 (Continuous Sub-Stepping CCD)：
+          // 每次微步最多 0.05m，徹底杜絕快速奔跑、掉幀或任何穿牆現象，並保留滑順沿牆滑行
+          const totalDist = Math.hypot(dx, dz);
+          const maxStepDist = 0.05;
+          const numSteps = Math.min(24, Math.max(1, Math.ceil(totalDist / maxStepDist)));
+          const stepDx = dx / numSteps;
+          const stepDz = dz / numSteps;
 
-          // 1. 先計算目標預期地坪高度 (包含上樓梯斜坡、樓層地板與室外地面)
-          const targetGroundY = getGroundHeight(nextX, nextZ, curPos.y);
+          for (let s = 0; s < numSteps; s++) {
+            const currentY = curPos.y;
 
-          // 2. 碰壁不穿牆滑動碰撞檢測 (門口、走廊、樓梯暢行無阻)
-          let finalX = curPos.x;
-          let finalZ = curPos.z;
+            // 1. X 軸滑動檢測
+            const testX = curPos.x + stepDx;
+            const groundAtX = getGroundHeight(testX, curPos.z, currentY);
+            const checkY_X = Math.max(currentY, groundAtX);
+            let canMoveX = !checkWallCollision(testX, checkY_X, curPos.z);
+            // 樓層邊緣防墜落：在 2F 以上時，不可直接跳出護欄外落入虛空，須走樓梯
+            if (currentY > 1.2 && groundAtX < 0.5 && !checkStairElevation(testX, currentY, curPos.z).onStair) {
+              canMoveX = false;
+            }
+            if (canMoveX) {
+              curPos.x = testX;
+            }
 
-          if (!checkWallCollision(nextX, targetGroundY, curPos.z)) {
-            finalX = nextX;
-          }
-          if (!checkWallCollision(finalX, targetGroundY, nextZ)) {
-            finalZ = nextZ;
-          }
+            // 2. Z 軸滑動檢測
+            const testZ = curPos.z + stepDz;
+            const groundAtZ = getGroundHeight(curPos.x, testZ, currentY);
+            const checkY_Z = Math.max(currentY, groundAtZ);
+            let canMoveZ = !checkWallCollision(curPos.x, checkY_Z, testZ);
+            if (currentY > 1.2 && groundAtZ < 0.5 && !checkStairElevation(curPos.x, currentY, testZ).onStair) {
+              canMoveZ = false;
+            }
+            if (canMoveZ) {
+              curPos.z = testZ;
+            }
 
-          curPos.x = finalX;
-          curPos.z = finalZ;
-
-          // 3. 實體階梯升降與跨樓層地坪跟隨 (如大勇國小物理地形)
-          const finalGroundY = getGroundHeight(curPos.x, curPos.z, curPos.y);
-          if (!isJumping) {
-            curPos.y = finalGroundY;
-            jumpBaseY = finalGroundY;
+            // 3. 實體階梯升降與跨樓層地坪跟隨 (如大勇國小物理地形)
+            if (!isJumping) {
+              const stairInfo = checkStairElevation(curPos.x, curPos.y, curPos.z);
+              if (stairInfo.onStair) {
+                curPos.y = stairInfo.elevation;
+              } else {
+                curPos.y = getGroundHeight(curPos.x, curPos.z, curPos.y);
+              }
+              jumpBaseY = curPos.y;
+            }
           }
         }
       }
