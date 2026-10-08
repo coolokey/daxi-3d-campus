@@ -471,6 +471,109 @@
     }
     .nav-close:hover { background: rgba(255,255,255,0.25); }
 
+    /* Floating Venue Info Card (Dayong Elementary Concept) */
+    #venue-card {
+      position: absolute;
+      bottom: calc(18px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      width: min(540px, calc(100% - 32px));
+      padding: 16px 20px;
+      z-index: 28;
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      border-left: 5px solid #38bdf8;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #venue-card.venue-card-hidden {
+      transform: translateX(-50%) translateY(140%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .venue-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .venue-card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .venue-card-close {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid var(--panel-border);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s;
+    }
+    .venue-card-close:hover { background: rgba(255, 255, 255, 0.25); }
+    .venue-card-title {
+      font-size: 19px;
+      font-weight: 900;
+      color: #fff;
+      margin: 0 0 4px 0;
+    }
+    .venue-card-sub {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .venue-card-desc {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #cbd5e1;
+      margin-bottom: 14px;
+    }
+    .venue-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .venue-card-btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      transition: filter 0.2s, transform 0.15s;
+    }
+    .venue-card-btn:hover { filter: brightness(1.2); transform: scale(1.02); }
+    .venue-card-btn.primary {
+      background: #10b981;
+      color: #fff;
+    }
+    .venue-card-btn.secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .venue-card-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
     /* High-Definition Cartographic Minimap (Matching media_1791335056310.png) */
     #minimap-card {
       position: absolute;
@@ -1523,6 +1626,90 @@
       box-shadow: 0 4px 12px rgba(250, 204, 21, 0.35);
     }
 
+    /* Excel Batch Exchange Section (Dayong Elementary Concept) */
+    .room-edit-batch-card {
+      margin: 16px 20px 0 20px;
+      padding: 14px 16px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 12px;
+    }
+    .batch-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .batch-card-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .batch-btn {
+      padding: 6px 13px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .batch-btn:hover {
+      background: rgba(56, 189, 248, 0.3);
+      color: #fff;
+    }
+    .batch-hint {
+      font-size: 11.5px;
+      color: #94a3b8;
+      margin: 0 0 8px 0;
+      line-height: 1.45;
+    }
+    .batch-textarea {
+      width: 100%;
+      height: 76px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-family: Consolas, monospace;
+      font-size: 11.5px;
+      padding: 8px 10px;
+      resize: vertical;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .batch-textarea:focus { border-color: #38bdf8; }
+    .batch-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .batch-apply-btn {
+      padding: 6px 15px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #10b981;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+    .batch-apply-btn:hover { filter: brightness(1.15); }
+    .batch-status {
+      font-size: 12px;
+      color: #34d399;
+      font-weight: 600;
+    }
+
     @media (max-width: 768px) {
       #walk-instruction-banner {
         top: auto;
@@ -1731,6 +1918,14 @@
       <input type="checkbox" id="check-invert-y" class="custom-checkbox">
       <span class="modal-checkbox-label">上下反轉</span>
     </label>
+    <label class="modal-checkbox-row">
+      <input type="checkbox" id="check-stair-pads" class="custom-checkbox" checked>
+      <span class="modal-checkbox-label">樓梯口用傳送點上下樓（取消則走實體樓梯）</span>
+    </label>
+    <label class="modal-checkbox-row">
+      <input type="checkbox" id="check-auto-turn" class="custom-checkbox" checked>
+      <span class="modal-checkbox-label">到達目的地前自動跟隨轉向</span>
+    </label>
     <button class="modal-ctrl-reset-btn" id="btn-reset-turn">恢復預設</button>
   </div>
 
@@ -1745,8 +1940,27 @@
       <div class="nav-dist"><span id="hud-dist-val">0</span><small>m</small></div>
     </div>
     <div class="nav-actions">
+      <button class="auto-walk-btn" id="btn-nav-tp" style="background: #3b82f6;">⚡ 傳送門口</button>
       <button class="auto-walk-btn" id="btn-auto-walk">🚶‍♂️ 自動帶路</button>
       <button class="nav-close" id="btn-cancel-nav" title="結束導航">✕</button>
+    </div>
+  </div>
+
+  <!-- Floating Venue Info Card (Dayong Elementary Concept) -->
+  <div id="venue-card" class="glass venue-card-hidden">
+    <div class="venue-card-header">
+      <div class="venue-card-badge" id="vc-badge">🏷️ 教室資訊</div>
+      <button class="venue-card-close" id="vc-btn-close" title="關閉">✕</button>
+    </div>
+    <div class="venue-card-body">
+      <h3 class="venue-card-title" id="vc-title">教室名稱</h3>
+      <div class="venue-card-sub" id="vc-sub">所屬大樓 • 樓層</div>
+      <div class="venue-card-desc" id="vc-desc">點擊下方按鈕可啟動自動帶路、瞬間傳送至門口，或由高空鳥瞰教室位置。</div>
+    </div>
+    <div class="venue-card-actions">
+      <button class="venue-card-btn primary" id="vc-btn-walk">🚶 帶我去</button>
+      <button class="venue-card-btn secondary" id="vc-btn-tp">⚡ 傳送到門口</button>
+      <button class="venue-card-btn secondary" id="vc-btn-bird">👁️ 鳥瞰位置</button>
     </div>
   </div>
 
@@ -1773,11 +1987,11 @@
     <ul style="list-style: none; line-height: 1.8; font-size: 13px; color: #cbd5e1; margin-bottom: 16px;">
       <li>🖱️ <b>自由旋轉視野</b>：左鍵拖曳 360° 旋轉視野，右鍵平移，滾輪自由縮放距離。</li>
       <li>⌨️ <b>人物行走操控</b>：<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或方向鍵視角相對走動，<kbd>Shift</kbd> 加速奔跑。</li>
-      <li>📱 <b>觸控支援</b>：單指旋轉全景，雙指捏合縮放，右下角按鈕移動角色。</li>
-      <li>🏢 <b>樓層切換</b>：點選右側 1F ~ 4F 即可透視內部教室配置與走廊。</li>
-      <li>🪜 <b>實體樓梯爬升</b>：導航至 2F/3F 教室時，同學會由川堂走至樓梯間沿踏階走上樓！</li>
-      <li>🚶 <b>自動帶路</b>：搜尋或點擊任意門牌後，點擊「自動帶路」同學將親自帶您前往！</li>
-      <li>🗺️ <b>平面總圖</b>：按 <kbd>M</kbd> 鍵可隨時對照 115 學年度原始平面藍圖。</li>
+      <li>⚡ <b>快捷鍵系統</b>：<kbd>G</kbd> 自動帶路、<kbd>T</kbd> 傳送門口、<kbd>/</kbd> 搜尋、<kbd>R</kbd>/<kbd>F</kbd> 仰角微調、<kbd>[</kbd>/<kbd>]</kbd> 調速、<kbd>Esc</kbd> 關閉視窗。</li>
+      <li>🪜 <b>樓梯雙模式上下樓</b>：踩踏樓梯口光圈點（<span style="color:#fbbf24;">▲ 上樓</span> / <span style="color:#38bdf8;">▼ 下樓</span>）直達樓層；亦可在轉頭設定中關閉傳送點自己爬樓梯！</li>
+      <li>🏷️ <b>教室資訊卡片</b>：點擊任意門牌或搜尋項目，即可開啟卡片選擇「帶我去」、「傳送門口」或「鳥瞰位置」！</li>
+      <li>🏢 <b>2D 地圖樓層連動</b>：上下樓時，左下角小地圖自動即時切換至該樓層的室內平面配置圖。</li>
+      <li>📊 <b>Excel 批次配置</b>：點選「教室配置」可直接將全校教室清單一鍵匯出或貼上套用。</li>
     </ul>
     <button class="btn-action" style="width: 100%; justify-content: center; background: var(--accent); color: #0f172a;" id="btn-close-help">我知道了！開始導覽</button>
   </div>
@@ -1829,6 +2043,21 @@
     <!-- Scrollable Building Grids -->
     <div class="room-edit-body" id="room-edit-grids-container">
       <!-- Generated dynamically by populateRoomConfigModal() -->
+    </div>
+
+    <!-- Excel Batch Import/Export Section (Dayong Elementary Concept) -->
+    <div class="room-edit-batch-card">
+      <div class="batch-card-header">
+        <div class="batch-card-title">📊 與 Excel 快速雙向複製貼上</div>
+        <button class="batch-btn" id="btn-export-excel">📋 複製目前配置到剪貼簿 (Excel 格式)</button>
+      </div>
+      <p class="batch-hint">點選上方按鈕可直接將全校教室清單複製為 TSV，在 Excel 按 Ctrl+V 貼上；亦可由 Excel 複製貼至下方框中，按套用即可批次更新！</p>
+      <textarea id="batch-excel-area" class="batch-textarea" placeholder="教室代號	教室名稱	所屬大樓	樓層	類別
+801	801 班教室	八年級(南棟)	2	grade8"></textarea>
+      <div class="batch-footer">
+        <button class="batch-apply-btn" id="btn-import-excel">📥 套用貼上的內容</button>
+        <span class="batch-status" id="batch-import-status"></span>
+      </div>
     </div>
 
     <!-- Footer Action Bar -->
@@ -2556,21 +2785,53 @@
     const labelsContainer = document.getElementById("labels-container");
     const ROOMS_DB = {};
 
-    // 4.0 Collision & Multi-Floor Surface Engine (參考大勇國小與 3D 物理行走系統)
+    // 4.0 Collision & Multi-Floor Surface Engine (大勇國小 GRID 空間網格分割與物理推擠穿牆防禦系統)
     const WALL_COLLIDERS = [];
     const WALK_SURFACES = [];
+    const STAIR_PADS = [];
+    let useStairPads = true;
+    let autoTurnWithNav = true;
+    let stairPadCooldown = 0;
     const AVATAR_COLLISION_RADIUS = 0.28;
     const AVATAR_HEIGHT = 1.45;
 
+    // 空間網格劃分 (Spatial Hash Grid CS = 5.0m)
+    const GRID = {
+      cs: 5.0,
+      cells: new Map(),
+      key(cx, cz) { return `${cx},${cz}`; }
+    };
+
+    function addColliderToGrid(c) {
+      const cs = GRID.cs;
+      const minCX = Math.floor(c.minX / cs);
+      const maxCX = Math.floor(c.maxX / cs);
+      const minCZ = Math.floor(c.minZ / cs);
+      const maxCZ = Math.floor(c.maxZ / cs);
+      for (let cx = minCX; cx <= maxCX; cx++) {
+        for (let cz = minCZ; cz <= maxCZ; cz++) {
+          const k = GRID.key(cx, cz);
+          let list = GRID.cells.get(k);
+          if (!list) {
+            list = [];
+            GRID.cells.set(k, list);
+          }
+          list.push(c);
+        }
+      }
+    }
+
     function registerWallCollider(minX, maxX, minZ, maxZ, minY, maxY) {
-      WALL_COLLIDERS.push({
+      const collider = {
         minX: Math.min(minX, maxX),
         maxX: Math.max(minX, maxX),
         minZ: Math.min(minZ, maxZ),
         maxZ: Math.max(minZ, maxZ),
         minY: minY !== undefined ? minY : -0.5,
         maxY: maxY !== undefined ? maxY : 24
-      });
+      };
+      WALL_COLLIDERS.push(collider);
+      addColliderToGrid(collider);
     }
 
     function registerWalkFlat(x0, x1, z0, z1, h) {
@@ -2643,16 +2904,152 @@
         }
       }
 
-      for (let i = 0; i < WALL_COLLIDERS.length; i++) {
-        const c = WALL_COLLIDERS[i];
-        if (avatarMaxY >= c.minY && avatarMinY <= c.maxY) {
-          if (avatarMaxX > c.minX && avatarMinX < c.maxX &&
-              avatarMaxZ > c.minZ && avatarMinZ < c.maxZ) {
-            return true;
+      const cs = GRID.cs;
+      const minCX = Math.floor(avatarMinX / cs);
+      const maxCX = Math.floor(avatarMaxX / cs);
+      const minCZ = Math.floor(avatarMinZ / cs);
+      const maxCZ = Math.floor(avatarMaxZ / cs);
+      const tested = new Set();
+
+      for (let cx = minCX; cx <= maxCX; cx++) {
+        for (let cz = minCZ; cz <= maxCZ; cz++) {
+          const list = GRID.cells.get(GRID.key(cx, cz));
+          if (!list) continue;
+          for (let i = 0; i < list.length; i++) {
+            const c = list[i];
+            if (tested.has(c)) continue;
+            tested.add(c);
+            if (avatarMaxY >= c.minY && avatarMinY <= c.maxY) {
+              if (avatarMaxX > c.minX && avatarMinX < c.maxX &&
+                  avatarMaxZ > c.minZ && avatarMinZ < c.maxZ) {
+                return true;
+              }
+            }
           }
         }
       }
       return false;
+    }
+
+    // 大勇國小 Penetration Push-out 物理投影推擠公式 (防卡牆與極致滑順)
+    function collideSpatial(pos, radius, avatarY) {
+      const cs = GRID.cs;
+      const minCX = Math.floor((pos.x - radius) / cs);
+      const maxCX = Math.floor((pos.x + radius) / cs);
+      const minCZ = Math.floor((pos.z - radius) / cs);
+      const maxCZ = Math.floor((pos.z + radius) / cs);
+      const tested = new Set();
+      const avatarMinY = avatarY + 0.15;
+      const avatarMaxY = avatarY + AVATAR_HEIGHT - 0.15;
+
+      // 階梯坡道放行檢查
+      for (let i = 0; i < WALK_SURFACES.length; i++) {
+        const s = WALK_SURFACES[i];
+        if (s.ax && pos.x >= s.x0 && pos.x <= s.x1 && pos.z >= s.z0 && pos.z <= s.z1) {
+          let f = ((s.ax === "x" ? pos.x : pos.z) - s.c0) / (s.c1 - s.c0);
+          f = Math.max(0, Math.min(1, f));
+          const rampY = s.h0 + (s.h1 - s.h0) * f;
+          if (Math.abs(avatarY - rampY) < 1.2) {
+            return;
+          }
+        }
+      }
+
+      for (let cx = minCX; cx <= maxCX; cx++) {
+        for (let cz = minCZ; cz <= maxCZ; cz++) {
+          const list = GRID.cells.get(GRID.key(cx, cz));
+          if (!list) continue;
+          for (let i = 0; i < list.length; i++) {
+            const c = list[i];
+            if (tested.has(c)) continue;
+            tested.add(c);
+
+            if (avatarMaxY < c.minY || avatarMinY > c.maxY) continue;
+
+            const closeX = Math.max(c.minX, Math.min(pos.x, c.maxX));
+            const closeZ = Math.max(c.minZ, Math.min(pos.z, c.maxZ));
+            const diffX = pos.x - closeX;
+            const diffZ = pos.z - closeZ;
+            const distSq = diffX * diffX + diffZ * diffZ;
+
+            if (distSq < radius * radius) {
+              if (distSq > 1e-6) {
+                const dist = Math.sqrt(distSq);
+                const push = radius - dist;
+                pos.x += (diffX / dist) * push;
+                pos.z += (diffZ / dist) * push;
+              } else {
+                const dLeft = Math.abs(pos.x - c.minX);
+                const dRight = Math.abs(c.maxX - pos.x);
+                const dBack = Math.abs(pos.z - c.minZ);
+                const dFront = Math.abs(c.maxZ - pos.z);
+                const minD = Math.min(dLeft, dRight, dBack, dFront);
+                if (minD === dLeft) pos.x = c.minX - radius;
+                else if (minD === dRight) pos.x = c.maxX + radius;
+                else if (minD === dBack) pos.z = c.minZ - radius;
+                else pos.z = c.maxZ + radius;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 大勇國小 3D 樓梯雙向傳送光圈產生器 (Staircase Teleport Pad Mesh)
+    function createStairPadMesh(labelText, hexColor) {
+      const padGroup = new THREE.Group();
+      // 外環光圈
+      const ringGeo = new THREE.RingGeometry(0.48, 0.72, 32);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: hexColor,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      ringMesh.rotation.x = -Math.PI / 2;
+      padGroup.add(ringMesh);
+
+      // 內環發光圓盤
+      const discGeo = new THREE.CircleGeometry(0.46, 32);
+      const discMat = new THREE.MeshBasicMaterial({
+        color: hexColor,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.35
+      });
+      const discMesh = new THREE.Mesh(discGeo, discMat);
+      discMesh.rotation.x = -Math.PI / 2;
+      padGroup.add(discMesh);
+
+      // 立體導引指示門牌 Canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = 160;
+      canvas.height = 72;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(4, 4, 152, 64, 10);
+      else ctx.rect(4, 4, 152, 64);
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 22px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(labelText, 80, 36);
+
+      const badgeTexture = new THREE.CanvasTexture(canvas);
+      const badgeMat = new THREE.MeshBasicMaterial({ map: badgeTexture, transparent: true, side: THREE.DoubleSide });
+      const badgeMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.05, 0.52), badgeMat);
+      badgeMesh.position.set(0, 0.38, 0);
+      badgeMesh.rotation.x = -0.35;
+      padGroup.add(badgeMesh);
+
+      return padGroup;
     }
 
     function checkStairElevation(x, y, z) {
@@ -2833,6 +3230,72 @@
       ctx.font = "bold 24px sans-serif";
       ctx.fillText("Student Activity Center", 256, 96);
       return new THREE.CanvasTexture(canvas);
+    }
+
+    // 4.1.1 台灣校園磁磚與柱體馬賽克擬真紋理 (Procedural Canvas Textures - 大勇國小概念)
+    function createSchoolTileTexture(color = "#f1ece4", groutColor = "#94a3b8") {
+      const canvas = document.createElement("canvas");
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, 128, 128);
+
+      // Tile grout grid
+      ctx.strokeStyle = groutColor;
+      ctx.lineWidth = 1.8;
+      for (let x = 0; x <= 128; x += 32) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 128);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= 128; y += 16) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(128, y);
+        ctx.stroke();
+      }
+
+      // Subtle natural specks
+      ctx.fillStyle = "rgba(0,0,0,0.04)";
+      for (let i = 0; i < 60; i++) {
+        const nx = Math.random() * 128;
+        const ny = Math.random() * 128;
+        ctx.fillRect(nx, ny, 1.8, 1.8);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(4, 2);
+      return tex;
+    }
+
+    function createMosaicTexture(baseColor = "#2563eb", tileCount = 8) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#cbd5e1";
+      ctx.fillRect(0, 0, 128, 128);
+
+      const step = 128 / tileCount;
+      for (let i = 0; i < tileCount; i++) {
+        for (let j = 0; j < tileCount; j++) {
+          const shade = 0.85 + Math.random() * 0.3;
+          ctx.fillStyle = baseColor;
+          ctx.globalAlpha = Math.min(1.0, shade);
+          ctx.fillRect(i * step + 1, j * step + 1, step - 2, step - 2);
+        }
+      }
+      ctx.globalAlpha = 1.0;
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(2, 4);
+      return tex;
     }
 
     // 4.1 Ground Lawn & Driveways
@@ -3179,6 +3642,26 @@
         // 註冊階梯走道坡面與上層平台 (Z 軸向內走梯，由 0 至 -flightLength 上升)
         registerWalkRamp(worldX - stairWidth / 2 - 0.3, worldX + stairWidth / 2 + 0.3, worldZ - flightLength, worldZ + 0.2, 'z', worldZ, baseH, worldZ - flightLength, topH);
         registerWalkFlat(worldX - stairWidth / 2 - 0.5, worldX + stairWidth / 2 + 0.5, worldZ - flightLength - 2.4, worldZ - flightLength, topH);
+
+        // 4.4.1 大勇國小階梯雙向光圈傳送點 (Staircase Dual Teleport Pads)
+        // 下層入口光圈 (▲ 上樓到 f+1 F)
+        const padBase = createStairPadMesh(`▲ 上樓 (${f + 1}F)`, 0xfbbf24);
+        padBase.position.set(0, baseH + 0.05, 0.4);
+        stairGroup.add(padBase);
+
+        // 上層出口光圈 (▼ 下樓到 f F)
+        const padTop = createStairPadMesh(`▼ 下樓 (${f}F)`, 0x38bdf8);
+        padTop.position.set(0, topH + 0.05, -flightLength - 1.1);
+        stairGroup.add(padTop);
+
+        STAIR_PADS.push({
+          basePos: new THREE.Vector3(worldX, baseH, worldZ + 0.4),
+          topPos: new THREE.Vector3(worldX, topH, worldZ - flightLength - 1.1),
+          fromFloor: f,
+          toFloor: f + 1,
+          padBaseMesh: padBase,
+          padTopMesh: padTop
+        });
       }
 
       return stairGroup;
@@ -3828,8 +4311,10 @@
       const isHoriz = cfg.width >= cfg.depth;
       const corridorWidth = 2.6;
 
-      // Common architectural materials
-      const extWallMat = new THREE.MeshStandardMaterial({ color: cfg.color, roughness: 0.65 });
+      // Common architectural materials (使用台灣學校二丁掛磁磚與馬賽克柱體擬真紋理)
+      const schoolTileMap = createSchoolTileTexture('#' + (cfg.color || 0x3b82f6).toString(16).padStart(6, '0'));
+      const extWallMat = new THREE.MeshStandardMaterial({ color: cfg.color, map: schoolTileMap, roughness: 0.65 });
+      const mosaicPillarMat = new THREE.MeshLambertMaterial({ map: createMosaicTexture("#2563eb", 8) });
       const intWallMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.8 });
       const floorMat = new THREE.MeshStandardMaterial({ color: 0xd8dee9, roughness: 0.7 });
       const corridorFloorMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.7 });
@@ -3888,7 +4373,7 @@
           for (let c = 0; c <= colCount; c++) {
             const colMesh = new THREE.Mesh(
               new THREE.BoxGeometry(0.45, FH, 0.45),
-              new THREE.MeshLambertMaterial({ color: 0xffffff })
+              mosaicPillarMat
             );
             colMesh.position.set(-cfg.width / 2 + c * colStep, fCenterY, outerZ);
             colMesh.castShadow = true;
@@ -4328,7 +4813,7 @@
         `;
         badgeDiv.onclick = (e) => {
           e.stopPropagation();
-          navigateToRoom(r.id);
+          openVenueCard(r.id);
         };
         labelsContainer.appendChild(badgeDiv);
 
@@ -4737,6 +5222,7 @@
       document.getElementById("nav-hud").classList.remove("visible");
       stopAutoWalk();
       currentNavPoints = [];
+      currentNavRoomId = null;
     }
 
     const btnAutoWalk = document.getElementById("btn-auto-walk");
@@ -4878,7 +5364,81 @@
     }
 
     window.addEventListener("keydown", (e) => {
-      if (e.target.tagName === "INPUT") return;
+      // 若正在打字則不干擾輸入框
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
+      // Escape: 關閉所有視窗與取消導航
+      if (e.key === "Escape") {
+        closeVenueCard();
+        closeRoomConfigModal();
+        if (modalSpeedCtrl) modalSpeedCtrl.classList.remove("open");
+        if (modalTurnCtrl) modalTurnCtrl.classList.remove("open");
+        document.getElementById("campus-map-modal")?.classList.remove("open");
+        document.getElementById("help-modal")?.classList.remove("open");
+        document.getElementById("modal-backdrop")?.classList.remove("open");
+        if (currentNavPoints && currentNavPoints.length > 0) clearNavigation();
+        return;
+      }
+
+      // /: 快速聚焦搜尋欄
+      if (e.key === "/") {
+        e.preventDefault();
+        const sInp = document.getElementById("search-input");
+        if (sInp) {
+          sInp.focus();
+          sInp.select();
+        }
+        return;
+      }
+
+      // G: 切換自動帶路 / 停止帶路
+      if (e.key === "g" || e.key === "G") {
+        if (currentNavPoints && currentNavPoints.length > 1) {
+          e.preventDefault();
+          if (isAutoWalking) stopAutoWalk();
+          else startAutoWalk();
+        }
+        return;
+      }
+
+      // T: 導航或檢視教室時瞬間傳送到門口
+      if (e.key === "t" || e.key === "T") {
+        if (currentNavRoomId) {
+          e.preventDefault();
+          teleportToRoom(currentNavRoomId);
+        } else if (currentSelectedRoomId) {
+          e.preventDefault();
+          teleportToRoom(currentSelectedRoomId);
+        }
+        return;
+      }
+
+      // R / F: 鏡頭仰角微調 (Pitch Tilt Up / Down)
+      if (e.key === "r" || e.key === "R") {
+        avatarPitch = Math.min(avatarPitch + 0.08, 0.65);
+        return;
+      }
+      if (e.key === "f" || e.key === "F") {
+        avatarPitch = Math.max(avatarPitch - 0.08, -0.65);
+        return;
+      }
+
+      // [ / ]: 移動速度靈敏度增減
+      if (e.key === "[") {
+        if (sliderSpeed) {
+          sliderSpeed.value = Math.max(50, parseInt(sliderSpeed.value) - 10);
+          sliderSpeed.dispatchEvent(new Event("input"));
+        }
+        return;
+      }
+      if (e.key === "]") {
+        if (sliderSpeed) {
+          sliderSpeed.value = Math.min(200, parseInt(sliderSpeed.value) + 10);
+          sliderSpeed.dispatchEvent(new Event("input"));
+        }
+        return;
+      }
+
       if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") moveInput.forward = true;
       if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") moveInput.backward = true;
       if (e.key === "a" || e.key === "A") moveInput.left = true;
@@ -5205,15 +5765,252 @@
       });
     }
 
+    // 7.1 Excel 雙向快速匯出 / 匯入 (大勇國小概念)
+    function exportToExcel() {
+      const lines = ["教室代號\t教室名稱\t所屬大樓\t樓層\t類別代碼"];
+      BUILDINGS_CONFIG.forEach(cfg => {
+        if (!cfg.rooms) return;
+        cfg.rooms.forEach(r => {
+          const name = getRoomDisplayName(r);
+          const code = r.code || r.id;
+          lines.push(`${code}\t${name}\t${cfg.name}\t${r.floor}\t${r.cat || cfg.category || "academic"}`);
+        });
+      });
+      const tsvContent = lines.join("\n");
+      const textarea = document.getElementById("batch-excel-area");
+      if (textarea) textarea.value = tsvContent;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(tsvContent).then(() => {
+          showToast("📋 已成功複製全校教室配置 TSV！可直接在 Excel 按 Ctrl+V 貼上編輯。");
+        }).catch(() => {
+          showToast("📋 已產生 TSV 內容於文字框，請全選複製至 Excel！");
+        });
+      } else {
+        showToast("📋 已產生 TSV 內容於文字框，請複製！");
+      }
+    }
+
+    function importFromExcel() {
+      const textarea = document.getElementById("batch-excel-area");
+      const statusEl = document.getElementById("batch-import-status");
+      if (!textarea) return;
+      const text = textarea.value.trim();
+      if (!text) {
+        alert("請先將 Excel 內容貼入文字框中！");
+        return;
+      }
+
+      const rows = text.split(/\r?\n/);
+      let updatedCount = 0;
+
+      rows.forEach(row => {
+        const cols = row.split(/\t|,/);
+        if (cols.length < 2) return;
+        const codeOrId = cols[0].trim();
+        const newName = cols[1].trim();
+        if (!codeOrId || !newName || codeOrId === "教室代號" || codeOrId === "代號") return;
+
+        let targetRoom = ROOMS_DB[codeOrId];
+        if (!targetRoom) {
+          targetRoom = Object.values(ROOMS_DB).find(r => r.code === codeOrId || r.name === codeOrId);
+        }
+        if (targetRoom) {
+          customRoomNames[targetRoom.id] = newName;
+          updatedCount++;
+        }
+      });
+
+      if (updatedCount > 0) {
+        localStorage.setItem("daxi_room_custom_names", JSON.stringify(customRoomNames));
+        populateRoomConfigModal();
+        if (statusEl) {
+          statusEl.textContent = `✅ 成功套用更新 ${updatedCount} 間教室！`;
+          statusEl.style.color = "#34d399";
+        }
+        showToast(`🎉 成功由 Excel 匯入並套用 ${updatedCount} 間教室配置！`);
+      } else {
+        if (statusEl) {
+          statusEl.textContent = `⚠️ 未找到相符的教室代號，請檢查格式。`;
+          statusEl.style.color = "#f87171";
+        }
+      }
+    }
+
+    const btnExportExcel = document.getElementById("btn-export-excel");
+    if (btnExportExcel) btnExportExcel.addEventListener("click", exportToExcel);
+
+    const btnImportExcel = document.getElementById("btn-import-excel");
+    if (btnImportExcel) btnImportExcel.addEventListener("click", importFromExcel);
+
     /* ==========================================================================
-       8. NAVIGATION & CAMERA TRANSITIONS
+       8. VENUE CARD, NAVIGATION & CAMERA TRANSITIONS (大勇國小概念)
        ========================================================================== */
+    let currentSelectedRoomId = null;
+    let currentNavRoomId = null;
+
+    function updateUrlQueryTarget(roomId) {
+      try {
+        const url = new URL(window.location);
+        if (roomId) {
+          url.searchParams.set("to", roomId);
+        } else {
+          url.searchParams.delete("to");
+        }
+        window.history.replaceState({}, "", url);
+      } catch (e) {}
+    }
+
+    function openVenueCard(roomId) {
+      const room = ROOMS_DB[roomId];
+      if (!room) return;
+      currentSelectedRoomId = roomId;
+
+      const card = document.getElementById("venue-card");
+      if (!card) return;
+
+      const badge = document.getElementById("vc-badge");
+      const title = document.getElementById("vc-title");
+      const sub = document.getElementById("vc-sub");
+      const desc = document.getElementById("vc-desc");
+
+      const catNames = {
+        grade7: "🎒 七年級班級",
+        grade8: "🎒 八年級班級",
+        grade9: "🎒 九年級班級",
+        admin: "🏛️ 處室機關",
+        special: "🔬 專科／專用教室",
+        sports: "🏀 體育活動場館"
+      };
+
+      if (badge) badge.textContent = catNames[room.cat] || "🏷️ 校園處室/空間";
+      if (title) title.textContent = getRoomDisplayName(room);
+      if (sub) sub.textContent = `${room.buildingName} • ${room.floor} 樓`;
+      if (desc) {
+        if (room.cat === "admin") {
+          desc.textContent = `大溪國中行政核心處室，承辦教學行政、學生發展、總務支援與輔導諮商業務。`;
+        } else if (room.cat === "sports") {
+          desc.textContent = `全校體育運動與各項大型集會活動專用空間，設備完善安全。`;
+        } else if (room.cat === "special") {
+          desc.textContent = `專業探索與實作教室，配備多元數位教學與各領域專業實驗器具。`;
+        } else {
+          desc.textContent = `115學年度標準普通班教室，備有數位黑板、冷氣空調、獨立儲物空間。`;
+        }
+      }
+
+      card.classList.remove("venue-card-hidden");
+      updateUrlQueryTarget(roomId);
+
+      // 若在鳥瞰模式，鏡頭平滑聚焦
+      const destNode = NAV_NODES[room.node];
+      if (destNode && currentMode === "bird") {
+        animateCameraTo(
+          new THREE.Vector3(destNode.x + 22, (destNode.y || 0) + 24, destNode.z + 30),
+          new THREE.Vector3(destNode.x, (destNode.y || 0) + 2, destNode.z),
+          750
+        );
+      }
+    }
+
+    function closeVenueCard() {
+      const card = document.getElementById("venue-card");
+      if (card) card.classList.add("venue-card-hidden");
+      currentSelectedRoomId = null;
+      updateUrlQueryTarget(null);
+    }
+
+    function teleportToRoom(roomId) {
+      const room = ROOMS_DB[roomId];
+      if (!room) return;
+      const targetNode = NAV_NODES[room.node];
+      if (!targetNode) return;
+
+      if (avatarGroup) {
+        clearNavigation();
+        closeVenueCard();
+        avatarGroup.position.set(targetNode.x, targetNode.y || 0, targetNode.z);
+        jumpBaseY = avatarGroup.position.y;
+        prevAvatarPos.copy(avatarGroup.position);
+
+        if (room.floor > 1) {
+          setFloorFilter(room.floor);
+        } else {
+          setFloorFilter("all");
+        }
+
+        if (currentMode === "bird") {
+          setControlMode("avatar");
+        }
+        camera.position.set(targetNode.x - Math.sin(avatarAngle) * 3.5, (targetNode.y || 0) + 2.0, targetNode.z - Math.cos(avatarAngle) * 3.5);
+        camera.lookAt(targetNode.x, (targetNode.y || 0) + 1.2, targetNode.z);
+
+        showToast(`⚡ 已瞬間傳送至 [${room.buildingName} ${room.floor}F] ${getRoomDisplayName(room)} 門口！`);
+      }
+    }
+
+    function focusRoomBirdEye(roomId) {
+      const room = ROOMS_DB[roomId];
+      if (!room) return;
+      const targetNode = NAV_NODES[room.node] || { x: 0, y: 0, z: 0 };
+
+      if (room.floor > 1) {
+        setFloorFilter(room.floor);
+      } else {
+        setFloorFilter("all");
+      }
+      setControlMode("bird");
+
+      animateCameraTo(
+        new THREE.Vector3(targetNode.x + 24, (targetNode.y || 0) + 26, targetNode.z + 32),
+        new THREE.Vector3(targetNode.x, (targetNode.y || 0) + 2, targetNode.z),
+        1000
+      );
+      showToast(`👁️ 已俯瞰鎖定 [${room.buildingName} ${room.floor}F] ${getRoomDisplayName(room)}！`);
+    }
+
+    const vcBtnClose = document.getElementById("vc-btn-close");
+    if (vcBtnClose) vcBtnClose.addEventListener("click", closeVenueCard);
+
+    const vcBtnWalk = document.getElementById("vc-btn-walk");
+    if (vcBtnWalk) {
+      vcBtnWalk.addEventListener("click", () => {
+        if (currentSelectedRoomId) {
+          const rid = currentSelectedRoomId;
+          closeVenueCard();
+          navigateToRoom(rid);
+          startAutoWalk();
+        }
+      });
+    }
+
+    const vcBtnTp = document.getElementById("vc-btn-tp");
+    if (vcBtnTp) {
+      vcBtnTp.addEventListener("click", () => {
+        if (currentSelectedRoomId) teleportToRoom(currentSelectedRoomId);
+      });
+    }
+
+    const vcBtnBird = document.getElementById("vc-btn-bird");
+    if (vcBtnBird) {
+      vcBtnBird.addEventListener("click", () => {
+        if (currentSelectedRoomId) focusRoomBirdEye(currentSelectedRoomId);
+      });
+    }
+
+    const btnNavTp = document.getElementById("btn-nav-tp");
+    if (btnNavTp) {
+      btnNavTp.addEventListener("click", () => {
+        if (currentNavRoomId) teleportToRoom(currentNavRoomId);
+      });
+    }
+
     function navigateToRoom(roomId) {
       const room = ROOMS_DB[roomId];
       if (!room) {
         alert("找不到此處室或教室: " + roomId);
         return;
       }
+      currentNavRoomId = roomId;
 
       const targetNodeId = room.node;
       const startNodeId = avatarGroup ? findClosestNavNode(avatarGroup.position) : "gate";
@@ -5239,7 +6036,7 @@
       }
       const meters = Math.round(totalDist);
 
-      document.getElementById("hud-target-name").textContent = `[${room.buildingName} ${room.floor}F] ${room.name}`;
+      document.getElementById("hud-target-name").textContent = `[${room.buildingName} ${room.floor}F] ${getRoomDisplayName(room)}`;
       document.getElementById("hud-route-desc").textContent = `由當前位置 → 經由 ${room.buildingName} 走廊/樓梯至 ${room.floor} 樓`;
       document.getElementById("hud-dist-val").textContent = meters;
       document.getElementById("nav-hud").classList.add("visible");
@@ -5378,6 +6175,21 @@
       });
     }
 
+    const checkStairPads = document.getElementById("check-stair-pads");
+    if (checkStairPads) {
+      checkStairPads.addEventListener("change", (e) => {
+        useStairPads = e.target.checked;
+        showToast(useStairPads ? "🪜 已開啟樓梯光圈傳送點模式！" : "🚶 已切換為自己走實體樓梯模式！");
+      });
+    }
+
+    const checkAutoTurn = document.getElementById("check-auto-turn");
+    if (checkAutoTurn) {
+      checkAutoTurn.addEventListener("change", (e) => {
+        autoTurnWithNav = e.target.checked;
+      });
+    }
+
     if (btnResetTurn) {
       btnResetTurn.addEventListener("click", () => {
         if (sliderTurn) sliderTurn.value = 100;
@@ -5393,6 +6205,12 @@
 
         if (checkInvertY) checkInvertY.checked = false;
         isInvertY = false;
+
+        if (checkStairPads) checkStairPads.checked = true;
+        useStairPads = true;
+
+        if (checkAutoTurn) checkAutoTurn.checked = true;
+        autoTurnWithNav = true;
       });
     }
 
@@ -5596,12 +6414,16 @@
 
     window.onSelectSearchRoom = (roomId) => {
       searchResults.style.display = "none";
-      searchInput.value = ROOMS_DB[roomId].name;
-      navigateToRoom(roomId);
+      if (ROOMS_DB[roomId]) {
+        searchInput.value = getRoomDisplayName(ROOMS_DB[roomId]);
+        openVenueCard(roomId);
+      }
     };
 
     document.querySelectorAll(".venue-chip").forEach(chip => {
-      chip.onclick = () => navigateToRoom(chip.dataset.to);
+      chip.onclick = () => {
+        if (chip.dataset.to) openVenueCard(chip.dataset.to);
+      };
     });
 
     document.getElementById("btn-cancel-nav").onclick = clearNavigation;
@@ -5900,6 +6722,109 @@
       miniCtx.fillText("P 停車場", pLotX + pLotW / 2, pLotZ + pLotH / 2);
       miniCtx.fillText("正門", toMiniX(-10), toMiniZ(88));
       miniCtx.fillText("車道", toMiniX(52.5), toMiniZ(12));
+
+      // 10.5 跨樓層 2D 平面圖動態圖層同步 (大勇國小 paintFloorMap 概念)
+      const currentAvatarY = avatarGroup ? avatarGroup.position.y : 0;
+      let detectedFloorNum = 1;
+      if (currentAvatarY >= 9.5) detectedFloorNum = 4;
+      else if (currentAvatarY >= 6.0) detectedFloorNum = 3;
+      else if (currentAvatarY >= 2.4) detectedFloorNum = 2;
+
+      const activeFloorNum = (currentFloorFilter !== "all") ? parseInt(currentFloorFilter) : detectedFloorNum;
+
+      if (activeFloorNum >= 2) {
+        // 半透明遮罩覆蓋戶外地坪
+        miniCtx.fillStyle = "rgba(15, 23, 42, 0.78)";
+        miniCtx.fillRect(0, 0, 360, 360);
+
+        // 樓層平面圖狀態徽章
+        miniCtx.fillStyle = "rgba(30, 41, 59, 0.95)";
+        miniCtx.fillRect(16, 14, 150, 24);
+        miniCtx.strokeStyle = "#38bdf8";
+        miniCtx.lineWidth = 1.4;
+        miniCtx.strokeRect(16, 14, 150, 24);
+        miniCtx.fillStyle = "#38bdf8";
+        miniCtx.font = "bold 11px -apple-system, BlinkMacSystemFont, sans-serif";
+        miniCtx.textAlign = "center";
+        miniCtx.textBaseline = "middle";
+        miniCtx.fillText(`🏢 ${activeFloorNum}F 室內配置平面圖`, 91, 26);
+
+        // 繪製擁有該樓層之大樓平面配置
+        BUILDINGS_CONFIG.filter(cfg => cfg.floors >= activeFloorNum).forEach(cfg => {
+          const bx = toMiniX(cfg.x - cfg.width / 2);
+          const bz = toMiniZ(cfg.z - cfg.depth / 2);
+          const bw = cfg.width * (328 / 250);
+          const bh = cfg.depth * (328 / 180);
+
+          miniCtx.fillStyle = "#1e293b";
+          miniCtx.fillRect(bx, bz, bw, bh);
+          miniCtx.strokeStyle = "#38bdf8";
+          miniCtx.lineWidth = 1.5;
+          miniCtx.strokeRect(bx, bz, bw, bh);
+
+          const floorRooms = (cfg.rooms || []).filter(r => r.floor === activeFloorNum);
+          if (floorRooms.length > 0) {
+            const isNorthCorridor = cfg.corridorSide === "north";
+            const isEastCorridor = cfg.corridorSide === "east";
+            const isVertical = isEastCorridor || cfg.corridorSide === "west";
+
+            floorRooms.forEach((r, idx) => {
+              let rx, rz, rw, rh;
+              if (!isVertical) {
+                const segW = bw / floorRooms.length;
+                rx = bx + idx * segW;
+                rw = segW - 1;
+                rz = isNorthCorridor ? bz + bh * 0.35 : bz;
+                rh = bh * 0.65;
+              } else {
+                const segH = bh / floorRooms.length;
+                rz = bz + idx * segH;
+                rh = segH - 1;
+                rx = isEastCorridor ? bx : bx + bw * 0.35;
+                rw = bw * 0.65;
+              }
+
+              const rColors = {
+                grade7: "#2563eb",
+                grade8: "#d97706",
+                grade9: "#059669",
+                admin: "#475569",
+                special: "#7c3aed",
+                sports: "#b91c1c"
+              };
+              miniCtx.fillStyle = rColors[r.cat] || "#2563eb";
+              miniCtx.fillRect(rx, rz, rw, rh);
+              miniCtx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+              miniCtx.lineWidth = 0.8;
+              miniCtx.strokeRect(rx, rz, rw, rh);
+
+              miniCtx.fillStyle = "#ffffff";
+              miniCtx.font = "bold 8px -apple-system, BlinkMacSystemFont, sans-serif";
+              miniCtx.textAlign = "center";
+              miniCtx.textBaseline = "middle";
+              const dispName = (customRoomNames[r.id] || r.name).replace(/\s*\(\d+F\)/, '').slice(0, 4);
+              miniCtx.fillText(dispName, rx + rw / 2, rz + rh / 2);
+            });
+          }
+
+          // 樓梯標記
+          if (cfg.stairs) {
+            cfg.stairs.forEach(st => {
+              if (st.floors >= activeFloorNum) {
+                const sx = toMiniX(st.x);
+                const sz = toMiniZ(st.z);
+                miniCtx.fillStyle = "#fbbf24";
+                miniCtx.beginPath();
+                miniCtx.arc(sx, sz, 3.8, 0, Math.PI * 2);
+                miniCtx.fill();
+                miniCtx.strokeStyle = "#0f172a";
+                miniCtx.lineWidth = 1;
+                miniCtx.stroke();
+              }
+            });
+          }
+        });
+      }
     
       // 11. Draw Player Marker Arrow and Orientation (100% matched to Daxi avatar position)
       if (avatarGroup) {
@@ -5965,8 +6890,10 @@ miniCanvas.addEventListener("click", (e) => {
     function checkUrlQueryTarget() {
       const params = new URLSearchParams(window.location.search);
       const to = params.get("to");
-      if (to) {
-        setTimeout(() => navigateToRoom(to), 600);
+      if (to && ROOMS_DB[to]) {
+        setTimeout(() => {
+          openVenueCard(to);
+        }, 600);
       }
     }
 
@@ -6006,9 +6933,10 @@ miniCanvas.addEventListener("click", (e) => {
           } else {
             const dir = targetPos.clone().sub(curPos).normalize();
             curPos.addScaledVector(dir, stepDist);
-            jumpBaseY = curPos.y;
-            avatarAngle = Math.atan2(dir.x, dir.z);
-            avatarGroup.rotation.y = avatarAngle;
+            if (autoTurnWithNav) {
+              avatarAngle = Math.atan2(dir.x, dir.z);
+              avatarGroup.rotation.y = avatarAngle;
+            }
           }
         } else {
           stopAutoWalk();
@@ -6096,8 +7024,43 @@ miniCanvas.addEventListener("click", (e) => {
               }
               jumpBaseY = curPos.y;
             }
+
+            // 大勇國小 Spatial Hash Push-out 二次投影校正，徹底防穿牆並滑順沿牆推離
+            collideSpatial(curPos, AVATAR_COLLISION_RADIUS, currentY);
           }
         }
+
+        // 4. 大勇國小樓梯口雙向光圈傳送檢測 (Stair Teleport Pads)
+        if (avatarGroup && useStairPads && !isJumping && stairPadCooldown <= 0) {
+          const curP = avatarGroup.position;
+          for (let i = 0; i < STAIR_PADS.length; i++) {
+            const pad = STAIR_PADS[i];
+            // 進入下層光圈踏點 -> 傳送至上層
+            if (curP.distanceTo(pad.basePos) < 1.05 && Math.abs(curP.y - pad.basePos.y) < 1.2) {
+              avatarGroup.position.set(pad.topPos.x, pad.topPos.y, pad.topPos.z);
+              jumpBaseY = pad.topPos.y;
+              prevAvatarPos.copy(avatarGroup.position);
+              stairPadCooldown = 1.8;
+              setFloorFilter(pad.toFloor);
+              showToast(`🪜 已透過樓梯傳送點直達 ${pad.toFloor}F 走廊！`);
+              break;
+            }
+            // 進入上層光圈踏點 -> 傳送至下層
+            if (curP.distanceTo(pad.topPos) < 1.05 && Math.abs(curP.y - pad.topPos.y) < 1.2) {
+              avatarGroup.position.set(pad.basePos.x, pad.basePos.y, pad.basePos.z);
+              jumpBaseY = pad.basePos.y;
+              prevAvatarPos.copy(avatarGroup.position);
+              stairPadCooldown = 1.8;
+              setFloorFilter(pad.fromFloor);
+              showToast(`🪜 已透過樓梯傳送點直達 ${pad.fromFloor}F 走廊！`);
+              break;
+            }
+          }
+        }
+      }
+
+      if (stairPadCooldown > 0) {
+        stairPadCooldown -= delta;
       }
 
       // Space-bar Jump Hop (依據當前樓層地面高度落地，不穿破樓板)
