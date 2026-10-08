@@ -187,39 +187,121 @@
       margin-left: 6px;
     }
 
-    /* Action Buttons in Top Bar */
+    /* Top Action Buttons (Exact Replica of media_1791469297996_bb3e98fa.png) */
     .top-actions {
       display: flex;
       gap: 8px;
       align-items: center;
+      flex-shrink: 0;
     }
-    .btn-action {
-      height: 42px;
-      padding: 0 14px;
-      display: flex;
+    .nav-mode-pill {
+      height: 40px;
+      padding: 0 16px;
+      display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #f1f5f9;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 12px;
+      background: #182230;
+      backdrop-filter: blur(12px);
+      transition: all 0.18s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .nav-mode-pill:hover {
+      background: #243247;
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+    .nav-mode-pill.active {
+      background: #fdfbf7;
+      color: #0f172a;
+      border-color: #fdfbf7;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    }
+    .nav-mode-pill .key-badge {
+      display: inline-block;
+      padding: 1px 5px;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .nav-mode-pill.active .key-badge {
+      background: rgba(15, 23, 42, 0.08);
+      color: #475569;
+      border-color: rgba(15, 23, 42, 0.15);
+    }
+    .nav-icon-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: #182230;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #f1f5f9;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+    .nav-icon-circle:hover {
+      background: #243247;
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+
+    /* Search Quick Venues Popover (Exact Replica of media_1791469297996_bb3e98fa.png) */
+    #search-quick-venues {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 320px;
+      background: #182230;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-left: 3.5px solid #facc15;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+      padding: 10px 12px;
+      z-index: 90;
+      display: none;
+    }
+    .quick-venues-header {
+      font-size: 11.5px;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .quick-venues-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .quick-venue-btn {
+      background: #222f3e;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #f1f5f9;
+      border-radius: 6px;
+      padding: 6px 12px;
       font-size: 13px;
       font-weight: 700;
-      color: var(--text);
       cursor: pointer;
-      border: 1px solid var(--panel-border);
-      border-radius: var(--radius);
-      background: var(--panel);
-      backdrop-filter: blur(12px);
-      transition: all 0.2s ease;
-      white-space: nowrap;
+      transition: all 0.15s ease;
     }
-    .btn-action:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.35);
+    .quick-venue-btn:hover {
+      background: #334155;
+      border-color: #facc15;
+      color: #facc15;
       transform: translateY(-1px);
-    }
-    .btn-action.active {
-      background: var(--accent);
-      color: #0f172a;
-      border-color: var(--accent);
-      box-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
     }
 
     /* Quick Venue Filter Chips Bar */
@@ -1038,9 +1120,417 @@
       display: none;
       z-index: 55;
     }
-    #modal-backdrop.open { display: block; }
+    /* Top Floating Walk Instruction Banner (Matching Reference media_1791468841831_414f259e.png) */
+    #walk-instruction-banner {
+      position: absolute;
+      top: 66px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 9999px;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #f1f5f9;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 25;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+      user-select: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      white-space: nowrap;
+      pointer-events: auto;
+    }
+    #walk-instruction-banner.hidden {
+      display: none;
+    }
+    .banner-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .banner-btn:hover {
+      background: #facc15;
+      color: #0f172a;
+      border-color: #facc15;
+    }
+    .banner-btn:active, .banner-btn.pressed {
+      transform: scale(0.92);
+      background: #eab308;
+      color: #0f172a;
+    }
+    .banner-highlight {
+      color: #facc15;
+      font-weight: 700;
+    }
+
+    /* Current Location Badge in Top Nav (Matching media_1791468841860_b8c925a6.png) */
+    #current-location-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #current-location-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    #modal-backdrop.open {
+      display: block;
+    }
+
+    /* Room Configuration Modal (Exact Replica of media_1791469297959 / 971 / 986) */
+    #modal-room-config {
+      position: fixed;
+      inset: 28px;
+      max-width: 1240px;
+      margin: auto;
+      background: #111a24;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.88);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      color: #f1f5f9;
+      overflow: hidden;
+    }
+    #modal-room-config.open {
+      display: flex;
+    }
+    .room-edit-header {
+      padding: 16px 22px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .room-edit-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .room-edit-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+    .room-edit-year-badge {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      font-family: var(--num), monospace;
+      font-size: 13.5px;
+      font-weight: 900;
+      padding: 2px 9px;
+      border-radius: 6px;
+    }
+    .room-edit-subtitle {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+    .room-edit-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #94a3b8;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.15s;
+    }
+    .room-edit-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    .room-edit-guide {
+      padding: 8px 22px 10px;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+    .room-edit-notice-bar {
+      margin: 0 22px 12px;
+      background: #1b2431;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 4px solid #facc15;
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13.5px;
+      color: #cbd5e1;
+    }
+    .room-edit-google-btn {
+      background: #facc15;
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .room-edit-google-btn:hover {
+      background: #fde047;
+      transform: translateY(-1px);
+    }
+    .room-edit-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 0 22px 12px;
+      overflow-x: auto;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .room-tab {
+      background: #182230;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #94a3b8;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .room-tab:hover {
+      color: #fff;
+      background: #243247;
+    }
+    .room-tab.active {
+      background: #fdfbf7;
+      color: #0f172a;
+      border-color: #fdfbf7;
+      font-weight: 800;
+    }
+    .room-edit-legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 22px;
+      font-size: 12px;
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .box-g7 { background: #38bdf8; }
+    .box-g8 { background: #fbbf24; }
+    .box-g9 { background: #f43f5e; }
+    .box-admin { background: #a855f7; }
+    .box-spec { background: #ec4899; }
+    .box-wc { background: #0284c7; }
+
+    /* Grids Body */
+    .room-edit-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .bld-section-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .bld-section-title::before {
+      content: "";
+      width: 4px;
+      height: 16px;
+      background: #ef4444;
+      border-radius: 2px;
+    }
+    .bld-section-range {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .floor-row-wrap {
+      display: flex;
+      align-items: stretch;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .floor-row-label {
+      width: 38px;
+      background: #182230;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .floor-row-rooms {
+      display: flex;
+      gap: 6px;
+      flex: 1;
+      overflow-x: auto;
+    }
+    .room-cell-card {
+      min-width: 96px;
+      flex: 1;
+      background: #1a2432;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 3.5px solid #64748b;
+      border-radius: 6px;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .room-cell-card:hover {
+      background: #243247;
+      border-color: rgba(255, 255, 255, 0.35);
+      transform: translateY(-1px);
+    }
+    .room-cell-card.top-g7 { border-top-color: #38bdf8; }
+    .room-cell-card.top-g8 { border-top-color: #fbbf24; }
+    .room-cell-card.top-g9 { border-top-color: #f43f5e; }
+    .room-cell-card.top-admin { border-top-color: #a855f7; }
+    .room-cell-card.top-spec { border-top-color: #ec4899; }
+    .room-cell-card.top-wc { border-top-color: #0284c7; }
+    .room-cell-code {
+      font-size: 10px;
+      color: #94a3b8;
+      font-family: var(--num), monospace;
+      font-weight: 700;
+    }
+    .room-cell-name {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 4px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .room-cell-card.is-stair {
+      background: #141d27;
+      border-top-color: #475569;
+      min-width: 60px;
+      flex: 0 0 60px;
+    }
+    .room-cell-card.is-stair .room-cell-name {
+      color: #64748b;
+      font-size: 11px;
+    }
+
+    /* Footer */
+    .room-edit-footer {
+      padding: 12px 22px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .room-edit-status {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .room-edit-footer-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .room-edit-btn-revert {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #f1f5f9;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .room-edit-btn-revert:hover {
+      background: #334155;
+    }
+    .room-edit-btn-save {
+      background: #facc15;
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 22px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .room-edit-btn-save:hover {
+      background: #fde047;
+      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.35);
+    }
 
     @media (max-width: 768px) {
+      #walk-instruction-banner {
+        top: auto;
+        bottom: 84px;
+        font-size: 11px;
+        padding: 4px 10px;
+        gap: 4px;
+      }
       .brand-title { font-size: 13px; }
       .search-box { flex: 1 1 100%; order: 3; }
       #top-nav { gap: 8px; }
@@ -1090,7 +1580,7 @@
     </div>
   </div>
 
-  <!-- Top Navigation Bar -->
+  <!-- Top Navigation Bar (Exact Replica of media_1791469297996_bb3e98fa.png) -->
   <header id="top-nav">
     <div class="brand-btn glass" id="btn-home" title="返回全校鳥瞰視野">
       <div class="brand-logo">溪</div>
@@ -1099,28 +1589,44 @@
         <div class="brand-subtitle">115學年度 3D 智慧校園導覽</div>
       </div>
     </div>
+    <div id="current-location-badge">● 校門口廣場</div>
 
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="搜尋處室、班級 (例如: 701, 教務處, 體育館...)" autocomplete="off">
+      <input type="text" id="search-input" placeholder="找教室或地點：301、健康中心、38..." autocomplete="off">
+      <div id="search-quick-venues">
+        <div class="quick-venues-header">常用研習與開會場地</div>
+        <div class="quick-venues-chips">
+          <button class="quick-venue-btn" data-to="library">圖書館</button>
+          <button class="quick-venue-btn" data-to="history-room">校史室</button>
+          <button class="quick-venue-btn" data-to="physics-lab">理化實驗室</button>
+          <button class="quick-venue-btn" data-to="principal">校長室</button>
+          <button class="quick-venue-btn" data-to="gym">活動中心禮堂</button>
+        </div>
+      </div>
       <ul id="search-results" class="glass"></ul>
     </div>
 
+    <!-- Top Action Buttons (Exact Replica of media_1791469297996_bb3e98fa.png) -->
     <div class="top-actions">
-      <button class="btn-action glass" id="btn-mode-toggle" title="切換漫遊或鳥瞰視角">
-        <span id="btn-mode-icon">🦅</span>
-        <span id="btn-mode-text">鳥瞰全景</span>
-      </button>
-      <button class="btn-action glass" id="btn-map-overlay" title="查看 115 官方平面圖 (快捷鍵 M)">
-        <span>🗺️</span>
-        <span>總平面圖</span>
-      </button>
-      <button class="btn-action glass" id="btn-help" title="查看操作說明與快捷鍵">
-        <span>❓</span>
-        <span>說明</span>
-      </button>
+      <button class="nav-mode-pill" id="btn-mode-walk" title="第一人稱視角漫遊">步行</button>
+      <button class="nav-mode-pill" id="btn-mode-bird" title="全校鳥瞰視野 (快捷鍵 M)">鳥瞰 <span class="key-badge">M</span></button>
+      <button class="nav-mode-pill active" id="btn-mode-third" title="第三人稱跟隨視角 (快捷鍵 V)">第三人稱 <span class="key-badge">V</span></button>
+      <button class="nav-mode-pill" id="btn-edit-rooms" title="檢視與編輯教室配置">編輯教室</button>
+      <button class="nav-icon-circle" id="btn-help-circle" title="操作說明與快捷鍵">?</button>
     </div>
   </header>
+
+  <!-- Top Floating Walk Instruction Banner (Matching Reference media_1791468841831_414f259e.png) -->
+  <div id="walk-instruction-banner">
+    <span>按住左鍵拖曳轉頭，放開就停止，可直接點選按鈕</span>
+    <button class="banner-btn" id="btn-turn-left" title="向左轉身 (快捷鍵 Q / ←)">←</button>
+    <button class="banner-btn" id="btn-turn-right" title="向右轉身 (快捷鍵 E / →)">→</button>
+    <span class="banner-highlight">轉身</span>
+    <button class="banner-btn" id="btn-sens-dec" title="調低靈敏度">-</button>
+    <button class="banner-btn" id="btn-sens-inc" title="調高靈敏度">+</button>
+    <span class="banner-highlight" id="banner-sens-display" title="點擊開啟設定">靈敏度 100%</span>
+  </div>
 
   <!-- Quick Filter Chips -->
   <div id="quick-bar">
@@ -1274,6 +1780,65 @@
       <li>🗺️ <b>平面總圖</b>：按 <kbd>M</kbd> 鍵可隨時對照 115 學年度原始平面藍圖。</li>
     </ul>
     <button class="btn-action" style="width: 100%; justify-content: center; background: var(--accent); color: #0f172a;" id="btn-close-help">我知道了！開始導覽</button>
+  </div>
+
+  <!-- Classroom Configuration / Edit Modal (Matching media_1791469297959 / 971 / 986) -->
+  <div id="modal-room-config">
+    <div class="room-edit-header">
+      <div class="room-edit-title-wrap">
+        <h2 class="room-edit-title">教室配置</h2>
+        <span class="room-edit-year-badge">115</span>
+        <span class="room-edit-subtitle">學年度</span>
+      </div>
+      <button class="room-edit-close" id="btn-close-room-config" title="關閉">✕</button>
+    </div>
+    
+    <div class="room-edit-guide">
+      格子左上角的編號是固定的教室編號；中間的名稱可以直接改。輸入三碼班級（例如 801）會自動套用年級顏色。
+    </div>
+
+    <div class="room-edit-notice-bar">
+      <span id="room-edit-login-notice">登入後才能修改教室名稱；不登入也可以看目前的配置。</span>
+      <button class="room-edit-google-btn" id="btn-google-login">用 Google 帳號登入</button>
+    </div>
+
+    <!-- Building Filter Tabs -->
+    <div class="room-edit-tabs" id="room-edit-tabs">
+      <button class="room-tab active" data-bld="all">全部</button>
+      <button class="room-tab" data-bld="admin-front">行政前棟</button>
+      <button class="room-tab" data-bld="admin-back">行政後棟</button>
+      <button class="room-tab" data-bld="grade8-front">八年級(南棟)</button>
+      <button class="room-tab" data-bld="grade8-mid">八年級(中棟)</button>
+      <button class="room-tab" data-bld="grade9-back">九年級大樓</button>
+      <button class="room-tab" data-bld="art-building">藝術館</button>
+      <button class="room-tab" data-bld="tech-building">科技館</button>
+      <button class="room-tab" data-bld="multi-building">綜合大樓</button>
+      <button class="room-tab" data-bld="new-grade7">七年級新大樓</button>
+    </div>
+
+    <!-- Color Legend -->
+    <div class="room-edit-legend">
+      <span class="legend-item"><i class="legend-box box-g7"></i> 七年級</span>
+      <span class="legend-item"><i class="legend-box box-g8"></i> 八年級</span>
+      <span class="legend-item"><i class="legend-box box-g9"></i> 九年級</span>
+      <span class="legend-item"><i class="legend-box box-admin"></i> 處室</span>
+      <span class="legend-item"><i class="legend-box box-spec"></i> 專科・館室</span>
+      <span class="legend-item"><i class="legend-box box-wc"></i> 廁所</span>
+    </div>
+
+    <!-- Scrollable Building Grids -->
+    <div class="room-edit-body" id="room-edit-grids-container">
+      <!-- Generated dynamically by populateRoomConfigModal() -->
+    </div>
+
+    <!-- Footer Action Bar -->
+    <div class="room-edit-footer">
+      <div class="room-edit-status" id="room-edit-save-status">尚未修改</div>
+      <div class="room-edit-footer-actions">
+        <button class="room-edit-btn-revert" id="btn-revert-rooms">還原</button>
+        <button class="room-edit-btn-save" id="btn-save-rooms">儲存</button>
+      </div>
+    </div>
   </div>
 
   <!-- JavaScript Application Logic -->
@@ -1586,7 +2151,7 @@
     scene.background = new THREE.Color(0x99c7e0);
     scene.fog = new THREE.FogExp2(0x99c7e0, 0.0028);
 
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.2, 1000);
+    const camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.2, 1000);
     const OVERVIEW_CAM = new THREE.Vector3(0, 110, 155);
     const OVERVIEW_TARGET = new THREE.Vector3(0, 8, 15);
     camera.position.copy(OVERVIEW_CAM);
@@ -1650,9 +2215,9 @@
     let avatarLeftArm = null, avatarRightArm = null;
     let avatarLeftLeg = null, avatarRightLeg = null;
     let avatarAngle = Math.PI; // 預設面向校園北側 (朝前)
-    let avatarPitch = -0.15;   // 預設略微向下俯視角色
-    const cameraDistance = 3.6; // 鏡頭距離角色適中距離 (室內不擠壓、室外寬闊)
-    const cameraHeight = 1.7;   // 鏡頭跟隨高度 (人物正後方視線)
+    let avatarPitch = -0.14;   // 預設略微向下俯視角色
+    const cameraDistance = 4.4; // 鏡頭距離角色適中距離，人物小巧置於螢幕下方，視野開闊 (如 media_1791468841860_b8c925a6.png)
+    const cameraHeight = 1.95;  // 鏡頭跟隨高度，俯看校園前進方向無阻擋
     let prevAvatarPos = new THREE.Vector3(0, 0, 96);
     const avatarSpeed = 16;
     const avatarRunSpeed = 26;
@@ -1973,6 +2538,9 @@
       avatarRightLeg = buildLeg(false);
       avatarGroup.add(avatarRightLeg);
 
+      // 人物縮小尺寸，身形小巧置於視窗下方，前方視野完全開闊 (如 media_1791468841860_b8c925a6.png 與 media_1791468841831_414f259e.png)
+      avatarGroup.scale.set(0.48, 0.48, 0.48);
+
       scene.add(avatarGroup);
     }
 
@@ -1991,8 +2559,8 @@
     // 4.0 Collision & Multi-Floor Surface Engine (參考大勇國小與 3D 物理行走系統)
     const WALL_COLLIDERS = [];
     const WALK_SURFACES = [];
-    const AVATAR_COLLISION_RADIUS = 0.38;
-    const AVATAR_HEIGHT = 1.8;
+    const AVATAR_COLLISION_RADIUS = 0.24;
+    const AVATAR_HEIGHT = 1.45;
 
     function registerWallCollider(minX, maxX, minZ, maxZ, minY, maxY) {
       WALL_COLLIDERS.push({
@@ -4199,17 +4767,22 @@
 
     function setControlMode(mode) {
       currentMode = mode;
-      const btnIcon = document.getElementById("btn-mode-icon");
-      const btnText = document.getElementById("btn-mode-text");
-      const toggleBtn = document.getElementById("btn-mode-toggle");
+      const btnWalk = document.getElementById("btn-mode-walk");
+      const btnBird = document.getElementById("btn-mode-bird");
+      const btnThird = document.getElementById("btn-mode-third");
       const bottomCtrls = document.getElementById("avatar-bottom-controls");
+      const walkBanner = document.getElementById("walk-instruction-banner");
+
+      if (btnWalk) btnWalk.classList.toggle("active", mode === "firstperson");
+      if (btnBird) btnBird.classList.toggle("active", mode === "bird");
+      if (btnThird) btnThird.classList.toggle("active", mode === "avatar");
+
+      if (walkBanner) {
+        walkBanner.classList.toggle("hidden", mode === "bird");
+      }
 
       if (mode === "avatar") {
         controls.enabled = false;
-        toggleBtn.classList.add("active");
-        btnIcon.textContent = "🧑‍🎓";
-        btnText.textContent = "第三人稱";
-        toggleBtn.title = "目前為第三人稱跟隨視角，點擊切換為鳥瞰全景";
         if (avatarGroup) avatarGroup.visible = true;
         if (bottomCtrls) bottomCtrls.style.display = "flex";
         showToast("切換為「第三人稱跟隨視角」！WASD 跑步漫遊，鏡頭緊跟角色正後方。");
@@ -4222,33 +4795,25 @@
             avatarGroup.position.y + cameraHeight - sinP * cameraDistance,
             avatarGroup.position.z - Math.cos(avatarAngle) * cosP * cameraDistance
           );
-          const targetLookAt = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.5, 0));
+          const targetLookAt = avatarGroup.position.clone().add(new THREE.Vector3(0, 0.85, 0));
           animateCameraTo(behindPos, targetLookAt);
         }
       } else if (mode === "firstperson") {
         controls.enabled = false;
-        toggleBtn.classList.add("active");
-        btnIcon.textContent = "👀";
-        btnText.textContent = "第一人稱";
-        toggleBtn.title = "目前為第一人稱視角，點擊切換為第三人稱";
         if (avatarGroup) avatarGroup.visible = false;
         if (bottomCtrls) bottomCtrls.style.display = "flex";
-        showToast("切換為「第一人稱視角」！滑鼠環顧、WASD 漫遊。");
+        showToast("切換為「第一人稱步行視角」！滑鼠環顧、WASD 漫遊。");
         if (avatarGroup) {
-          const eyePos = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.65, 0));
+          const eyePos = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.25, 0));
           const lookPos = new THREE.Vector3(
             avatarGroup.position.x + Math.sin(avatarAngle) * 10,
-            avatarGroup.position.y + 1.65 + Math.sin(avatarPitch) * 10,
+            avatarGroup.position.y + 1.25 + Math.sin(avatarPitch) * 10,
             avatarGroup.position.z + Math.cos(avatarAngle) * 10
           );
           animateCameraTo(eyePos, lookPos, 600);
         }
       } else {
         controls.enabled = true;
-        toggleBtn.classList.remove("active");
-        btnIcon.textContent = "🦅";
-        btnText.textContent = "鳥瞰全景";
-        toggleBtn.title = "目前為鳥瞰模式，點擊切換為第三人稱角色漫遊";
         if (avatarGroup) avatarGroup.visible = true;
         if (bottomCtrls) bottomCtrls.style.display = "none";
         showToast("切換為「全校鳥瞰模式」！可 360° 俯瞰校園全貌。");
@@ -4280,9 +4845,15 @@
       }
     }
 
-    document.getElementById("btn-mode-toggle").onclick = () => {
-      setControlMode(currentMode === "bird" ? "avatar" : "bird");
-    };
+    // Top-Right Action Buttons Listeners (Exact Replica of media_1791469297996_bb3e98fa.png)
+    document.getElementById("btn-mode-walk").addEventListener("click", () => setControlMode("firstperson"));
+    document.getElementById("btn-mode-bird").addEventListener("click", () => setControlMode("bird"));
+    document.getElementById("btn-mode-third").addEventListener("click", () => setControlMode("avatar"));
+    document.getElementById("btn-edit-rooms").addEventListener("click", openRoomConfigModal);
+    document.getElementById("btn-help-circle").addEventListener("click", () => {
+      document.getElementById("help-modal").classList.add("open");
+      document.getElementById("modal-backdrop").classList.add("open");
+    });
 
     function showToast(text) {
       const toast = document.getElementById("mode-toast");
@@ -4295,10 +4866,10 @@
       if (e.target.tagName === "INPUT") return;
       if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") moveInput.forward = true;
       if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") moveInput.backward = true;
-      if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") moveInput.left = true;
-      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") moveInput.right = true;
-      if (e.key === "q" || e.key === "Q") moveInput.turnLeft = true;
-      if (e.key === "e" || e.key === "E") moveInput.turnRight = true;
+      if (e.key === "a" || e.key === "A") moveInput.left = true;
+      if (e.key === "d" || e.key === "D") moveInput.right = true;
+      if (e.key === "q" || e.key === "Q" || e.key === "ArrowLeft") moveInput.turnLeft = true;
+      if (e.key === "e" || e.key === "E" || e.key === "ArrowRight") moveInput.turnRight = true;
       if (e.shiftKey) moveInput.sprint = true;
       if (e.code === "Space") {
         e.preventDefault();
@@ -4322,10 +4893,10 @@
       if (e.target.tagName === "INPUT") return;
       if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") moveInput.forward = false;
       if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") moveInput.backward = false;
-      if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") moveInput.left = false;
-      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") moveInput.right = false;
-      if (e.key === "q" || e.key === "Q") moveInput.turnLeft = false;
-      if (e.key === "e" || e.key === "E") moveInput.turnRight = false;
+      if (e.key === "a" || e.key === "A") moveInput.left = false;
+      if (e.key === "d" || e.key === "D") moveInput.right = false;
+      if (e.key === "q" || e.key === "Q" || e.key === "ArrowLeft") moveInput.turnLeft = false;
+      if (e.key === "e" || e.key === "E" || e.key === "ArrowRight") moveInput.turnRight = false;
       if (!e.shiftKey) moveInput.sprint = false;
     });
 
@@ -4352,6 +4923,272 @@
     bindDpad("dpad-down", "backward");
     bindDpad("dpad-left", "left");
     bindDpad("dpad-right", "right");
+
+    // Banner Turn Buttons & Sensitivity Handlers (Exact Replica of media_1791468841831_414f259e.png)
+    function bindTurnButton(btnId, isLeft) {
+      const el = document.getElementById(btnId);
+      if (!el) return;
+      let interval = null;
+      const start = (e) => {
+        e.preventDefault();
+        el.classList.add("pressed");
+        if (interval) clearInterval(interval);
+        interval = setInterval(() => {
+          avatarAngle += (isLeft ? 0.045 : -0.045) * turnSensitivityMultiplier;
+          if (avatarGroup) avatarGroup.rotation.y = avatarAngle;
+        }, 16);
+      };
+      const stop = (e) => {
+        el.classList.remove("pressed");
+        if (interval) { clearInterval(interval); interval = null; }
+      };
+      el.addEventListener("mousedown", start);
+      el.addEventListener("mouseup", stop);
+      el.addEventListener("mouseleave", stop);
+      el.addEventListener("touchstart", start, { passive: false });
+      el.addEventListener("touchend", stop, { passive: false });
+    }
+    bindTurnButton("btn-turn-left", true);
+    bindTurnButton("btn-turn-right", false);
+
+    const btnSensDec = document.getElementById("btn-sens-dec");
+    if (btnSensDec) {
+      btnSensDec.addEventListener("click", () => {
+        turnSensitivityMultiplier = Math.max(0.3, Math.round((turnSensitivityMultiplier - 0.1) * 10) / 10);
+        updateSensDisplays();
+      });
+    }
+    const btnSensInc = document.getElementById("btn-sens-inc");
+    if (btnSensInc) {
+      btnSensInc.addEventListener("click", () => {
+        turnSensitivityMultiplier = Math.min(2.5, Math.round((turnSensitivityMultiplier + 0.1) * 10) / 10);
+        updateSensDisplays();
+      });
+    }
+    function updateSensDisplays() {
+      const pct = Math.round(turnSensitivityMultiplier * 100) + "%";
+      const bEl = document.getElementById("banner-sens-display");
+      if (bEl) bEl.textContent = `靈敏度 ${pct}`;
+      const pEl = document.getElementById("btn-turn-ctrl");
+      if (pEl) pEl.textContent = `轉頭 ${pct}`;
+      const dEl = document.getElementById("val-turn-display");
+      if (dEl) dEl.textContent = pct;
+      const sl = document.getElementById("slider-turn");
+      if (sl) sl.value = Math.round(turnSensitivityMultiplier * 100);
+    }
+    const bannerSensDisp = document.getElementById("banner-sens-display");
+    if (bannerSensDisp) {
+      bannerSensDisp.addEventListener("click", () => {
+        document.getElementById("modal-turn-ctrl").classList.add("open");
+      });
+    }
+
+    // Search Quick Venues Popover (Exact Replica of media_1791469297996_bb3e98fa.png)
+    const searchQuickVenues = document.getElementById("search-quick-venues");
+    const searchInputEl = document.getElementById("search-input");
+    if (searchQuickVenues && searchInputEl) {
+      searchInputEl.addEventListener("focus", () => {
+        if (!searchInputEl.value.trim()) {
+          searchQuickVenues.style.display = "block";
+        }
+      });
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search-box")) {
+          searchQuickVenues.style.display = "none";
+        }
+      });
+      document.querySelectorAll(".quick-venue-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          searchQuickVenues.style.display = "none";
+          navigateToRoom(btn.dataset.to);
+        });
+      });
+    }
+
+    // 教室配置 (編輯教室) Modal Logic (Exact Replica of media_1791469297959 / 971 / 986)
+    let isRoomEditAuthorized = false;
+    let customRoomNames = {};
+    try {
+      customRoomNames = JSON.parse(localStorage.getItem("daxi_room_custom_names") || "{}");
+    } catch(e) {}
+
+    function getRoomDisplayName(room) {
+      return customRoomNames[room.id] || room.name;
+    }
+
+    function openRoomConfigModal() {
+      populateRoomConfigModal();
+      document.getElementById("modal-room-config").classList.add("open");
+      document.getElementById("modal-backdrop").classList.add("open");
+    }
+
+    function closeRoomConfigModal() {
+      document.getElementById("modal-room-config").classList.remove("open");
+      document.getElementById("modal-backdrop").classList.remove("open");
+    }
+
+    const btnCloseRoomConfig = document.getElementById("btn-close-room-config");
+    if (btnCloseRoomConfig) btnCloseRoomConfig.addEventListener("click", closeRoomConfigModal);
+
+    function populateRoomConfigModal(filterBld = "all") {
+      const container = document.getElementById("room-edit-grids-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      BUILDINGS_CONFIG.forEach(cfg => {
+        if (filterBld !== "all" && cfg.id !== filterBld) return;
+        if (!cfg.rooms || cfg.rooms.length === 0) return;
+
+        const sec = document.createElement("div");
+        sec.className = "room-edit-building-sec";
+        sec.innerHTML = `
+          <div class="bld-section-title">
+            <span>${cfg.name}</span>
+            <span class="bld-section-range">1F-${cfg.floors}F</span>
+          </div>
+        `;
+
+        for (let f = cfg.floors; f >= 1; f--) {
+          const fRooms = cfg.rooms.filter(r => r.floor === f);
+          const rowWrap = document.createElement("div");
+          rowWrap.className = "floor-row-wrap";
+
+          const fLabel = document.createElement("div");
+          fLabel.className = "floor-row-label";
+          fLabel.textContent = `${f}F`;
+          rowWrap.appendChild(fLabel);
+
+          const roomsList = document.createElement("div");
+          roomsList.className = "floor-row-rooms";
+
+          // West Staircard
+          const stairCard = document.createElement("div");
+          stairCard.className = "room-cell-card is-stair";
+          stairCard.innerHTML = `<span class="room-cell-name">樓梯</span>`;
+          roomsList.appendChild(stairCard);
+
+          // WC Card
+          const wcCard = document.createElement("div");
+          wcCard.className = "room-cell-card top-wc";
+          wcCard.innerHTML = `<span class="room-cell-code">WC</span><span class="room-cell-name">廁所</span>`;
+          roomsList.appendChild(wcCard);
+
+          fRooms.forEach((r, idx) => {
+            const card = document.createElement("div");
+            let catClass = "top-admin";
+            if (r.cat === "grade7") catClass = "top-g7";
+            else if (r.cat === "grade8") catClass = "top-g8";
+            else if (r.cat === "grade9") catClass = "top-g9";
+            else if (r.cat === "special" || r.cat === "sports") catClass = "top-spec";
+
+            card.className = `room-cell-card ${catClass}`;
+            const rCode = r.code ? r.code.split("-").pop() : (idx + 1);
+            const dispName = getRoomDisplayName(r);
+            card.innerHTML = `
+              <span class="room-cell-code">${rCode}</span>
+              <span class="room-cell-name" id="room-name-text-${r.id}">${dispName}</span>
+            `;
+
+            card.addEventListener("click", () => {
+              if (isRoomEditAuthorized) {
+                const newName = prompt(`請輸入新的教室名稱（目前為：${dispName}）：`, dispName);
+                if (newName && newName.trim() && newName.trim() !== dispName) {
+                  customRoomNames[r.id] = newName.trim();
+                  const targetText = document.getElementById(`room-name-text-${r.id}`);
+                  if (targetText) targetText.textContent = newName.trim();
+                  const sStatus = document.getElementById("room-edit-save-status");
+                  if (sStatus) {
+                    sStatus.textContent = "● 有尚未儲存的修改";
+                    sStatus.style.color = "#facc15";
+                  }
+                }
+              } else {
+                closeRoomConfigModal();
+                navigateToRoom(r.id);
+                showToast(`📍 正在前往 [${cfg.name} ${r.floor}F] ${dispName}！`);
+              }
+            });
+            roomsList.appendChild(card);
+          });
+
+          // East Staircard
+          const stairCardEast = document.createElement("div");
+          stairCardEast.className = "room-cell-card is-stair";
+          stairCardEast.innerHTML = `<span class="room-cell-name">樓梯</span>`;
+          roomsList.appendChild(stairCardEast);
+
+          rowWrap.appendChild(roomsList);
+          sec.appendChild(rowWrap);
+        }
+        container.appendChild(sec);
+      });
+    }
+
+    const editTabs = document.getElementById("room-edit-tabs");
+    if (editTabs) {
+      editTabs.addEventListener("click", (e) => {
+        const tab = e.target.closest(".room-tab");
+        if (!tab) return;
+        document.querySelectorAll("#room-edit-tabs .room-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        populateRoomConfigModal(tab.dataset.bld);
+      });
+    }
+
+    const btnGoogleLogin = document.getElementById("btn-google-login");
+    if (btnGoogleLogin) {
+      btnGoogleLogin.addEventListener("click", () => {
+        isRoomEditAuthorized = !isRoomEditAuthorized;
+        const notice = document.getElementById("room-edit-login-notice");
+        if (isRoomEditAuthorized) {
+          if (notice) {
+            notice.textContent = "✅ 已成功登入教師管理員權限！點選任意教室卡片即可直接修改名稱。";
+            notice.style.color = "#34d399";
+          }
+          btnGoogleLogin.textContent = "登出管理帳號";
+          btnGoogleLogin.style.background = "#e2e8f0";
+          showToast("已取得教室名稱編輯權限！點選格子即可改名。");
+        } else {
+          if (notice) {
+            notice.textContent = "登入後才能修改教室名稱；不登入也可以看目前的配置。";
+            notice.style.color = "#cbd5e1";
+          }
+          btnGoogleLogin.textContent = "用 Google 帳號登入";
+          btnGoogleLogin.style.background = "#facc15";
+        }
+      });
+    }
+
+    const btnSaveRooms = document.getElementById("btn-save-rooms");
+    if (btnSaveRooms) {
+      btnSaveRooms.addEventListener("click", () => {
+        localStorage.setItem("daxi_room_custom_names", JSON.stringify(customRoomNames));
+        const sStatus = document.getElementById("room-edit-save-status");
+        if (sStatus) {
+          sStatus.textContent = "✅ 所有教室名稱已儲存！";
+          sStatus.style.color = "#34d399";
+        }
+        showToast("💾 教室配置已成功儲存！");
+        setTimeout(() => closeRoomConfigModal(), 700);
+      });
+    }
+
+    const btnRevertRooms = document.getElementById("btn-revert-rooms");
+    if (btnRevertRooms) {
+      btnRevertRooms.addEventListener("click", () => {
+        if (confirm("確定要還原所有教室配置為 115 學年度預設值嗎？")) {
+          customRoomNames = {};
+          localStorage.removeItem("daxi_room_custom_names");
+          populateRoomConfigModal();
+          const sStatus = document.getElementById("room-edit-save-status");
+          if (sStatus) {
+            sStatus.textContent = "已還原為預設值";
+            sStatus.style.color = "#94a3b8";
+          }
+          showToast("已還原預設教室配置！");
+        }
+      });
+    }
 
     /* ==========================================================================
        8. NAVIGATION & CAMERA TRANSITIONS
@@ -4778,31 +5615,48 @@
       };
     }
 
-    document.getElementById("btn-home").onclick = () => {
-      clearNavigation();
-      setFloorFilter("all");
-      welcomeCard.classList.remove("hidden");
-      setControlMode("bird");
-    };
+    const btnHome = document.getElementById("btn-home");
+    if (btnHome) {
+      btnHome.onclick = () => {
+        clearNavigation();
+        setFloorFilter("all");
+        welcomeCard.classList.remove("hidden");
+        setControlMode("bird");
+      };
+    }
 
     const helpModal = document.getElementById("help-modal");
     const modalBackdrop = document.getElementById("modal-backdrop");
-    document.getElementById("btn-help").onclick = () => {
-      welcomeCard.classList.toggle("hidden");
-    };
-    document.getElementById("btn-close-help").onclick = () => {
-      helpModal.classList.remove("open");
-      modalBackdrop.classList.remove("open");
-    };
-    modalBackdrop.onclick = () => {
-      helpModal.classList.remove("open");
-      modalBackdrop.classList.remove("open");
-      mapModal.classList.remove("open");
-    };
-
+    const btnHelp = document.getElementById("btn-help") || document.getElementById("btn-help-circle");
+    if (btnHelp) {
+      btnHelp.onclick = () => {
+        welcomeCard.classList.toggle("hidden");
+      };
+    }
+    const btnCloseHelp = document.getElementById("btn-close-help");
+    if (btnCloseHelp && helpModal && modalBackdrop) {
+      btnCloseHelp.onclick = () => {
+        helpModal.classList.remove("open");
+        modalBackdrop.classList.remove("open");
+      };
+    }
     const mapModal = document.getElementById("campus-map-modal");
-    document.getElementById("btn-map-overlay").onclick = () => mapModal.classList.add("open");
-    document.getElementById("btn-close-map-modal").onclick = () => mapModal.classList.remove("open");
+    if (modalBackdrop) {
+      modalBackdrop.onclick = () => {
+        if (helpModal) helpModal.classList.remove("open");
+        modalBackdrop.classList.remove("open");
+        if (mapModal) mapModal.classList.remove("open");
+      };
+    }
+
+    const btnMapOverlay = document.getElementById("btn-map-overlay");
+    if (btnMapOverlay && mapModal) {
+      btnMapOverlay.onclick = () => mapModal.classList.add("open");
+    }
+    const btnCloseMapModal = document.getElementById("btn-close-map-modal");
+    if (btnCloseMapModal && mapModal) {
+      btnCloseMapModal.onclick = () => mapModal.classList.remove("open");
+    }
 
     // 2D High-Definition Minimap (115學年度官方平面圖精準繪製)
     const miniCanvas = document.getElementById("minimap-canvas");
@@ -5147,21 +6001,22 @@ miniCanvas.addEventListener("click", (e) => {
       }
       // 2. MANUAL KEYBOARD / DPAD CONTROLS (Forward-Facing Follow Camera Movement)
       else if (avatarGroup && (currentMode === "avatar" || currentMode === "firstperson")) {
-        // Q / E 鍵旋轉人物與鏡頭視角
+        // Q / E 或 ← / → 鍵旋轉人物與鏡頭視角 (向左轉身 / 向右轉身)
         if (moveInput.turnLeft) {
-          avatarAngle -= 2.2 * delta;
+          avatarAngle += 2.2 * delta;
           avatarGroup.rotation.y = avatarAngle;
         }
         if (moveInput.turnRight) {
-          avatarAngle += 2.2 * delta;
+          avatarAngle -= 2.2 * delta;
           avatarGroup.rotation.y = avatarAngle;
         }
 
         // 以人物當前面向 (avatarAngle) 作為前進正前方方向向量 (Forward Vector)
         const fwdX = Math.sin(avatarAngle);
         const fwdZ = Math.cos(avatarAngle);
-        const rightX = Math.sin(avatarAngle + Math.PI / 2);
-        const rightZ = Math.cos(avatarAngle + Math.PI / 2);
+        // 右側向量 (Right Vector: 當面向北朝前時，右方為東 +X)
+        const rightX = Math.sin(avatarAngle - Math.PI / 2);
+        const rightZ = Math.cos(avatarAngle - Math.PI / 2);
 
         let moveFwd = 0;
         let moveSide = 0;
@@ -5242,12 +6097,12 @@ miniCanvas.addEventListener("click", (e) => {
             const cosP = Math.cos(avatarPitch);
             const sinP = Math.sin(avatarPitch);
             const headX = avatarGroup.position.x;
-            const headY = avatarGroup.position.y + 1.5;
+            const headY = avatarGroup.position.y + 1.15;
             const headZ = avatarGroup.position.z;
 
             const rawDirX = -Math.sin(avatarAngle) * cosP;
             const rawDirZ = -Math.cos(avatarAngle) * cosP;
-            const rawDirY = (cameraHeight - 1.5) - sinP * cameraDistance;
+            const rawDirY = (cameraHeight - 1.15) - sinP * cameraDistance;
 
             let safeDist = cameraDistance;
             // 8-step raymarch to avoid clipping through interior/exterior walls
@@ -5257,12 +6112,12 @@ miniCanvas.addEventListener("click", (e) => {
               const testX = headX + rawDirX * cameraDistance * frac;
               const testZ = headZ + rawDirZ * cameraDistance * frac;
               const testY = headY + rawDirY * frac;
-              if (checkWallCollision(testX, testY - 0.5, testZ)) {
-                safeDist = Math.max(1.1, cameraDistance * ((s - 1) / steps));
+              if (checkWallCollision(testX, testY - 0.4, testZ)) {
+                safeDist = Math.max(0.9, cameraDistance * ((s - 1) / steps));
                 break;
               }
             }
-            if (safeDist < 1.6) {
+            if (safeDist < 1.3) {
               avatarGroup.visible = false;
             } else {
               avatarGroup.visible = true;
@@ -5272,14 +6127,14 @@ miniCanvas.addEventListener("click", (e) => {
             const camZ = headZ + rawDirZ * cameraDistance * factor;
             const camY = headY + rawDirY * factor;
             camera.position.set(camX, camY, camZ);
-            camera.lookAt(headX, headY, headZ);
+            camera.lookAt(headX, avatarGroup.position.y + 0.85, headZ);
           }
         } else if (currentMode === "firstperson") {
           if (!isCameraAnimating) {
-            camera.position.set(avatarGroup.position.x, avatarGroup.position.y + 1.65, avatarGroup.position.z);
+            camera.position.set(avatarGroup.position.x, avatarGroup.position.y + 1.25, avatarGroup.position.z);
             camera.lookAt(
               avatarGroup.position.x + Math.sin(avatarAngle) * 10,
-              avatarGroup.position.y + 1.65 + Math.sin(avatarPitch) * 10,
+              avatarGroup.position.y + 1.25 + Math.sin(avatarPitch) * 10,
               avatarGroup.position.z + Math.cos(avatarAngle) * 10
             );
           }
@@ -5299,6 +6154,25 @@ miniCanvas.addEventListener("click", (e) => {
         const floorBadgeEl = document.getElementById("minimap-floor-badge");
         if (floorBadgeEl && currentFloorFilter === "all") {
           floorBadgeEl.textContent = detectedFloor;
+        }
+
+        // Dynamic Location Detection for Top Badge (Matching media_1791468841860_b8c925a6.png)
+        const bld = getBuildingAt(avatarGroup.position.x, avatarGroup.position.z);
+        const locBadge = document.getElementById("current-location-badge");
+        if (locBadge) {
+          if (bld) {
+            locBadge.textContent = `● ${bld.name} (${detectedFloor})`;
+          } else if (avatarGroup.position.z > 70) {
+            locBadge.textContent = "● 校門口迎曦穿堂";
+          } else if (avatarGroup.position.x < -35) {
+            locBadge.textContent = "● 綠茵操場司令台";
+          } else if (avatarGroup.position.x > 30 && avatarGroup.position.z < -10) {
+            locBadge.textContent = "● 室外綜合球場";
+          } else if (avatarGroup.position.x > 35 && avatarGroup.position.z > 25) {
+            locBadge.textContent = "● 停車場 / 迎賓車道";
+          } else {
+            locBadge.textContent = "● 中央中庭文化花園";
+          }
         }
 
         // Nametag Screen Position
