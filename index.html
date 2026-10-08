@@ -1586,7 +1586,7 @@
     scene.background = new THREE.Color(0x99c7e0);
     scene.fog = new THREE.FogExp2(0x99c7e0, 0.0028);
 
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.2, 1000);
     const OVERVIEW_CAM = new THREE.Vector3(0, 110, 155);
     const OVERVIEW_TARGET = new THREE.Vector3(0, 8, 15);
     camera.position.copy(OVERVIEW_CAM);
@@ -1649,10 +1649,13 @@
     let avatarGroup = null;
     let avatarLeftArm = null, avatarRightArm = null;
     let avatarLeftLeg = null, avatarRightLeg = null;
-    let avatarAngle = 0;
+    let avatarAngle = Math.PI; // 預設面向校園北側 (朝前)
+    let avatarPitch = -0.15;   // 預設略微向下俯視角色
+    const cameraDistance = 3.6; // 鏡頭距離角色適中距離 (室內不擠壓、室外寬闊)
+    const cameraHeight = 1.7;   // 鏡頭跟隨高度 (人物正後方視線)
     let prevAvatarPos = new THREE.Vector3(0, 0, 96);
-    const avatarSpeed = 18;
-    const avatarRunSpeed = 28;
+    const avatarSpeed = 16;
+    const avatarRunSpeed = 26;
 
     // 1. 五官紋理生成 (參考 media_1791355365994.png：黑亮大眼、高光眼神、腮紅粉頰、微笑小嘴)
     // 1. 五官與頭部紋理生成 (完美還原 media_1791355365994.png)
@@ -1985,10 +1988,10 @@
     const labelsContainer = document.getElementById("labels-container");
     const ROOMS_DB = {};
 
-    // 4.0 Collision & Multi-Floor Staircase Engine (AABB 碰撞體與階梯升降系統)
+    // 4.0 Collision & Multi-Floor Surface Engine (參考大勇國小與 3D 物理行走系統)
     const WALL_COLLIDERS = [];
-    const STAIR_ZONES = [];
-    const AVATAR_COLLISION_RADIUS = 0.42;
+    const WALK_SURFACES = [];
+    const AVATAR_COLLISION_RADIUS = 0.38;
     const AVATAR_HEIGHT = 1.8;
 
     function registerWallCollider(minX, maxX, minZ, maxZ, minY, maxY) {
@@ -2002,17 +2005,52 @@
       });
     }
 
-    function registerStairZone(worldX, worldZ, width, depth, baseY, topY, fromFloor, toFloor, axis = 'z', dir = 1) {
-      STAIR_ZONES.push({
-        worldX, worldZ,
-        minX: worldX - width / 2,
-        maxX: worldX + width / 2,
-        minZ: worldZ - depth / 2,
-        maxZ: worldZ + depth / 2,
-        baseY, topY,
-        fromFloor, toFloor,
-        axis, dir
+    function registerWalkFlat(x0, x1, z0, z1, h) {
+      WALK_SURFACES.push({
+        x0: Math.min(x0, x1),
+        x1: Math.max(x0, x1),
+        z0: Math.min(z0, z1),
+        z1: Math.max(z0, z1),
+        h0: h,
+        h1: h,
+        ax: null
       });
+    }
+
+    function registerWalkRamp(x0, x1, z0, z1, ax, c0, h0, c1, h1) {
+      WALK_SURFACES.push({
+        x0: Math.min(x0, x1),
+        x1: Math.max(x0, x1),
+        z0: Math.min(z0, z1),
+        z1: Math.max(z0, z1),
+        ax: ax,
+        c0: c0,
+        h0: h0,
+        c1: c1,
+        h1: h1
+      });
+    }
+
+    // 全校基底戶外地坪 (Outdoor Ground Level)
+    registerWalkFlat(-250, 250, -250, 250, 0);
+
+    function getGroundHeight(x, z, currentY) {
+      let highest = 0;
+      for (let i = 0; i < WALK_SURFACES.length; i++) {
+        const s = WALK_SURFACES[i];
+        if (x >= s.x0 && x <= s.x1 && z >= s.z0 && z <= s.z1) {
+          let h = s.h0;
+          if (s.ax) {
+            let f = ((s.ax === "x" ? x : z) - s.c0) / (s.c1 - s.c0);
+            f = Math.max(0, Math.min(1, f));
+            h = s.h0 + (s.h1 - s.h0) * f;
+          }
+          if (h <= currentY + 0.95 && h >= highest) {
+            highest = h;
+          }
+        }
+      }
+      return highest;
     }
 
     function checkWallCollision(x, y, z) {
@@ -2023,6 +2061,14 @@
       const avatarMaxZ = z + r;
       const avatarMinY = y + 0.2;
       const avatarMaxY = y + AVATAR_HEIGHT - 0.2;
+
+      // 若人物在階梯坡面範圍內，直接開放暢通行走，不受兩側隔間誤擋
+      for (let i = 0; i < WALK_SURFACES.length; i++) {
+        const s = WALK_SURFACES[i];
+        if (s.ax && x >= s.x0 && x <= s.x1 && z >= s.z0 && z <= s.z1) {
+          return false;
+        }
+      }
 
       for (let i = 0; i < WALL_COLLIDERS.length; i++) {
         const c = WALL_COLLIDERS[i];
@@ -2037,20 +2083,13 @@
     }
 
     function checkStairElevation(x, y, z) {
-      for (let i = 0; i < STAIR_ZONES.length; i++) {
-        const sz = STAIR_ZONES[i];
-        if (x >= sz.minX && x <= sz.maxX && z >= sz.minZ && z <= sz.maxZ) {
-          if (y >= sz.baseY - 0.6 && y <= sz.topY + 0.8) {
-            let t = 0;
-            if (sz.axis === 'z') {
-              t = sz.dir === 1 ? (z - sz.minZ) / (sz.maxZ - sz.minZ) : (sz.maxZ - z) / (sz.maxZ - sz.minZ);
-            } else {
-              t = sz.dir === 1 ? (x - sz.minX) / (sz.maxX - sz.minX) : (sz.maxX - x) / (sz.maxX - sz.minX);
-            }
-            t = Math.max(0, Math.min(1, t));
-            const elev = sz.baseY + t * (sz.topY - sz.baseY);
-            return { onStair: true, elevation: elev, floor: t > 0.6 ? sz.toFloor : sz.fromFloor };
-          }
+      for (let i = 0; i < WALK_SURFACES.length; i++) {
+        const s = WALK_SURFACES[i];
+        if (s.ax && x >= s.x0 && x <= s.x1 && z >= s.z0 && z <= s.z1) {
+          let f = ((s.ax === "x" ? x : z) - s.c0) / (s.c1 - s.c0);
+          f = Math.max(0, Math.min(1, f));
+          const elev = s.h0 + (s.h1 - s.h0) * f;
+          return { onStair: true, elevation: elev };
         }
       }
       return { onStair: false };
@@ -2480,7 +2519,7 @@
       trunk.position.y = 1.2;
       trunk.castShadow = true;
       tree.add(trunk);
-      const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(2.8, 1), new THREE.MeshLambertMaterial({ color: 0x386641, roughness: 0.8 }));
+      const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(2.8, 1), new THREE.MeshLambertMaterial({ color: 0x386641 }));
       crown.position.y = 4.2;
       crown.castShadow = true;
       tree.add(crown);
@@ -2503,56 +2542,60 @@
       const worldX = (bldWorldX !== undefined) ? bldWorldX + x : x;
       const worldZ = (bldWorldZ !== undefined) ? bldWorldZ + z : z;
 
+      const flightLength = 4.2;
+      const stairWidth = 2.4;
+      const stepCount = 12;
+      const stepDepth = flightLength / stepCount;
+
       for (let f = 1; f < totalFloors; f++) {
         const baseH = (f - 1) * FH;
-        const stepCount = 10;
-        const stepDepth = 0.4;
-        const stairWidth = 2.4;
-        const flightLength = stepCount * stepDepth;
+        const topH = f * FH;
+        const stepH = FH / stepCount;
 
-        // Steps
+        // Steps (踏階)
         for (let s = 0; s < stepCount; s++) {
           const stepMesh = new THREE.Mesh(
             new THREE.BoxGeometry(stairWidth, 0.22, stepDepth),
             new THREE.MeshLambertMaterial({ color: 0xd1d5db })
           );
-          stepMesh.position.set(0, baseH + (s + 0.5) * (FH / stepCount), -s * stepDepth);
+          stepMesh.position.set(0, baseH + (s + 0.5) * stepH, -s * stepDepth);
           stepMesh.castShadow = true;
           stepMesh.receiveShadow = true;
           stairGroup.add(stepMesh);
         }
 
-        // Side Rails & Posts
+        // Side Rails & Posts (兩側深藍色安全護欄與立柱)
         [-stairWidth / 2 + 0.08, stairWidth / 2 - 0.08].forEach(rx => {
           const rail = new THREE.Mesh(
-            new THREE.BoxGeometry(0.08, 0.08, flightLength * 1.3),
+            new THREE.BoxGeometry(0.08, 0.08, flightLength * 1.25),
             new THREE.MeshLambertMaterial({ color: 0x1e3a8a })
           );
-          rail.position.set(rx, baseH + FH * 0.5 + 0.9, -flightLength * 0.5);
+          rail.position.set(rx, baseH + FH * 0.5 + 0.85, -flightLength * 0.5);
           rail.rotation.x = 0.65;
           stairGroup.add(rail);
 
-          const post1 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.0, 8), new THREE.MeshLambertMaterial({ color: 0x64748b }));
+          const post1 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.0, 8), new THREE.MeshLambertMaterial({ color: 0x64748b }));
           post1.position.set(rx, baseH + 0.5, 0);
           stairGroup.add(post1);
 
-          const post2 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.0, 8), new THREE.MeshLambertMaterial({ color: 0x64748b }));
+          const post2 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.0, 8), new THREE.MeshLambertMaterial({ color: 0x64748b }));
           post2.position.set(rx, baseH + FH + 0.5, -flightLength);
           stairGroup.add(post2);
         });
 
-        // Top Landing Platform (上層休息平台)
+        // Top Landing Platform (上層休息平台，直通該樓層走廊)
         const landing = new THREE.Mesh(
-          new THREE.BoxGeometry(stairWidth + 0.4, 0.25, 2.2),
-          new THREE.MeshLambertMaterial({ color: 0xffffff })
+          new THREE.BoxGeometry(stairWidth + 0.4, 0.2, 2.4),
+          new THREE.MeshLambertMaterial({ color: 0xe2e8f0 })
         );
-        landing.position.set(0, f * FH, -flightLength - 0.9);
+        landing.position.set(0, topH, -flightLength - 1.1);
         landing.castShadow = true;
         landing.receiveShadow = true;
         stairGroup.add(landing);
 
-        // 註冊攀爬梯區 (Z 軸向內走梯，方向 -1 表示往 -Z 上升)
-        registerStairZone(worldX, worldZ - flightLength * 0.5, stairWidth + 0.6, flightLength + 1.8, baseH, f * FH, f, f + 1, 'z', -1);
+        // 註冊階梯走道坡面與上層平台 (Z 軸向內走梯，由 0 至 -flightLength 上升)
+        registerWalkRamp(worldX - stairWidth / 2 - 0.3, worldX + stairWidth / 2 + 0.3, worldZ - flightLength, worldZ + 0.2, 'z', worldZ, baseH, worldZ - flightLength, topH);
+        registerWalkFlat(worldX - stairWidth / 2 - 0.5, worldX + stairWidth / 2 + 0.5, worldZ - flightLength - 2.4, worldZ - flightLength, topH);
       }
 
       return stairGroup;
@@ -2982,7 +3025,7 @@
       // 訓平池 (荷花睡蓮池 x=16 相對亭位即 x=-2)
       const pool = new THREE.Mesh(
         new THREE.CylinderGeometry(8.5, 8.5, 0.6, 32),
-        new THREE.MeshLambertMaterial({ color: 0x0284c7, transparent: true, opacity: 0.88, roughness: 0.1 })
+        new THREE.MeshLambertMaterial({ color: 0x0284c7, transparent: true, opacity: 0.88 })
       );
       pool.position.set(16, 0.25, 0);
       gardenGroup.add(pool);
@@ -3055,6 +3098,145 @@
     }
     createMultiBuildingParking();
 
+    // 4.7 依據校園實景照片（F:\1151005---創意教學 - 複製\3D\05_普通教室內部結構 及 06_專科教室與行政空間）
+    // 真實還原普通教室、專科教室與行政辦公室之內部擺設與家具（講桌、黑板、木製課桌椅、壁櫃、OA屏風等）
+    function populateRoomInterior(roomGroup, room, roomW, roomD, fBaseY, fTopY, isOffice, isSpecial) {
+      const deskTopMat = new THREE.MeshLambertMaterial({ color: 0xd4a373 }); // 實木桌板
+      const deskLegMat = new THREE.MeshLambertMaterial({ color: 0x475569 }); // 鋼管桌腳
+      const chairSeatMat = new THREE.MeshLambertMaterial({ color: 0xb45309 }); // 木製椅面
+      const deskPodiumMat = new THREE.MeshLambertMaterial({ color: isOffice ? 0x78350f : 0x92400e });
+
+      // 1. 講桌 / 主管桌 (Podium / Executive Desk)
+      const podium = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.85, 0.65), deskPodiumMat);
+      podium.position.set(0, fBaseY + 0.425, roomD * 0.28);
+      podium.castShadow = true;
+      roomGroup.add(podium);
+
+      // 筆電 / 教師講義
+      const laptop = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.02, 0.25), new THREE.MeshLambertMaterial({ color: 0x1e293b }));
+      laptop.position.set(0, fBaseY + 0.86, roomD * 0.28);
+      roomGroup.add(laptop);
+
+      // 2. 教學大黑板 / 辦公室白板 (Chalkboard / Whiteboard)
+      const boardW = Math.min(3.4, Math.max(1.8, roomW - 1.2));
+      const boardMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(boardW, 1.35, 0.05),
+        new THREE.MeshStandardMaterial({ color: isOffice ? 0xf8fafc : 0x1b4332, roughness: 0.85 })
+      );
+      boardMesh.position.set(0, fBaseY + 1.8, roomD * 0.46);
+      roomGroup.add(boardMesh);
+
+      const boardTrim = new THREE.Mesh(
+        new THREE.BoxGeometry(boardW + 0.1, 1.45, 0.03),
+        new THREE.MeshLambertMaterial({ color: 0xa16207 })
+      );
+      boardTrim.position.set(0, fBaseY + 1.8, roomD * 0.45);
+      roomGroup.add(boardTrim);
+
+      // 3. 天藍色踢腳護壁板 (對應照片 05_普通教室內部結構：下層粉天藍色護壁、上層白牆)
+      const wainscot = new THREE.Mesh(
+        new THREE.BoxGeometry(roomW - 0.2, 1.0, 0.03),
+        new THREE.MeshLambertMaterial({ color: 0x7dd3fc })
+      );
+      wainscot.position.set(0, fBaseY + 0.5, roomD * 0.47);
+      roomGroup.add(wainscot);
+
+      // 4. 依照空間類型擺設家具
+      if (isOffice) {
+        // 行政空間：OA 屏風隔間工作站（對應 03_教職員辦公室OA屏風隔間與辦公桌.jpg）
+        const oaPanelMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+        const oaTableMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+        const pcMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+
+        [-1.1, 1.1].forEach(ox => {
+          const panel = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.15, 0.05), oaPanelMat);
+          panel.position.set(ox, fBaseY + 0.58, -roomD * 0.1);
+          roomGroup.add(panel);
+
+          const table = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.72, 0.6), oaTableMat);
+          table.position.set(ox, fBaseY + 0.36, -roomD * 0.1 - 0.3);
+          roomGroup.add(table);
+
+          const mon = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.28, 0.04), pcMat);
+          mon.position.set(ox, fBaseY + 0.86, -roomD * 0.1 - 0.25);
+          roomGroup.add(mon);
+        });
+
+        // 榮譽獎盃櫃（對應 04_校長室實木辦公桌與榮譽獎盃展示櫃.jpg）
+        const cabinet = new THREE.Mesh(
+          new THREE.BoxGeometry(1.6, 1.7, 0.4),
+          new THREE.MeshLambertMaterial({ color: 0x475569 })
+        );
+        cabinet.position.set(-roomW * 0.35, fBaseY + 0.85, 0);
+        roomGroup.add(cabinet);
+
+        [-0.35, 0, 0.35].forEach(tx => {
+          const trophy = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.07, 0.04, 0.22, 8),
+            new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.85, roughness: 0.2 })
+          );
+          trophy.position.set(-roomW * 0.35 + tx, fBaseY + 1.82, 0);
+          roomGroup.add(trophy);
+        });
+      } else if (room.id && room.id.includes("music")) {
+        // 音樂教室：直立鋼琴（對應 01_音樂專科教室與長條型直笛木課桌.jpg）
+        const piano = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.15, 0.6), new THREE.MeshLambertMaterial({ color: 0x09090b }));
+        piano.position.set(-roomW * 0.3, fBaseY + 0.58, 0);
+        roomGroup.add(piano);
+      } else {
+        // 普通教室：標準木製學生課桌椅（對應 04_標準學生木製課桌椅印字與磨石子地板.jpg）
+        // 2 欄排列，中央保持 1.8m 暢通走道，確保進出自由
+        const colOffsets = [-Math.max(1.2, roomW * 0.25), Math.max(1.2, roomW * 0.25)];
+        const rowOffsets = [roomD * 0.05, -roomD * 0.18];
+
+        colOffsets.forEach(cx => {
+          rowOffsets.forEach(rz => {
+            const deskTop = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.04, 0.46), deskTopMat);
+            deskTop.position.set(cx, fBaseY + 0.72, rz);
+            roomGroup.add(deskTop);
+
+            const deskLegs = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.7, 0.4), deskLegMat);
+            deskLegs.position.set(cx, fBaseY + 0.35, rz);
+            roomGroup.add(deskLegs);
+
+            const chairSeat = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.03, 0.36), chairSeatMat);
+            chairSeat.position.set(cx, fBaseY + 0.42, rz - 0.38);
+            roomGroup.add(chairSeat);
+
+            const chairBack = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.32, 0.03), chairSeatMat);
+            chairBack.position.set(cx, fBaseY + 0.65, rz - 0.54);
+            roomGroup.add(chairBack);
+          });
+        });
+
+        // 教室後方置物壁櫃（對應 01_普通教室全景與後方儲物壁櫃.jpg）
+        const lockerW = Math.min(3.2, Math.max(1.6, roomW - 1.6));
+        const lockers = new THREE.Mesh(
+          new THREE.BoxGeometry(lockerW, 1.05, 0.35),
+          new THREE.MeshLambertMaterial({ color: 0x854d0e })
+        );
+        lockers.position.set(0, fBaseY + 0.53, -roomD * 0.44);
+        roomGroup.add(lockers);
+
+        // 教室後方榮譽佈告欄（對應 06_教室後方佈告欄與柱面榮譽錦旗.jpg）
+        const bulletin = new THREE.Mesh(
+          new THREE.BoxGeometry(lockerW, 0.8, 0.03),
+          new THREE.MeshLambertMaterial({ color: 0xfde68a })
+        );
+        bulletin.position.set(0, fBaseY + 1.65, -roomD * 0.46);
+        roomGroup.add(bulletin);
+      }
+
+      // 天花板柔和照明燈盤 (Ceiling Light Panel)
+      const lightPanel = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.8, 0.9),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+      );
+      lightPanel.rotation.x = Math.PI / 2;
+      lightPanel.position.set(0, fTopY - 0.12, 0);
+      roomGroup.add(lightPanel);
+    }
+
     // 4.8 Buildings Construction (中空可進入建築、大樓入口、走廊、樓梯與隔間空教室)
     BUILDINGS_CONFIG.forEach(cfg => {
       const bldGroup = new THREE.Group();
@@ -3064,14 +3246,14 @@
       const corridorWidth = 2.6;
 
       // Common architectural materials
-      const extWallMat = new THREE.MeshLambertMaterial({ color: cfg.color, roughness: 0.65 });
-      const intWallMat = new THREE.MeshLambertMaterial({ color: 0xf1f5f9, roughness: 0.8 });
-      const floorMat = new THREE.MeshLambertMaterial({ color: 0xd8dee9, roughness: 0.7 });
-      const corridorFloorMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0, roughness: 0.7 });
-      const ceilingMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc, roughness: 0.9, side: THREE.DoubleSide });
+      const extWallMat = new THREE.MeshStandardMaterial({ color: cfg.color, roughness: 0.65 });
+      const intWallMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.8 });
+      const floorMat = new THREE.MeshStandardMaterial({ color: 0xd8dee9, roughness: 0.7 });
+      const corridorFloorMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.7 });
+      const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.9, side: THREE.DoubleSide });
       const glassMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.55 });
-      const chalkboardMat = new THREE.MeshLambertMaterial({ color: 0x1b4332, roughness: 0.85 });
-      const whiteboardMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc, roughness: 0.3 });
+      const chalkboardMat = new THREE.MeshStandardMaterial({ color: 0x1b4332, roughness: 0.85 });
+      const whiteboardMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
       const woodTrimMat = new THREE.MeshLambertMaterial({ color: 0xa16207 });
       const canopyMat = new THREE.MeshLambertMaterial({ color: cfg.roofColor || 0x1e3a8a });
 
@@ -3232,6 +3414,9 @@
           const usableMaxX = cfg.width / 2 - 1.2;
           const usableW = usableMaxX - usableMinX;
 
+          // 走廊可站立行走地坪 (Walkable Corridor Slab)
+          registerWalkFlat(cfg.x - cfg.width / 2, cfg.x + cfg.width / 2, cfg.z + Math.min(outerZ, cWallZ), cfg.z + Math.max(outerZ, cWallZ), fBaseY);
+
           if (floorRooms.length > 0) {
             const roomW = usableW / floorRooms.length;
             for (let i = 0; i < floorRooms.length; i++) {
@@ -3240,7 +3425,10 @@
               const rCenterX = (rMinX + rMaxX) / 2;
               const room = floorRooms[i];
 
-              // 門兩側之內走廊隔間牆 (Wall segments beside classroom door)
+              // 註冊該教室可站立行走地坪 (Walkable Classroom Slab)
+              registerWalkFlat(cfg.x + rMinX, cfg.x + rMaxX, cfg.z + Math.min(backZ, cWallZ), cfg.z + Math.max(backZ, cWallZ), fBaseY);
+
+              // 門兩側之內走廊隔間牆 (Wall segments beside classroom door, leaving 1.8m doorway)
               const seg1W = Math.max(0.2, (rCenterX - 0.9) - rMinX);
               const seg1Mesh = new THREE.Mesh(new THREE.BoxGeometry(seg1W, FH, 0.2), intWallMat);
               seg1Mesh.position.set(rMinX + seg1W / 2, fCenterY, cWallZ);
@@ -3276,42 +3464,13 @@
                 registerWallCollider(cfg.x + rMinX - 0.2, cfg.x + rMinX + 0.2, cfg.z + Math.min(backZ, cWallZ), cfg.z + Math.max(backZ, cWallZ), fBaseY, fTopY);
               }
 
-              // 空教室內部細節：照片實況「下層粉天藍色護壁板、上層白牆」雙色粉刷
-              const wainscotMesh = new THREE.Mesh(
-                new THREE.BoxGeometry(roomW - 0.2, 1.3, 0.04),
-                new THREE.MeshLambertMaterial({ color: 0x7dd3fc }) // 教室專屬天藍色踢腳護壁
-              );
-              wainscotMesh.position.set(rCenterX, fBaseY + 0.65, isNorthCorridor ? (cWallZ + 0.78) : (cWallZ - 0.78));
-              floorGroup.add(wainscotMesh);
-
-              // 空教室內部細節：滑動大黑板 / 白板 (Chalkboard with Chalk Tray)
-              const boardW = Math.min(3.4, roomW - 1.2);
+              // 依據校園真實照片放置教室/辦公室內部實體家具（木質課桌椅、黑板、講台、壁櫃、OA屏風等）
               const isOffice = (room.cat === "admin");
-              const boardMesh = new THREE.Mesh(
-                new THREE.BoxGeometry(boardW, 1.4, 0.06),
-                isOffice ? whiteboardMat : chalkboardMat
-              );
-              boardMesh.position.set(rCenterX, fBaseY + 1.8, isNorthCorridor ? (cWallZ + 0.8) : (cWallZ - 0.8));
-              floorGroup.add(boardMesh);
-
-              const trim = new THREE.Mesh(new THREE.BoxGeometry(boardW + 0.1, 1.5, 0.04), woodTrimMat);
-              trim.position.copy(boardMesh.position);
-              trim.position.z += isNorthCorridor ? -0.02 : 0.02;
-              floorGroup.add(trim);
-
-              // 講桌 (Teacher's Wooden Podium Desk)
-              const podium = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.9, 0.7), woodTrimMat);
-              podium.position.set(rCenterX, fBaseY + 0.45, isNorthCorridor ? (cWallZ + 1.8) : (cWallZ - 1.8));
-              floorGroup.add(podium);
-
-              // 天花板柔和照明燈盤 (Ceiling Light Panel)
-              const lightPanel = new THREE.Mesh(
-                new THREE.PlaneGeometry(2.0, 1.0),
-                new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
-              );
-              lightPanel.rotation.x = Math.PI / 2;
-              lightPanel.position.set(rCenterX, fTopY - 0.12, (backZ + cWallZ) / 2);
-              floorGroup.add(lightPanel);
+              const isSpecial = (room.cat === "special" || room.cat === "sports");
+              const roomSubGroup = new THREE.Group();
+              roomSubGroup.position.set(rCenterX, 0, (backZ + cWallZ) / 2);
+              populateRoomInterior(roomSubGroup, room, roomW, Math.abs(backZ - cWallZ), fBaseY, fTopY, isOffice, isSpecial);
+              floorGroup.add(roomSubGroup);
             }
           }
         } else {
@@ -3385,6 +3544,9 @@
           const usableMaxZ = cfg.depth / 2 - 1.2;
           const usableD = usableMaxZ - usableMinZ;
 
+          // 走廊可站立行走地坪 (Walkable Corridor Slab)
+          registerWalkFlat(cfg.x + Math.min(outerX, cWallX), cfg.x + Math.max(outerX, cWallX), cfg.z - cfg.depth / 2, cfg.z + cfg.depth / 2, fBaseY);
+
           if (floorRooms.length > 0) {
             const roomD = usableD / floorRooms.length;
             for (let i = 0; i < floorRooms.length; i++) {
@@ -3393,7 +3555,10 @@
               const rCenterZ = (rMinZ + rMaxZ) / 2;
               const room = floorRooms[i];
 
-              // 門兩側隔間牆
+              // 註冊該教室可站立行走地坪 (Walkable Classroom Slab)
+              registerWalkFlat(cfg.x + Math.min(backX, cWallX), cfg.x + Math.max(backX, cWallX), cfg.z + rMinZ, cfg.z + rMaxZ, fBaseY);
+
+              // 門兩側隔間牆 (保留 1.8m 寬門口)
               const seg1D = Math.max(0.2, (rCenterZ - 0.9) - rMinZ);
               const seg1Mesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, FH, seg1D), intWallMat);
               seg1Mesh.position.set(cWallX, fCenterY, rMinZ + seg1D / 2);
@@ -3429,23 +3594,13 @@
                 registerWallCollider(cfg.x + Math.min(backX, cWallX), cfg.x + Math.max(backX, cWallX), cfg.z + rMinZ - 0.2, cfg.z + rMinZ + 0.2, fBaseY, fTopY);
               }
 
-              // 空教室黑板
-              const boardD = Math.min(3.4, roomD - 1.2);
-              const boardMesh = new THREE.Mesh(
-                new THREE.BoxGeometry(0.06, 1.4, boardD),
-                chalkboardMat
-              );
-              boardMesh.position.set(isEastCorridor ? (cWallX - 0.8) : (cWallX + 0.8), fBaseY + 1.8, rCenterZ);
-              floorGroup.add(boardMesh);
-
-              // 天花板照明
-              const lightPanel = new THREE.Mesh(
-                new THREE.PlaneGeometry(1.0, 2.0),
-                new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
-              );
-              lightPanel.rotation.x = Math.PI / 2;
-              lightPanel.position.set((backX + cWallX) / 2, fTopY - 0.12, rCenterZ);
-              floorGroup.add(lightPanel);
+              // 依據照片精緻擺設家具（木質課桌椅、黑板、講台、壁櫃、OA屏風等）
+              const isOffice = (room.cat === "admin");
+              const isSpecial = (room.cat === "special" || room.cat === "sports");
+              const roomSubGroup = new THREE.Group();
+              roomSubGroup.position.set((backX + cWallX) / 2, 0, rCenterZ);
+              populateRoomInterior(roomSubGroup, room, Math.abs(backX - cWallX), roomD, fBaseY, fTopY, isOffice, isSpecial);
+              floorGroup.add(roomSubGroup);
             }
           }
         }
@@ -4036,7 +4191,7 @@
        7. CONTROL MODES & SMOOTH CAMERA
        ========================================================================== */
     let currentMode = "bird"; // Start in Overview Mode (鳥瞰全景) with Welcome Card
-    const moveInput = { forward: false, backward: false, left: false, right: false, sprint: false };
+    const moveInput = { forward: false, backward: false, left: false, right: false, sprint: false, turnLeft: false, turnRight: false };
     let walkAnimCycle = 0;
     let jumpVelocity = 0;
     let jumpBaseY = 0;
@@ -4050,19 +4205,28 @@
       const bottomCtrls = document.getElementById("avatar-bottom-controls");
 
       if (mode === "avatar") {
+        controls.enabled = false;
         toggleBtn.classList.add("active");
         btnIcon.textContent = "🧑‍🎓";
         btnText.textContent = "第三人稱";
-        toggleBtn.title = "目前為第三人稱漫遊，點擊切換為鳥瞰全景";
+        toggleBtn.title = "目前為第三人稱跟隨視角，點擊切換為鳥瞰全景";
         if (avatarGroup) avatarGroup.visible = true;
         if (bottomCtrls) bottomCtrls.style.display = "flex";
-        showToast("切換為「第三人稱視角」！WASD 跑步漫遊。");
+        showToast("切換為「第三人稱跟隨視角」！WASD 跑步漫遊，鏡頭緊跟角色正後方。");
         if (avatarGroup) {
-          const targetLookAt = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.8, 0));
-          const behindPos = avatarGroup.position.clone().add(new THREE.Vector3(0, 5.5, 12));
+          avatarAngle = avatarGroup.rotation.y;
+          const cosP = Math.cos(avatarPitch);
+          const sinP = Math.sin(avatarPitch);
+          const behindPos = new THREE.Vector3(
+            avatarGroup.position.x - Math.sin(avatarAngle) * cosP * cameraDistance,
+            avatarGroup.position.y + cameraHeight - sinP * cameraDistance,
+            avatarGroup.position.z - Math.cos(avatarAngle) * cosP * cameraDistance
+          );
+          const targetLookAt = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.5, 0));
           animateCameraTo(behindPos, targetLookAt);
         }
       } else if (mode === "firstperson") {
+        controls.enabled = false;
         toggleBtn.classList.add("active");
         btnIcon.textContent = "👀";
         btnText.textContent = "第一人稱";
@@ -4071,11 +4235,16 @@
         if (bottomCtrls) bottomCtrls.style.display = "flex";
         showToast("切換為「第一人稱視角」！滑鼠環顧、WASD 漫遊。");
         if (avatarGroup) {
-          const eyePos = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.7, 0));
-          const forwardVec = new THREE.Vector3(Math.sin(avatarAngle) * 10, 0, Math.cos(avatarAngle) * 10);
-          animateCameraTo(eyePos, eyePos.clone().add(forwardVec), 600);
+          const eyePos = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.65, 0));
+          const lookPos = new THREE.Vector3(
+            avatarGroup.position.x + Math.sin(avatarAngle) * 10,
+            avatarGroup.position.y + 1.65 + Math.sin(avatarPitch) * 10,
+            avatarGroup.position.z + Math.cos(avatarAngle) * 10
+          );
+          animateCameraTo(eyePos, lookPos, 600);
         }
       } else {
+        controls.enabled = true;
         toggleBtn.classList.remove("active");
         btnIcon.textContent = "🦅";
         btnText.textContent = "鳥瞰全景";
@@ -4128,6 +4297,8 @@
       if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") moveInput.backward = true;
       if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") moveInput.left = true;
       if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") moveInput.right = true;
+      if (e.key === "q" || e.key === "Q") moveInput.turnLeft = true;
+      if (e.key === "e" || e.key === "E") moveInput.turnRight = true;
       if (e.shiftKey) moveInput.sprint = true;
       if (e.code === "Space") {
         e.preventDefault();
@@ -4142,7 +4313,7 @@
         toggleBirdMode();
       }
 
-      if (["w","s","a","d","W","S","A","D","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
+      if (["w","s","a","d","W","S","A","D","q","e","Q","E","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
         if (currentMode === "bird") setControlMode("avatar");
       }
     });
@@ -4153,6 +4324,8 @@
       if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") moveInput.backward = false;
       if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") moveInput.left = false;
       if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") moveInput.right = false;
+      if (e.key === "q" || e.key === "Q") moveInput.turnLeft = false;
+      if (e.key === "e" || e.key === "E") moveInput.turnRight = false;
       if (!e.shiftKey) moveInput.sprint = false;
     });
 
@@ -4418,26 +4591,34 @@
     function applyManualCameraRotation(deltaX, deltaY) {
       const rotSens = turnSensitivityMultiplier;
       const inv = isInvertY ? -1 : 1;
-      const thetaAngle = -deltaX * 0.0035 * rotSens;
-      const phiAngle = -deltaY * 0.0035 * rotSens * inv;
 
-      const offset = camera.position.clone().sub(controls.target);
-      if (Math.abs(thetaAngle) > 0.0001) {
-        offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), thetaAngle);
+      if (currentMode === "avatar" || currentMode === "firstperson") {
+        avatarAngle -= deltaX * 0.0035 * rotSens;
+        avatarPitch = Math.max(-0.55, Math.min(0.55, avatarPitch - deltaY * 0.0035 * rotSens * inv));
+        if (avatarGroup) {
+          avatarGroup.rotation.y = avatarAngle;
+        }
+      } else {
+        const thetaAngle = -deltaX * 0.0035 * rotSens;
+        const phiAngle = -deltaY * 0.0035 * rotSens * inv;
+        const offset = camera.position.clone().sub(controls.target);
+        if (Math.abs(thetaAngle) > 0.0001) {
+          offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), thetaAngle);
+        }
+        if (Math.abs(phiAngle) > 0.0001) {
+          const right = new THREE.Vector3().crossVectors(offset, new THREE.Vector3(0, 1, 0)).normalize();
+          offset.applyAxisAngle(right, phiAngle);
+        }
+        const minD = controls.minDistance || 4;
+        const maxD = controls.maxDistance || 300;
+        offset.clampLength(minD, maxD);
+        camera.position.copy(controls.target).add(offset);
+        controls.update();
       }
-      if (Math.abs(phiAngle) > 0.0001) {
-        const right = new THREE.Vector3().crossVectors(offset, new THREE.Vector3(0, 1, 0)).normalize();
-        offset.applyAxisAngle(right, phiAngle);
-      }
-      const minD = controls.minDistance || 4;
-      const maxD = controls.maxDistance || 300;
-      offset.clampLength(minD, maxD);
-      camera.position.copy(controls.target).add(offset);
-      controls.update();
     }
 
     renderer.domElement.addEventListener("mousedown", (e) => {
-      if ((mouseTurnMode === "left" && e.button === 0) || (mouseTurnMode === "right" && e.button === 2)) {
+      if ((mouseTurnMode === "left" && e.button === 0) || (mouseTurnMode === "right" && e.button === 2) || currentMode === "avatar") {
         isMouseDownDragging = true;
       }
     });
@@ -4445,16 +4626,18 @@
       isMouseDownDragging = false;
     });
     renderer.domElement.addEventListener("contextmenu", (e) => {
-      if (mouseTurnMode === "right") {
+      if (mouseTurnMode === "right" || currentMode === "avatar") {
         e.preventDefault();
       }
     });
     renderer.domElement.addEventListener("mousemove", (e) => {
-      if (mouseTurnMode === "move" && (currentMode === "avatar" || currentMode === "firstperson")) {
-        const deltaX = e.movementX || 0;
-        const deltaY = e.movementY || 0;
-        if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
-          applyManualCameraRotation(deltaX, deltaY);
+      if (currentMode === "avatar" || currentMode === "firstperson") {
+        if (isMouseDownDragging || mouseTurnMode === "move") {
+          const deltaX = e.movementX || 0;
+          const deltaY = e.movementY || 0;
+          if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
+            applyManualCameraRotation(deltaX, deltaY);
+          }
         }
       } else if (isInvertY && isMouseDownDragging) {
         const deltaY = e.movementY || 0;
@@ -4463,6 +4646,26 @@
         }
       }
     });
+
+    let touchStartX = 0, touchStartY = 0;
+    renderer.domElement.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    renderer.domElement.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 1 && (currentMode === "avatar" || currentMode === "firstperson")) {
+        if (!e.target.closest("#avatar-bottom-controls") && !e.target.closest("#minimap-container")) {
+          const dx = e.touches[0].clientX - touchStartX;
+          const dy = e.touches[0].clientY - touchStartY;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          applyManualCameraRotation(dx, dy);
+        }
+      }
+    }, { passive: true });
 
     function focusBuilding(cfg) {
       animateCameraTo(
@@ -4942,66 +5145,66 @@ miniCanvas.addEventListener("click", (e) => {
           stopAutoWalk();
         }
       }
-      // 2. MANUAL KEYBOARD / DPAD CONTROLS (Camera-Relative Movement)
+      // 2. MANUAL KEYBOARD / DPAD CONTROLS (Forward-Facing Follow Camera Movement)
       else if (avatarGroup && (currentMode === "avatar" || currentMode === "firstperson")) {
-        const camDir = new THREE.Vector3();
-        camera.getWorldDirection(camDir);
-        camDir.y = 0;
-        camDir.normalize();
-        const camRight = new THREE.Vector3().crossVectors(camDir, new THREE.Vector3(0, 1, 0)).normalize();
-
-        const moveVec = new THREE.Vector3();
-        if (moveInput.forward) moveVec.add(camDir);
-        if (moveInput.backward) moveVec.sub(camDir);
-        if (moveInput.left) moveVec.sub(camRight);
-        if (moveInput.right) moveVec.add(camRight);
-
-        if (moveVec.lengthSq() > 0.001) {
-          isMoving = true;
-          moveVec.normalize();
-          avatarAngle = Math.atan2(moveVec.x, moveVec.z);
+        // Q / E 鍵旋轉人物與鏡頭視角
+        if (moveInput.turnLeft) {
+          avatarAngle -= 2.2 * delta;
           avatarGroup.rotation.y = avatarAngle;
+        }
+        if (moveInput.turnRight) {
+          avatarAngle += 2.2 * delta;
+          avatarGroup.rotation.y = avatarAngle;
+        }
 
-          const dx = moveVec.x * currentSpeed;
-          const dz = moveVec.z * currentSpeed;
+        // 以人物當前面向 (avatarAngle) 作為前進正前方方向向量 (Forward Vector)
+        const fwdX = Math.sin(avatarAngle);
+        const fwdZ = Math.cos(avatarAngle);
+        const rightX = Math.sin(avatarAngle + Math.PI / 2);
+        const rightZ = Math.cos(avatarAngle + Math.PI / 2);
+
+        let moveFwd = 0;
+        let moveSide = 0;
+        if (moveInput.forward) moveFwd += 1;
+        if (moveInput.backward) moveFwd -= 1;
+        if (moveInput.left) moveSide -= 1;
+        if (moveInput.right) moveSide += 1;
+
+        if (moveFwd !== 0 || moveSide !== 0) {
+          isMoving = true;
+          const len = Math.hypot(moveFwd, moveSide);
+          moveFwd /= len;
+          moveSide /= len;
+
+          const dx = (fwdX * moveFwd + rightX * moveSide) * currentSpeed;
+          const dz = (fwdZ * moveFwd + rightZ * moveSide) * currentSpeed;
           const curPos = avatarGroup.position;
 
-          // 1. Sliding Collision Check against Walls (碰壁不能穿牆，支援滑行)
+          const nextX = curPos.x + dx;
+          const nextZ = curPos.z + dz;
+
+          // 1. 先計算目標預期地坪高度 (包含上樓梯斜坡、樓層地板與室外地面)
+          const targetGroundY = getGroundHeight(nextX, nextZ, curPos.y);
+
+          // 2. 碰壁不穿牆滑動碰撞檢測 (門口、走廊、樓梯暢行無阻)
           let finalX = curPos.x;
           let finalZ = curPos.z;
 
-          if (!checkWallCollision(curPos.x + dx, curPos.y, curPos.z)) {
-            finalX = curPos.x + dx;
+          if (!checkWallCollision(nextX, targetGroundY, curPos.z)) {
+            finalX = nextX;
           }
-          if (!checkWallCollision(finalX, curPos.y, curPos.z + dz)) {
-            finalZ = curPos.z + dz;
+          if (!checkWallCollision(finalX, targetGroundY, nextZ)) {
+            finalZ = nextZ;
           }
 
           curPos.x = finalX;
           curPos.z = finalZ;
 
-          // 2. Staircase Ascend / Descend & Floor Ground Detection (看到樓梯可上樓，進入各樓層走廊)
-          const stairCheck = checkStairElevation(curPos.x, curPos.y, curPos.z);
-          if (stairCheck.onStair) {
-            if (!isJumping) {
-              curPos.y = stairCheck.elevation;
-              jumpBaseY = curPos.y;
-            }
-          } else {
-            const currentBld = getBuildingAt(curPos.x, curPos.z);
-            if (currentBld) {
-              const detectedF = Math.max(1, Math.min(currentBld.floors, Math.floor((curPos.y + 0.8) / FH) + 1));
-              const floorGroundY = (detectedF - 1) * FH;
-              if (!isJumping) {
-                curPos.y = floorGroundY;
-                jumpBaseY = floorGroundY;
-              }
-            } else {
-              if (!isJumping) {
-                curPos.y = 0;
-                jumpBaseY = 0;
-              }
-            }
+          // 3. 實體階梯升降與跨樓層地坪跟隨 (如大勇國小物理地形)
+          const finalGroundY = getGroundHeight(curPos.x, curPos.z, curPos.y);
+          if (!isJumping) {
+            curPos.y = finalGroundY;
+            jumpBaseY = finalGroundY;
           }
         }
       }
@@ -5017,7 +5220,7 @@ miniCanvas.addEventListener("click", (e) => {
         }
       }
 
-      // 3. AVATAR WALKING LIMB ANIMATION
+      // 3. AVATAR WALKING LIMB ANIMATION & CAMERA FOLLOW
       if (avatarGroup) {
         if (isMoving) {
           walkAnimCycle += delta * (moveInput.sprint ? 16 : 10);
@@ -5032,16 +5235,57 @@ miniCanvas.addEventListener("click", (e) => {
           avatarRightArm.rotation.x = 0;
         }
 
-        // Camera Follow in Avatar / First-Person Mode
-        if (currentMode === "avatar" && isMoving) {
-          const deltaPos = avatarGroup.position.clone().sub(prevAvatarPos);
-          camera.position.add(deltaPos);
-          controls.target.add(deltaPos);
+        // Camera Follow in Avatar / First-Person Mode (正後方跟隨視角，如大勇國小)
+        if (currentMode === "avatar") {
+          avatarGroup.rotation.y = avatarAngle;
+          if (!isCameraAnimating) {
+            const cosP = Math.cos(avatarPitch);
+            const sinP = Math.sin(avatarPitch);
+            const headX = avatarGroup.position.x;
+            const headY = avatarGroup.position.y + 1.5;
+            const headZ = avatarGroup.position.z;
+
+            const rawDirX = -Math.sin(avatarAngle) * cosP;
+            const rawDirZ = -Math.cos(avatarAngle) * cosP;
+            const rawDirY = (cameraHeight - 1.5) - sinP * cameraDistance;
+
+            let safeDist = cameraDistance;
+            // 8-step raymarch to avoid clipping through interior/exterior walls
+            const steps = 8;
+            for (let s = 1; s <= steps; s++) {
+              const frac = s / steps;
+              const testX = headX + rawDirX * cameraDistance * frac;
+              const testZ = headZ + rawDirZ * cameraDistance * frac;
+              const testY = headY + rawDirY * frac;
+              if (checkWallCollision(testX, testY - 0.5, testZ)) {
+                safeDist = Math.max(1.1, cameraDistance * ((s - 1) / steps));
+                break;
+              }
+            }
+            if (safeDist < 1.6) {
+              avatarGroup.visible = false;
+            } else {
+              avatarGroup.visible = true;
+            }
+            const factor = safeDist / cameraDistance;
+            const camX = headX + rawDirX * cameraDistance * factor;
+            const camZ = headZ + rawDirZ * cameraDistance * factor;
+            const camY = headY + rawDirY * factor;
+            camera.position.set(camX, camY, camZ);
+            camera.lookAt(headX, headY, headZ);
+          }
         } else if (currentMode === "firstperson") {
-          camera.position.set(avatarGroup.position.x, avatarGroup.position.y + 1.7, avatarGroup.position.z);
-          if (isMoving) {
-            const deltaPos = avatarGroup.position.clone().sub(prevAvatarPos);
-            controls.target.add(deltaPos);
+          if (!isCameraAnimating) {
+            camera.position.set(avatarGroup.position.x, avatarGroup.position.y + 1.65, avatarGroup.position.z);
+            camera.lookAt(
+              avatarGroup.position.x + Math.sin(avatarAngle) * 10,
+              avatarGroup.position.y + 1.65 + Math.sin(avatarPitch) * 10,
+              avatarGroup.position.z + Math.cos(avatarAngle) * 10
+            );
+          }
+        } else if (currentMode === "bird") {
+          if (!isCameraAnimating) {
+            controls.update();
           }
         }
         prevAvatarPos.copy(avatarGroup.position);
@@ -5049,9 +5293,9 @@ miniCanvas.addEventListener("click", (e) => {
         // Dynamic Floor Detection for Minimap Badge
         const currentAvatarY = avatarGroup.position.y;
         let detectedFloor = "1F";
-        if (currentAvatarY >= 10.0) detectedFloor = "4F";
-        else if (currentAvatarY >= 6.5) detectedFloor = "3F";
-        else if (currentAvatarY >= 2.5) detectedFloor = "2F";
+        if (currentAvatarY >= 9.5) detectedFloor = "4F";
+        else if (currentAvatarY >= 6.0) detectedFloor = "3F";
+        else if (currentAvatarY >= 2.4) detectedFloor = "2F";
         const floorBadgeEl = document.getElementById("minimap-floor-badge");
         if (floorBadgeEl && currentFloorFilter === "all") {
           floorBadgeEl.textContent = detectedFloor;
@@ -5071,8 +5315,8 @@ miniCanvas.addEventListener("click", (e) => {
         }
       }
 
-      // Always update OrbitControls so rotation/zoom NEVER freezes (skip during smooth camera tween)
-      if (!isCameraAnimating) {
+      // OrbitControls 僅在鳥瞰模式更新，避免干擾第三人稱跟隨鏡頭
+      if (!isCameraAnimating && currentMode === "bird") {
         controls.update();
       }
 
