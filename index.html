@@ -344,37 +344,130 @@
       transform: translateY(-2px);
     }
 
-    /* Floor Selector (Right Side) */
+    /* Floor Selector (Right Side) - 完美對標大勇國小極簡黑透膠囊面板 (media 2/3/4) */
     #floor-selector {
       position: absolute;
-      right: 16px;
+      right: 18px;
       top: 130px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      padding: 6px;
-      z-index: 15;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 6px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(16px);
+      z-index: 85;
+      user-select: none;
+    }
+    .floor-selector-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 1px;
+      margin-bottom: 3px;
+      padding: 0 4px;
     }
     .floor-btn {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 38px;
       border-radius: 10px;
-      border: 1px solid transparent;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-      font-family: var(--num);
-      font-size: 16px;
-      font-weight: 700;
+      border: none;
+      background: transparent;
+      color: #f1f5f9;
+      font-family: var(--font), var(--num), sans-serif;
+      font-size: 14.5px;
+      font-weight: 800;
       cursor: pointer;
       display: grid;
       place-items: center;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .floor-btn:hover { background: rgba(255, 255, 255, 0.2); }
+    .floor-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      transform: scale(1.05);
+    }
     .floor-btn.active {
-      background: var(--accent);
-      color: #0f172a;
-      box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
+      background: #ffffff !important;
+      color: #0f172a !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      font-weight: 900;
+      transform: scale(1.04);
+    }
+
+    /* 大勇國小特色立體浮動教室膠囊徽章 (Dayong 3D Floating Room Badges) */
+    .dayong-room-badge {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translate(-50%, -100%);
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+      background: var(--badge-bg, #0284c7);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+      white-space: nowrap;
+      pointer-events: auto;
+      z-index: 30;
+      overflow: hidden;
+    }
+    .dayong-room-badge:hover {
+      transform: translate(-50%, -100%) scale(1.15) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 0 2px #facc15;
+      z-index: 60 !important;
+      filter: brightness(1.15);
+    }
+    .dayong-room-badge .drb-name {
+      padding: 4px 7px 4px 9px;
+      letter-spacing: 0.2px;
+      line-height: 1.2;
+    }
+    .dayong-room-badge .drb-seq {
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 10.5px;
+      font-weight: 900;
+      padding: 4px 6px;
+      margin-left: 2px;
+      font-family: var(--num), monospace;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* 大樓名稱樓層大標題徽章 (Building Floor Header Badge) */
+    .dayong-bld-header-badge {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translate(-50%, -100%);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      border-radius: 8px;
+      color: #f8fafc;
+      font-size: 13.5px;
+      font-weight: 900;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      pointer-events: none;
+      z-index: 25;
+      white-space: nowrap;
+    }
+    .dayong-bld-header-badge .bld-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #facc15;
+      box-shadow: 0 0 8px #facc15;
     }
 
     /* Navigation HUD (Bottom Center Card) */
@@ -1837,13 +1930,14 @@
     <div class="venue-chip" data-to="volleyball-out">🏐 戶外排球場</div>
   </div>
 
-  <!-- Floor Selector -->
-  <div id="floor-selector" class="glass">
-    <button class="floor-btn active" data-f="all" title="顯示全棟外觀">全</button>
-    <button class="floor-btn" data-f="4" title="檢視 4F 樓層空間">4F</button>
-    <button class="floor-btn" data-f="3" title="檢視 3F 樓層空間">3F</button>
-    <button class="floor-btn" data-f="2" title="檢視 2F 樓層空間">2F</button>
-    <button class="floor-btn" data-f="1" title="檢視 1F 樓層空間">1F</button>
+  <!-- Floor Selector (對標大勇國小樓層展示切換面板) -->
+  <div id="floor-selector">
+    <div class="floor-selector-title">樓層</div>
+    <button class="floor-btn active" data-f="all" title="顯示全校大樓鳥瞰外觀">全部</button>
+    <button class="floor-btn" data-f="4" title="檢視 4F 樓層空間配置">4F</button>
+    <button class="floor-btn" data-f="3" title="檢視 3F 樓層空間配置">3F</button>
+    <button class="floor-btn" data-f="2" title="檢視 2F 樓層空間配置">2F</button>
+    <button class="floor-btn" data-f="1" title="檢視 1F 樓層空間配置">1F</button>
   </div>
 
   <!-- 2D High-Definition Minimap (Reference: media_1791335056310.png) -->
@@ -2916,10 +3010,25 @@
        4. CAMPUS ENVIRONMENT, STAIRCASES & ARCHITECTURE
        ========================================================================== */
     const floorMeshes = [];
+    const roofMeshes = [];
+    const dayongHeaderBadges = [];
     const labelElements = [];
     const roomBadgeElements = [];
     const labelsContainer = document.getElementById("labels-container");
     const ROOMS_DB = {};
+    let globalRoomSeq = 1;
+
+    function getRoomBadgeColor(r) {
+      if (r.cat === "admin") return "#0284c7"; // 行政/處室: 晴朗天藍
+      if (r.cat === "grade7") return "#10b981"; // 七年級: 翠綠翡翠
+      if (r.cat === "grade8") return "#f59e0b"; // 八年級: 暖陽澄黃
+      if (r.cat === "grade9") return "#6366f1"; // 九年級: 曜石靛藍
+      if (r.cat === "sports") return "#ef4444"; // 體育/柔道: 珊瑚朱紅
+      if (r.cat === "special") return "#8b5cf6"; // 藝能專科: 典雅羅蘭紫
+      if (r.cat === "resource") return "#0d9488"; // 特教/資源: 清新松石綠
+      if (r.id && r.id.includes("kind")) return "#ec4899"; // 幼兒園: 活潑粉桃
+      return "#0284c7";
+    }
 
     // 4.0 Collision & Multi-Floor Surface Engine (大勇國小 GRID 空間網格分割與物理推擠穿牆防禦系統)
     const WALL_COLLIDERS = [];
@@ -6031,6 +6140,7 @@ function createGymSignTexture() {
               const rMaxX = usableMinX + (i + 1) * roomW;
               const rCenterX = (rMinX + rMaxX) / 2;
               const room = floorRooms[i];
+              room.worldPos = new THREE.Vector3(cfg.x + rCenterX, fBaseY + 2.4, cfg.z + (backZ + cWallZ) / 2);
 
               // 註冊該教室可站立行走地坪 (Walkable Classroom Slab)
               registerWalkFlat(cfg.x + rMinX, cfg.x + rMaxX, cfg.z + Math.min(backZ, cWallZ), cfg.z + Math.max(backZ, cWallZ), fBaseY);
@@ -6161,6 +6271,7 @@ function createGymSignTexture() {
               const rMaxZ = usableMinZ + (i + 1) * roomD;
               const rCenterZ = (rMinZ + rMaxZ) / 2;
               const room = floorRooms[i];
+              room.worldPos = new THREE.Vector3(cfg.x + (backX + cWallX) / 2, fBaseY + 2.4, cfg.z + rCenterZ);
 
               // 註冊該教室可站立行走地坪 (Walkable Classroom Slab)
               registerWalkFlat(cfg.x + Math.min(backX, cWallX), cfg.x + Math.max(backX, cWallX), cfg.z + rMinZ, cfg.z + rMaxZ, fBaseY);
@@ -6290,6 +6401,7 @@ function createGymSignTexture() {
           solarGroup.add(solarRow);
         }
         bldGroup.add(solarGroup);
+        roofMeshes.push(solarGroup);
       }
 
       // 中庭標誌性粉紅雙圓柱螺旋樓梯塔樓 (依據校園照片 03_02、03_03 精確還原：粉紅二丁掛磁磚＋豎向採光玻璃長窗＋圓形挑簷帽頂)
@@ -6380,6 +6492,7 @@ function createGymSignTexture() {
         pRoof.rotation.y = Math.PI / 2;
         pRoof.castShadow = true;
         bldGroup.add(pRoof);
+        roofMeshes.push(pRoof);
       } else {
         const roofMesh = new THREE.Mesh(
           new THREE.BoxGeometry(cfg.width + 0.8, 0.8, cfg.depth + 0.8),
@@ -6388,6 +6501,7 @@ function createGymSignTexture() {
         roofMesh.position.y = totalH + 0.4;
         roofMesh.castShadow = true;
         bldGroup.add(roofMesh);
+        roofMeshes.push(roofMesh);
       }
 
       // 頂樓高架太陽能光電遮陽棚 (依據空拍照 01_06 與大勇國小 solarRoof：高架鋼構立柱＋面南傾斜深藍單晶矽太陽能板矩陣)
@@ -6435,6 +6549,7 @@ function createGymSignTexture() {
         }
 
         bldGroup.add(roofSolarGroup);
+        roofMeshes.push(roofSolarGroup);
       }
 
       scene.add(bldGroup);
@@ -6452,12 +6567,15 @@ function createGymSignTexture() {
         };
         ROOMS_DB[r.id] = roomObj;
 
+        const seqNum = globalRoomSeq++;
         const badgeDiv = document.createElement("div");
-        badgeDiv.className = "room-badge";
-        const catColor = CATEGORY_COLORS[roomObj.cat] || "#2563eb";
+        badgeDiv.className = "dayong-room-badge";
+        const catColor = getRoomBadgeColor(r);
+        badgeDiv.style.setProperty("--badge-bg", catColor);
+        const cleanName = r.name.replace(/\s*\(\d+F\)/, '');
         badgeDiv.innerHTML = `
-          <span class="rb-tag" style="background:${catColor};">${r.floor}F</span>
-          <span>${r.name.replace(/\s*\(\d+F\)/, '')}</span>
+          <span class="drb-name">${cleanName}</span>
+          <span class="drb-seq">[${seqNum}]</span>
         `;
         badgeDiv.onclick = (e) => {
           e.stopPropagation();
@@ -6465,22 +6583,30 @@ function createGymSignTexture() {
         };
         labelsContainer.appendChild(badgeDiv);
 
+        const rWorldPos = r.worldPos ? r.worldPos.clone() : new THREE.Vector3(cfg.x, (r.floor - 1) * FH + 2.4, cfg.z);
         roomBadgeElements.push({
           element: badgeDiv,
           floor: r.floor,
-          nodeId: r.node
+          buildingId: cfg.id,
+          nodeId: r.node,
+          worldPos: rWorldPos
         });
       });
 
-      const labelDiv = document.createElement("div");
-      labelDiv.className = "building-label";
-      labelDiv.textContent = cfg.name;
-      labelDiv.onclick = () => focusBuilding(cfg);
-      labelsContainer.appendChild(labelDiv);
+      // 大勇國小同款大樓標題徽章 (Dayong Building Floor Header Badge)
+      const bldHeaderDiv = document.createElement("div");
+      bldHeaderDiv.className = "dayong-bld-header-badge";
+      bldHeaderDiv.innerHTML = `<span class="bld-dot"></span><span class="bld-title">${cfg.name}</span>`;
+      bldHeaderDiv.onclick = (e) => {
+        e.stopPropagation();
+        focusBuilding(cfg);
+      };
+      labelsContainer.appendChild(bldHeaderDiv);
 
-      labelElements.push({
-        element: labelDiv,
-        worldPos: new THREE.Vector3(cfg.x, totalH + 3.6, cfg.z)
+      dayongHeaderBadges.push({
+        element: bldHeaderDiv,
+        building: cfg,
+        worldPos: new THREE.Vector3(cfg.x, totalH + 3.8, cfg.z)
       });
     });
 
@@ -6617,17 +6743,7 @@ function createGymSignTexture() {
       { name: "籃球場群", x: 12, y: 1.8, z: -38 },
       { name: "蘭亭訓平池", x: -18, y: 2.2, z: -66 },
       { name: "校大門", x: -10, y: 3.5, z: 86 },
-      { name: "警衛室", x: 6, y: 3.2, z: 86 },
-      { name: "學生活動中心", x: -80, y: 6.0, z: 58 },
-      { name: "行政大樓", x: -12, y: 6.0, z: 32 },
-      { name: "八年級棟 (南棟)", x: 24, y: 6.0, z: 60 },
-      { name: "九年級棟 (縱向)", x: 2, y: 6.0, z: 28 },
-      { name: "八年級中棟 (縱向)", x: 28, y: 6.0, z: 28 },
-      { name: "健康中心棟", x: 12, y: 4.5, z: -4 },
-      { name: "七年級新大樓", x: 80, y: 6.0, z: -58 },
-      { name: "綜合大樓/圖書館", x: 74, y: 4.5, z: -23 },
-      { name: "科技館", x: 74, y: 4.5, z: 12 },
-      { name: "藝術館", x: 74, y: 8.0, z: 46 }
+      { name: "警衛室", x: 6, y: 3.2, z: 86 }
     ];
     const landmarkElements = [];
 
@@ -8240,7 +8356,7 @@ function createGymSignTexture() {
 
     let currentFloorFilter = "all";
     function setFloorFilter(floorVal) {
-      currentFloorFilter = floorVal;
+      currentFloorFilter = String(floorVal);
       const floorBadgeEl = document.getElementById("minimap-floor-badge");
       if (floorBadgeEl) {
         floorBadgeEl.textContent = floorVal === "all" ? "1F" : floorVal + "F";
@@ -8250,26 +8366,90 @@ function createGymSignTexture() {
         btn.classList.toggle("active", btn.dataset.f === String(floorVal));
       });
 
+      // 1. 屋頂與高架太陽能光電遮陽棚切層消隱 (Floor Slicing / Explosion)
+      roofMeshes.forEach(mesh => {
+        if (mesh) mesh.visible = (floorVal === "all");
+      });
+
+      if (floorVal !== "all") {
+        const wc = document.getElementById("welcome-card");
+        if (wc) wc.classList.add("hidden");
+      }
+
+      // 2. 樓層分層剖切：若選取 2F，則顯示 1F 與 2F，隱藏 3F 與 4F
       floorMeshes.forEach(grp => {
         if (floorVal === "all") {
           grp.visible = true;
         } else {
-          grp.visible = grp.userData.floorNum <= Number(floorVal);
+          grp.visible = (grp.userData.floorNum <= Number(floorVal));
         }
       });
 
+      // 3. 教室膠囊徽章顯示切換：選取特定樓層時只展示該樓層教室徽章；全部模式下隱藏以維持全校景觀整潔
+      const targetF = floorVal === "all" ? null : Number(floorVal);
       roomBadgeElements.forEach(rb => {
         if (floorVal === "all") {
-          rb.element.style.display = "flex";
+          rb.element.style.display = "none";
         } else {
-          rb.element.style.display = (rb.floor === Number(floorVal)) ? "flex" : "none";
+          rb.element.style.display = (rb.floor === targetF) ? "inline-flex" : "none";
         }
       });
+
+      // 4. 大勇國小款式大樓標題徽章（例如「八年級棟 1F」、「尊師樓 2F」）
+      dayongHeaderBadges.forEach(item => {
+        const cfg = item.building;
+        const titleEl = item.element.querySelector(".bld-title");
+        if (floorVal === "all") {
+          item.element.style.display = "inline-flex";
+          if (titleEl) titleEl.textContent = cfg.name;
+          item.worldPos = new THREE.Vector3(cfg.x, cfg.floors * FH + 3.8, cfg.z);
+        } else {
+          if (cfg.floors >= targetF) {
+            item.element.style.display = "inline-flex";
+            if (titleEl) titleEl.textContent = `${cfg.name} ${targetF}F`;
+            item.worldPos = new THREE.Vector3(cfg.x, targetF * FH + 3.6, cfg.z);
+          } else {
+            item.element.style.display = "none";
+          }
+        }
+      });
+
+      // 5. 隱藏預設舊版文字標籤與在單層模式下隱藏地標（維持樓層剖切畫面整潔對標大勇國小）
+      labelElements.forEach(item => {
+        if (item && item.element) item.element.style.display = "none";
+      });
+      landmarkElements.forEach(item => {
+        if (item && item.element) {
+          item.element.style.display = (floorVal === "all") ? "block" : "none";
+        }
+      });
+
+      // 6. 相機平滑飛行導引（對標大勇國小樓層展示視角：鳥瞰斜視角，清晰俯瞰各大樓剖面格局）
+      if (controls && camera && typeof animateCameraTo === "function") {
+        if (floorVal === "4") {
+          // 4F 專屬聚焦：全校唯一的四層樓專科大樓「藝術館」
+          animateCameraTo(
+            new THREE.Vector3(76, 28, 76),
+            new THREE.Vector3(74, 12, 46)
+          );
+        } else if (floorVal !== "all") {
+          animateCameraTo(
+            new THREE.Vector3(10, 42, 92),
+            new THREE.Vector3(10, 8, 38)
+          );
+        } else {
+          animateCameraTo(
+            new THREE.Vector3(30, 56, 115),
+            new THREE.Vector3(0, 0, 36)
+          );
+        }
+      }
     }
 
     document.querySelectorAll(".floor-btn").forEach(btn => {
       btn.onclick = () => setFloorFilter(btn.dataset.f);
     });
+    setFloorFilter("all");
 
     /* ==========================================================================
        9. SEARCH, QUICK CHIPS & 2D MINIMAP
@@ -9225,7 +9405,7 @@ miniCanvas.addEventListener("click", (e) => {
 
       // 3D Floating Landmark Pills (操場, 司令台, 籃球場, 大門, 停車場...)
       landmarkElements.forEach(item => {
-        if (currentMode !== "bird") {
+        if (currentMode !== "bird" || currentFloorFilter !== "all") {
           item.element.style.display = "none";
           return;
         }
@@ -9242,16 +9422,36 @@ miniCanvas.addEventListener("click", (e) => {
         }
       });
 
-      // 3D Floating Room Badges Position Updating
+      // 大勇國小款式大樓標題徽章 3D 浮動投影更新
+      dayongHeaderBadges.forEach(item => {
+        if (item.element.style.display === "none") return;
+        const wp = item.worldPos.clone();
+        wp.project(camera);
+        if (wp.z > 1) {
+          item.element.style.opacity = "0";
+          item.element.style.pointerEvents = "none";
+        } else {
+          item.element.style.opacity = "1";
+          item.element.style.pointerEvents = "auto";
+          const screenX = (wp.x * 0.5 + 0.5) * window.innerWidth;
+          const screenY = (-(wp.y * 0.5) + 0.5) * window.innerHeight;
+          item.element.style.left = `${screenX}px`;
+          item.element.style.top = `${screenY}px`;
+        }
+      });
+
+      // 大勇國小特色立體浮動教室膠囊徽章 3D 空間投影定位更新
       const camDist = camera.position.distanceTo(controls.target);
       roomBadgeElements.forEach(item => {
-        const node = NAV_NODES[item.nodeId];
-        if (!node) return;
-        const wp = new THREE.Vector3(node.x, (node.y || 0) + 2.2, node.z);
+        if (item.element.style.display === "none") return;
+        const wp = item.worldPos.clone();
         wp.project(camera);
-        if (wp.z > 1 || camDist > 140) {
-          item.element.style.display = "none";
-        } else if (item.element.style.display !== "none") {
+        if (wp.z > 1 || camDist > 185) {
+          item.element.style.opacity = "0";
+          item.element.style.pointerEvents = "none";
+        } else {
+          item.element.style.opacity = "1";
+          item.element.style.pointerEvents = "auto";
           const screenX = (wp.x * 0.5 + 0.5) * window.innerWidth;
           const screenY = (-(wp.y * 0.5) + 0.5) * window.innerHeight;
           item.element.style.left = `${screenX}px`;
