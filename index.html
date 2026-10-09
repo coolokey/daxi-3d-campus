@@ -897,6 +897,32 @@
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
     }
 
+    /* FPS Pointer Lock Crosshair (大勇國小沉浸準星) */
+    #fps-crosshair {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      transform: translate(-50%, -50%);
+      border: 2px solid rgba(250, 204, 21, 0.92);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.75);
+      pointer-events: none;
+      display: none;
+      z-index: 99;
+    }
+    #fps-crosshair::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      width: 2px;
+      height: 2px;
+      background: #facc15;
+      border-radius: 50%;
+    }
+
     /* 3D Floating Building & Room Labels */
     #labels-container {
       position: absolute;
@@ -1822,6 +1848,7 @@
 <body>
   <!-- Three.js Canvas -->
   <canvas id="webgl-canvas"></canvas>
+  <div id="fps-crosshair"></div>
 
   <!-- 3D DOM Labels Container -->
   <div id="labels-container"></div>
@@ -2005,9 +2032,10 @@
     <div class="modal-field-block">
       <div class="modal-field-title">滑鼠轉頭方式</div>
       <select id="select-mouse-turn" class="custom-select">
-        <option value="move">移動滑鼠就轉頭</option>
-        <option value="left" selected>按住滑鼠左鍵轉頭</option>
+        <option value="left" selected>按住滑鼠左鍵轉頭 (預設拖曳)</option>
         <option value="right">按住滑鼠右鍵轉頭</option>
+        <option value="move">移動滑鼠就轉頭 (免按住懸停)</option>
+        <option value="lock">點擊畫面鎖定指針 (FPS 準星模式)</option>
       </select>
     </div>
     <label class="modal-checkbox-row">
@@ -2556,8 +2584,7 @@
       armR: null, elbR: null
     };
     let avatarAngle = Math.PI; // 預設面向校園北側 (朝前)
-    let avatarPitch = -0.14;   // 預設略微向下俯視角色
-    const cameraDistance = 4.4; // 鏡頭距離角色適中距離，人物小巧置於螢幕下方，視野開闊 (如 media_1791468841860_b8c925a6.png)
+    let cameraDistance = 4.4; // 鏡頭距離角色適中距離，支援滑鼠滾輪無縫平滑縮放 (對標大勇國小)
     const cameraHeight = 1.95;  // 鏡頭跟隨高度，俯看校園前進方向無阻擋
     let prevAvatarPos = new THREE.Vector3(0, 0, 96);
     const avatarSpeed = 16;
@@ -8142,6 +8169,11 @@ function createGymSignTexture() {
         controls.mouseButtons = { LEFT: THREE.MOUSE.NONE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
       } else if (mouseTurnMode === "move") {
         controls.mouseButtons = { LEFT: THREE.MOUSE.NONE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.NONE };
+      } else if (mouseTurnMode === "lock") {
+        controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+        if (currentMode !== "bird" && !isPointerLocked) {
+          try { renderer.domElement.requestPointerLock(); } catch(err) {}
+        }
       }
     }
 
@@ -8270,20 +8302,77 @@ function createGymSignTexture() {
       }
     }
 
-    let mouseClickDownPos = { x: 0, y: 0 };
-    renderer.domElement.addEventListener("mousedown", (e) => {
-      mouseClickDownPos = { x: e.clientX, y: e.clientY };
-      if ((mouseTurnMode === "left" && e.button === 0) || (mouseTurnMode === "right" && e.button === 2) || currentMode === "avatar") {
-        isMouseDownDragging = true;
+    // ==========================================================================
+    // 大勇國小 3D 滑鼠完整交互系統 (Dayong Full Mouse Interaction Engine)
+    // 1. 鳥瞰 360° 軌道旋轉 (左鍵拖曳) & 視角平移 (右鍵 / Shift+左鍵)
+    // 2. 指數級平滑滾輪縮放 (指數曲線 Math.exp & 第三人稱/第一人稱無縫切換)
+    // 3. 指針鎖定 (Pointer Lock 沉浸 FPS 準星模式 & Glitch 防跳針防禦)
+    // 4. 動態游標狀態回饋 (grab/grabbing/move/pointer) & 3D 射線物件懸停點擊
+    // 5. 全域右鍵防選單 (contextmenu preventDefault)
+    // ==========================================================================
+
+    let isPointerLocked = false;
+    let lastPointerMoveTime = 0;
+
+    // 監聽指針鎖定狀態變更 (對標大勇國小 FPS 沉浸視角)
+    document.addEventListener("pointerlockchange", () => {
+      isPointerLocked = (document.pointerLockElement === renderer.domElement);
+      const crosshair = document.getElementById("fps-crosshair");
+      if (crosshair) crosshair.style.display = isPointerLocked ? "block" : "none";
+      if (isPointerLocked) {
+        lastPointerMoveTime = performance.now();
+        showToast("🎯 已進入指針鎖定視角，滑鼠直接轉動視角，按 ESC 鍵可退出");
       }
     });
+
+    // 畫布預設手勢游標
+    renderer.domElement.style.cursor = "grab";
+
+    let mouseClickDownPos = { x: 0, y: 0 };
+    let mouseDownButton = 0;
+
+    renderer.domElement.addEventListener("mousedown", (e) => {
+      mouseClickDownPos = { x: e.clientX, y: e.clientY };
+      mouseDownButton = e.button;
+
+      if (currentMode === "bird") {
+        if (e.button === 2 || e.shiftKey) {
+          renderer.domElement.style.cursor = "move"; // 平移游標
+        } else {
+          renderer.domElement.style.cursor = "grabbing"; // 抓取旋轉游標
+        }
+      } else {
+        // 人物漫遊模式 (avatar / firstperson)
+        if (mouseTurnMode === "lock") {
+          if (!isPointerLocked) {
+            try { renderer.domElement.requestPointerLock(); } catch(err) {}
+          }
+        }
+        if ((mouseTurnMode === "left" && e.button === 0) || (mouseTurnMode === "right" && e.button === 2) || mouseTurnMode === "move" || currentMode === "avatar") {
+          isMouseDownDragging = true;
+          renderer.domElement.style.cursor = "grabbing";
+        }
+      }
+    });
+
     window.addEventListener("mouseup", (e) => {
       isMouseDownDragging = false;
-      // 3D 空間射線點擊交互 (大勇國小特色：點選建築、公共藝術、地標即彈出地點資訊卡)
+      if (currentMode === "bird") {
+        renderer.domElement.style.cursor = "grab";
+      } else {
+        if (!isPointerLocked) renderer.domElement.style.cursor = "default";
+      }
+
+      // 3D 空間射線短點擊交互 (大勇國小特色：點選建築、公共藝術、地標即彈出地點資訊卡)
       if (e && e.target === renderer.domElement) {
         const dx = e.clientX - mouseClickDownPos.x;
         const dy = e.clientY - mouseClickDownPos.y;
         if (Math.hypot(dx, dy) < 6) {
+          // 若在人物模式且為 lock 模式，若尚未鎖定則請求鎖定
+          if ((currentMode === "avatar" || currentMode === "firstperson") && mouseTurnMode === "lock" && !isPointerLocked) {
+            try { renderer.domElement.requestPointerLock(); } catch(err) {}
+          }
+
           const rect = renderer.domElement.getBoundingClientRect();
           const mouse = new THREE.Vector2(
             ((e.clientX - rect.left) / rect.width) * 2 - 1,
@@ -8299,18 +8388,44 @@ function createGymSignTexture() {
                 openVenueCard(cur.userData.roomId);
                 return;
               }
+              if (cur.userData && cur.userData.buildingId) {
+                const bld = BUILDINGS_CONFIG.find(b => b.id === cur.userData.buildingId);
+                if (bld) {
+                  focusBuilding(bld);
+                  return;
+                }
+              }
               cur = cur.parent;
             }
           }
         }
       }
     });
+
+    // 禁用畫布上的右鍵選單，防止右鍵旋轉或平移視角時跳出瀏覽器選單 (對標大勇國小)
     renderer.domElement.addEventListener("contextmenu", (e) => {
-      if (mouseTurnMode === "right" || currentMode === "avatar") {
-        e.preventDefault();
-      }
+      e.preventDefault();
     });
+
+    // 滑鼠移動事件 (包含 Pointer Lock 轉向、拖曳轉向、懸停轉向以及鳥瞰懸停高亮)
     renderer.domElement.addEventListener("mousemove", (e) => {
+      // 1. 指針鎖定模式轉向 (FPS 視角直接帶動人物轉身與仰角)
+      if (isPointerLocked && (currentMode === "avatar" || currentMode === "firstperson")) {
+        const deltaX = e.movementX || 0;
+        const deltaY = e.movementY || 0;
+        const jumpHypot = Math.hypot(deltaX, deltaY);
+        // 大勇國小同款防跳針過濾 (過濾切換視窗或解鎖時產生的巨大異常跳動)
+        if (jumpHypot > 1800) return;
+        if (performance.now() - lastPointerMoveTime < 60 && jumpHypot > 320) return;
+        lastPointerMoveTime = performance.now();
+
+        if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
+          applyManualCameraRotation(deltaX, deltaY);
+        }
+        return;
+      }
+
+      // 2. 人物模式常規轉向
       if (currentMode === "avatar" || currentMode === "firstperson") {
         if (isMouseDownDragging || mouseTurnMode === "move") {
           const deltaX = e.movementX || 0;
@@ -8319,13 +8434,62 @@ function createGymSignTexture() {
             applyManualCameraRotation(deltaX, deltaY);
           }
         }
-      } else if (isInvertY && isMouseDownDragging) {
-        const deltaY = e.movementY || 0;
-        if (Math.abs(deltaY) > 0) {
-          applyManualCameraRotation(0, -deltaY * 2);
+      } else if (currentMode === "bird") {
+        // 3. 鳥瞰模式下的反轉 Y 軸輔助
+        if (isInvertY && isMouseDownDragging) {
+          const deltaY = e.movementY || 0;
+          if (Math.abs(deltaY) > 0) {
+            applyManualCameraRotation(0, -deltaY * 2);
+          }
+        }
+
+        // 4. 鳥瞰模式下的滑鼠懸停 3D 物件檢測 (Hover Raycast 反饋 pointer 游標)
+        if (!isMouseDownDragging) {
+          const rect = renderer.domElement.getBoundingClientRect();
+          const mouse = new THREE.Vector2(
+            ((e.clientX - rect.left) / rect.width) * 2 - 1,
+            -((e.clientY - rect.top) / rect.height) * 2 + 1
+          );
+          const raycaster = new THREE.Raycaster();
+          raycaster.setFromCamera(mouse, camera);
+          const intersects = raycaster.intersectObjects(scene.children, true);
+          let isHoveringInteractive = false;
+          for (let hit of intersects) {
+            let cur = hit.object;
+            while (cur && cur !== scene) {
+              if (cur.userData && (cur.userData.roomId || cur.userData.buildingId)) {
+                isHoveringInteractive = true;
+                break;
+              }
+              cur = cur.parent;
+            }
+            if (isHoveringInteractive) break;
+          }
+          renderer.domElement.style.cursor = isHoveringInteractive ? "pointer" : "grab";
         }
       }
     });
+
+    // 滑鼠滾輪縮放 (對標大勇國小指數級平滑縮放與人物視角切換)
+    window.addEventListener("wheel", (e) => {
+      if (e.target.closest && (e.target.closest("#search-results") || e.target.closest(".modal-ctrl-panel") || e.target.closest("#venue-card"))) return;
+      if (currentMode === "avatar" || currentMode === "firstperson") {
+        e.preventDefault();
+        // 大勇國小同款指數縮放：Math.exp(deltaY * 0.0012)
+        const zoomExp = Math.exp(e.deltaY * 0.0012);
+        cameraDistance = Math.max(1.5, Math.min(9.5, cameraDistance * zoomExp));
+
+        // 縮放連動視角：滾輪向前推近至極限時自動切換至第一人稱沉浸視角
+        if (cameraDistance <= 1.65 && currentMode !== "firstperson") {
+          setControlMode("firstperson");
+          showToast("👁️ 已切換為第一人稱沉浸視角（向下滾動滑鼠可拉遠）");
+        } else if (cameraDistance > 1.85 && currentMode === "firstperson") {
+          // 向後滾動拉遠時自動切回第三人稱視角
+          setControlMode("avatar");
+          showToast("🚶 已切換為第三人稱跟隨視角");
+        }
+      }
+    }, { passive: false });
 
     let touchStartX = 0, touchStartY = 0;
     renderer.domElement.addEventListener("touchstart", (e) => {
