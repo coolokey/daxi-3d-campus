@@ -1962,7 +1962,8 @@
     <div class="venue-card-actions">
       <button class="venue-card-btn primary" id="vc-btn-walk">🚶 帶我去</button>
       <button class="venue-card-btn secondary" id="vc-btn-tp">⚡ 傳送到門口</button>
-      <button class="venue-card-btn secondary" id="vc-btn-bird">👁️ 鳥瞰位置</button>
+      <button class="venue-card-btn secondary" id="vc-btn-bird">👁️ 鳥瞰特寫</button>
+      <button class="venue-card-btn secondary" id="vc-btn-share" title="複製此地點專屬分享連結">🔗 分享地點</button>
     </div>
   </div>
 
@@ -2049,9 +2050,14 @@
 
     <!-- Excel Batch Import/Export Section (Dayong Elementary Concept) -->
     <div class="room-edit-batch-card">
-      <div class="batch-card-header">
-        <div class="batch-card-title">📊 與 Excel 快速雙向複製貼上</div>
-        <button class="batch-btn" id="btn-export-excel">📋 複製目前配置到剪貼簿 (Excel 格式)</button>
+      <div class="batch-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="batch-card-title">📊 與 Excel 快速雙向匯出／匯入</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="batch-btn" id="btn-export-excel" title="複製全校教室配置到剪貼簿">📋 複製 TSV</button>
+          <button class="batch-btn" id="btn-download-csv" title="直接下載 UTF-8 附帶 BOM 的 Excel CSV 檔案">📥 下載 CSV 檔</button>
+          <button class="batch-btn" id="btn-upload-csv" title="選取電腦中的 CSV 檔匯入">📤 匯入 CSV 檔</button>
+          <input type="file" id="file-upload-csv" accept=".csv,.tsv,.txt" style="display:none">
+        </div>
       </div>
       <p class="batch-hint">點選上方按鈕可直接將全校教室清單複製為 TSV，在 Excel 按 Ctrl+V 貼上；亦可由 Excel 複製貼至下方框中，按套用即可批次更新！</p>
       <textarea id="batch-excel-area" class="batch-textarea" placeholder="教室代號	教室名稱	所屬大樓	樓層	類別
@@ -3342,6 +3348,87 @@
       return new THREE.CanvasTexture(canvas);
     }
 
+    // 4.0.1 科技與藝術教育圖騰貼圖 (Science & STEAM Lab Decal)
+    function createScienceDecalTexture() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 512;
+      canvas.height = 256;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, 512, 256);
+      ctx.strokeStyle = "#eab308";
+      ctx.lineWidth = 8;
+      ctx.strokeRect(6, 6, 500, 244);
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(16, 16, 480, 224);
+
+      // 燒杯與原子圖騰
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(90, 60); ctx.lineTo(130, 60);
+      ctx.moveTo(100, 60); ctx.lineTo(100, 90); ctx.lineTo(70, 180); ctx.lineTo(150, 180); ctx.lineTo(120, 90); ctx.lineTo(120, 60);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(56, 189, 248, 0.4)";
+      ctx.beginPath();
+      ctx.moveTo(85, 140); ctx.lineTo(135, 140); ctx.lineTo(145, 175); ctx.lineTo(75, 175); ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#facc15";
+      [[110, 120, 5], [100, 100, 4], [120, 90, 6], [105, 75, 4]].forEach(([bx, by, br]) => {
+        ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fill();
+      });
+
+      ctx.strokeStyle = "#facc15";
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.ellipse(110, 120, 50, 18, Math.PI / 4, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(110, 120, 50, 18, -Math.PI / 4, 0, Math.PI * 2); ctx.stroke();
+
+      // 文字
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 36px 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText("自然科學實驗室", 200, 80);
+      ctx.fillStyle = "#facc15";
+      ctx.font = "bold 26px 'Noto Sans TC', sans-serif";
+      ctx.fillText("STEAM 創客科技穿堂", 200, 130);
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "bold 18px 'Barlow Condensed', sans-serif";
+      ctx.fillText("INNOVATION & SCIENCE CORRIDOR", 200, 175);
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    // 4.0.2 連鎖幾何石磚鋪面 (Interlocking Concrete Paver Texture)
+    function createInterlockingPaverTexture() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#e2e8f0";
+      ctx.fillRect(0, 0, 512, 512);
+      const brickW = 32;
+      const brickH = 16;
+      for (let y = 0; y < 512; y += brickH) {
+        const offset = ((y / brickH) % 2) * (brickW / 2);
+        for (let x = -brickW; x < 512 + brickW; x += brickW) {
+          const shade = ((Math.sin(x * 12.3 + y * 45.7) * 43758.5453) % 1 + 1) * 0.5;
+          const val = Math.floor(215 + shade * 30);
+          ctx.fillStyle = `rgb(${val}, ${val - 2}, ${val - 6})`;
+          ctx.fillRect(x + offset + 1, y + 1, brickW - 2, brickH - 2);
+          ctx.strokeStyle = "#cbd5e1";
+          ctx.strokeRect(x + offset + 0.5, y + 0.5, brickW - 1, brickH - 1);
+        }
+      }
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(16, 16);
+      return tex;
+    }
+
     // 4.1 Ground Lawn & Driveways
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(460, 380),
@@ -3370,6 +3457,164 @@
     centralRoad.position.set(52, 0.025, 12);
     centralRoad.receiveShadow = true;
     scene.add(centralRoad);
+
+    // 4.1.1 道路標線、綠白枕木紋斑馬線、黃黑立體減速丘與幾何石磚林蔭步道
+    function createRoadMarkingsAndCrossings() {
+      const roadGroup = new THREE.Group();
+      const interlockingPaverTex = createInterlockingPaverTexture();
+
+      // A. 幾何石磚人行林蔭步道 (Interlocking Concrete Paver Promenades)
+      const paverMat = new THREE.MeshLambertMaterial({ map: interlockingPaverTex, color: 0xf8fafc });
+
+      // 1. 中庭中央大道 (九年級棟與八年級中棟之間，寬 12m、長 44m)
+      const courtyardWalkway = new THREE.Mesh(new THREE.PlaneGeometry(12, 44), paverMat);
+      courtyardWalkway.rotation.x = -Math.PI / 2;
+      courtyardWalkway.position.set(15, 0.032, 29);
+      courtyardWalkway.receiveShadow = true;
+      roadGroup.add(courtyardWalkway);
+
+      // 2. 正門迎賓廣場直通行政大樓玄關步道 (寬 8m、長 28m)
+      const adminWalkway = new THREE.Mesh(new THREE.PlaneGeometry(8, 28), paverMat);
+      adminWalkway.rotation.x = -Math.PI / 2;
+      adminWalkway.position.set(-12, 0.032, 63);
+      adminWalkway.receiveShadow = true;
+      roadGroup.add(adminWalkway);
+
+      // 3. 行政大樓玄關橫向連接中庭廣場步道 (寬 16m、長 5m)
+      const adminToCourtyardWalk = new THREE.Mesh(new THREE.PlaneGeometry(16, 5), paverMat);
+      adminToCourtyardWalk.rotation.x = -Math.PI / 2;
+      adminToCourtyardWalk.position.set(-4, 0.032, 50);
+      adminToCourtyardWalk.receiveShadow = true;
+      roadGroup.add(adminToCourtyardWalk);
+
+      // B. 台灣校園標準綠底白線枕木紋斑馬線 (Continental Green-and-White Zebra Crossings)
+      function createZebraCrossing(x, z, roadSpan, walkWidth, isAlongZ = false) {
+        const zebraGroup = new THREE.Group();
+        zebraGroup.position.set(x, 0.034, z);
+
+        const greenBaseGeo = isAlongZ ? new THREE.PlaneGeometry(roadSpan, walkWidth) : new THREE.PlaneGeometry(walkWidth, roadSpan);
+        const greenBase = new THREE.Mesh(greenBaseGeo, new THREE.MeshLambertMaterial({ color: 0x15803d }));
+        greenBase.rotation.x = -Math.PI / 2;
+        greenBase.receiveShadow = true;
+        zebraGroup.add(greenBase);
+
+        // 白色枕木反光條紋 (寬 0.45m、間隔 0.45m)
+        const stripeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const step = 0.9;
+        const count = Math.floor((isAlongZ ? walkWidth : roadSpan) / step);
+        const start = -((count - 1) * step) / 2;
+
+        for (let i = 0; i < count; i++) {
+          const offset = start + i * step;
+          const stripeGeo = isAlongZ ? new THREE.PlaneGeometry(roadSpan - 0.4, 0.45) : new THREE.PlaneGeometry(0.45, roadSpan - 0.4);
+          const stripe = new THREE.Mesh(stripeGeo, stripeMat);
+          stripe.rotation.x = -Math.PI / 2;
+          stripe.position.y = 0.003;
+          if (isAlongZ) stripe.position.z = offset;
+          else stripe.position.x = offset;
+          zebraGroup.add(stripe);
+        }
+        roadGroup.add(zebraGroup);
+      }
+
+      // 4 處校園核心行人穿越斑馬線
+      createZebraCrossing(26, 86, 9.0, 5.0, true);  // 1. 正門車道口
+      createZebraCrossing(52, 50, 9.0, 5.0, false); // 2. 中央車道南側中庭口
+      createZebraCrossing(52, 12, 9.0, 5.0, false); // 3. 中央車道科技館交叉口
+      createZebraCrossing(52, -25, 9.0, 5.0, false);// 4. 中央車道綜合大樓/操場連通道
+
+      // C. 黃黑相間立體減速丘 (Yellow-and-Black 3D Speed Bumps)
+      function createSpeedBump(x, z, bumpLength, isAlongZ = false) {
+        const bumpGroup = new THREE.Group();
+        bumpGroup.position.set(x, 0.03, z);
+
+        const segCount = 8;
+        const segLen = bumpLength / segCount;
+        for (let i = 0; i < segCount; i++) {
+          const isYellow = (i % 2 === 0);
+          const bumpMat = new THREE.MeshLambertMaterial({ color: isYellow ? 0xfacc15 : 0x1e293b });
+          const bumpGeo = isAlongZ ? new THREE.BoxGeometry(1.2, 0.10, segLen) : new THREE.BoxGeometry(segLen, 0.10, 1.2);
+          const bump = new THREE.Mesh(bumpGeo, bumpMat);
+          const offset = -bumpLength / 2 + (i + 0.5) * segLen;
+          if (isAlongZ) bump.position.set(0, 0.05, offset);
+          else bump.position.set(offset, 0.05, 0);
+          bump.castShadow = true;
+          bumpGroup.add(bump);
+        }
+        roadGroup.add(bumpGroup);
+      }
+
+      // 3 處校園車速限制立體減速丘
+      createSpeedBump(18, 86, 8.6, false); // 正門車道進校處
+      createSpeedBump(52, 32, 8.6, true);  // 中央車道中段
+      createSpeedBump(52, -8, 8.6, true);  // 中央車道北段運動區
+
+      // D. 車道白色標線 (Dashed Centerlines & Solid Edge Lines)
+      const whiteLineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+      // 1. 南側主幹道 (東西向 z=86) 中央白色虛線
+      for (let rx = -55; rx <= 95; rx += 6) {
+        const dash = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 0.18), whiteLineMat);
+        dash.rotation.x = -Math.PI / 2;
+        dash.position.set(rx, 0.028, 86);
+        roadGroup.add(dash);
+      }
+      // 南側主幹道兩側白色實線
+      [-4.2, 4.2].forEach(offsetZ => {
+        const edgeLine = new THREE.Mesh(new THREE.PlaneGeometry(166, 0.18), whiteLineMat);
+        edgeLine.rotation.x = -Math.PI / 2;
+        edgeLine.position.set(20, 0.028, 86 + offsetZ);
+        roadGroup.add(edgeLine);
+      });
+
+      // 2. 中央主車道 (南北向 x=52) 中央白色虛線
+      for (let rz = -55; rz <= 80; rz += 6) {
+        const dash = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 3.5), whiteLineMat);
+        dash.rotation.x = -Math.PI / 2;
+        dash.position.set(52, 0.028, rz);
+        roadGroup.add(dash);
+      }
+      // 中央主車道兩側白色實線
+      [-4.2, 4.2].forEach(offsetX => {
+        const edgeLine = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 150), whiteLineMat);
+        edgeLine.rotation.x = -Math.PI / 2;
+        edgeLine.position.set(52 + offsetX, 0.028, 12);
+        roadGroup.add(edgeLine);
+      });
+
+      // E. 車道「慢」字白色交通地面標字 Canvas
+      function createSlowStencilTexture() {
+        const canvas = document.createElement("canvas");
+        canvas.width = 128;
+        canvas.height = 128;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "rgba(0,0,0,0)";
+        ctx.fillRect(0, 0, 128, 128);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "900 88px 'Noto Sans TC', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("慢", 64, 64);
+        return new THREE.CanvasTexture(canvas);
+      }
+      const slowTex = createSlowStencilTexture();
+      const slowMat = new THREE.MeshBasicMaterial({ map: slowTex, transparent: true, opacity: 0.9 });
+
+      [
+        { x: 38, z: 86, rot: 0 },
+        { x: 52, z: 62, rot: Math.PI / 2 },
+        { x: 52, z: 2, rot: Math.PI / 2 }
+      ].forEach(sp => {
+        const slowMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), slowMat);
+        slowMesh.rotation.x = -Math.PI / 2;
+        slowMesh.rotation.z = sp.rot;
+        slowMesh.position.set(sp.x, 0.036, sp.z);
+        roadGroup.add(slowMesh);
+      });
+
+      scene.add(roadGroup);
+    }
+    createRoadMarkingsAndCrossings();
 
     // 4.2 正門迎賓廣場、彩繪大門柱、金色圓球、黃牆紅瓦警衛室與大王椰子樹林蔭大道
     function createMainEntrancePlaza() {
@@ -3557,7 +3802,7 @@
       bronze.position.y = 4.4;
       bronze.castShadow = true;
       statueGroup.add(bronze);
-
+      statueGroup.userData.roomId = "statue";
       scene.add(statueGroup);
 
       // 蔣公銅像基座碰撞體 (防止穿透銅像基座)
@@ -3704,6 +3949,7 @@
         }
       }
       artGroup.add(cubeGroup);
+      artGroup.userData.roomId = "rubiks-cube";
       scene.add(artGroup);
 
       // 實體碰撞體阻擋穿透魔術方塊
@@ -3861,6 +4107,7 @@
       });
 
       pGroup.add(bodyGroup);
+      pGroup.userData.roomId = "peacock";
       scene.add(pGroup);
 
       // 實體碰撞體阻擋
@@ -4568,6 +4815,8 @@
         standGroup.add(shadeTree);
       });
 
+      standGroup.userData.roomId = "grandstand";
+      trackGroup.userData.roomId = "grandstand";
       trackGroup.add(standGroup);
       scene.add(trackGroup);
 
@@ -4620,6 +4869,7 @@
       net.position.set(0, 2.4, 0);
       vbGroup.add(net);
 
+      vbGroup.userData.roomId = "volleyball-out";
       scene.add(vbGroup);
 
       ROOMS_DB["volleyball-out"] = {
@@ -4741,6 +4991,7 @@
         courtGroup.add(createHoop(offset, 14.2, Math.PI));
       }
 
+      courtGroup.userData.roomId = "court-bb";
       scene.add(courtGroup);
 
       ROOMS_DB["court-bb"] = {
@@ -4822,6 +5073,7 @@
         gardenGroup.add(pad);
       }
 
+      gardenGroup.userData.roomId = "lan-pavilion";
       scene.add(gardenGroup);
 
       ROOMS_DB["lan-pavilion"] = {
@@ -4837,30 +5089,336 @@
     }
     createLanPavilion();
 
-    // 4.9 連通風雨走廊 (Breezeways)
-    function createBreezeway(x, z, width, depth) {
-      const bw = new THREE.Group();
-      bw.position.set(x, 0, z);
-      const roof = new THREE.Mesh(new THREE.BoxGeometry(width, 0.35, depth), new THREE.MeshLambertMaterial({ color: 0xe2e8f0 }));
-      roof.position.y = 4.0;
-      roof.castShadow = true;
-      bw.add(roof);
+    // 4.9 空中穿堂（黃色鋼桁架連通走廊 Yellow Truss Skybridges）
+    // 依據校園真實建置與大勇國小立體空橋特色，打造高真實感亮黃色鋼骨 Warren 桁架、採光雨遮罩、透明安全防風護板、STEAM 科技實驗室彩繪護板
+    function createYellowTrussSkybridge(cfg) {
+      const {
+        id,
+        name,
+        code,
+        x, z,
+        length,
+        width,
+        orientation = "ew",
+        floors = [2, 3],
+        groundWalkable = true,
+        hasDecal = true,
+        decalSide = "south"
+      } = cfg;
 
-      for (let px of [-width / 2 + 0.4, width / 2 - 0.4]) {
-        for (let pz of [-depth / 2 + 0.4, depth / 2 - 0.4]) {
-          const col = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 4.0, 8), new THREE.MeshLambertMaterial({ color: 0x64748b }));
-          col.position.set(px, 2.0, pz);
-          col.castShadow = true;
-          bw.add(col);
+      const bridgeGroup = new THREE.Group();
+      bridgeGroup.position.set(x, 0, z);
+
+      const isEW = (orientation === "ew");
+      const spanL = length;
+      const walkW = width;
+      const topFloor = Math.max(...floors);
+      const topRoofH = topFloor * FH + 0.6; // 樓頂雨遮高度 (約 11.4m)
+
+      // 擬真材質
+      const steelYellowMat = new THREE.MeshStandardMaterial({
+        color: 0xf59e0b, // 鮮明工程亮黃色防蝕鋼構
+        metalness: 0.65,
+        roughness: 0.35
+      });
+      const steelDarkMat = new THREE.MeshStandardMaterial({
+        color: 0x334155, // 結構底座深灰耐磨鋼材
+        metalness: 0.7,
+        roughness: 0.4
+      });
+      const glassMat = new THREE.MeshLambertMaterial({
+        color: 0x93c5fd,
+        transparent: true,
+        opacity: 0.55
+      });
+      const canopyMat = new THREE.MeshLambertMaterial({
+        color: 0xe0f2fe,
+        transparent: true,
+        opacity: 0.75,
+        side: THREE.DoubleSide
+      });
+      const floorTileMat = new THREE.MeshStandardMaterial({
+        color: 0x94a3b8,
+        roughness: 0.65
+      });
+      const handrailMat = new THREE.MeshStandardMaterial({
+        color: 0x1e3a8a, // 扶手深藍色防鏽烤漆
+        metalness: 0.5,
+        roughness: 0.4
+      });
+
+      const bayCount = Math.max(4, Math.round(spanL / 2.8));
+      const bayStep = spanL / bayCount;
+
+      // 1. 各樓層可行走地坪與天花板 (Walkable Slabs & Ceilings)
+      floors.forEach(f => {
+        const slabY = (f - 1) * FH;
+        const slabGeo = isEW ? new THREE.BoxGeometry(spanL, 0.22, walkW) : new THREE.BoxGeometry(walkW, 0.22, spanL);
+        const slab = new THREE.Mesh(slabGeo, floorTileMat);
+        slab.position.y = slabY + 0.11;
+        slab.castShadow = true;
+        slab.receiveShadow = true;
+        bridgeGroup.add(slab);
+
+        // 註冊該樓層可步行走道 (平滑接合兩側大樓走廊)
+        if (isEW) {
+          registerWalkFlat(x - spanL / 2 - 0.4, x + spanL / 2 + 0.4, z - walkW / 2 + 0.3, z + walkW / 2 - 0.3, slabY);
+        } else {
+          registerWalkFlat(x - walkW / 2 + 0.3, x + walkW / 2 - 0.3, z - spanL / 2 - 0.4, z + spanL / 2 + 0.4, slabY);
+        }
+
+        // 走廊兩側 1.1m 安全護欄 (Handrails)
+        [-walkW / 2 + 0.12, walkW / 2 - 0.12].forEach(sideOffset => {
+          const railGeo = isEW ? new THREE.BoxGeometry(spanL, 0.08, 0.08) : new THREE.BoxGeometry(0.08, 0.08, spanL);
+          const rail = new THREE.Mesh(railGeo, handrailMat);
+          rail.position.set(isEW ? 0 : sideOffset, slabY + 1.1, isEW ? sideOffset : 0);
+          bridgeGroup.add(rail);
+        });
+      });
+
+      if (groundWalkable) {
+        if (isEW) {
+          registerWalkFlat(x - spanL / 2 - 0.4, x + spanL / 2 + 0.4, z - walkW / 2 + 0.3, z + walkW / 2 - 0.3, 0);
+        } else {
+          registerWalkFlat(x - walkW / 2 + 0.3, x + walkW / 2 - 0.3, z - spanL / 2 - 0.4, z + spanL / 2 + 0.4, 0);
         }
       }
-      scene.add(bw);
+
+      // 2. 兩側主立柱 (Primary Vertical Steel Columns)
+      [-walkW / 2, walkW / 2].forEach(sidePos => {
+        for (let b = 0; b <= bayCount; b++) {
+          const colPos = -spanL / 2 + b * bayStep;
+          const col = new THREE.Mesh(
+            new THREE.BoxGeometry(0.22, topRoofH, 0.22),
+            steelYellowMat
+          );
+          col.position.set(isEW ? colPos : sidePos, topRoofH / 2, isEW ? sidePos : colPos);
+          col.castShadow = true;
+          bridgeGroup.add(col);
+
+          // 柱底耐重混凝土/深灰鋼基座
+          const foot = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.5, 0.42), steelDarkMat);
+          foot.position.set(isEW ? colPos : sidePos, 0.25, isEW ? sidePos : colPos);
+          bridgeGroup.add(foot);
+        }
+      });
+
+      // 3. 縱向上下主樑弦桿 (Longitudinal Top & Bottom Chords)
+      [-walkW / 2, walkW / 2].forEach(sidePos => {
+        // 各樓層水平弦桿
+        floors.forEach(f => {
+          const chordH = (f - 1) * FH;
+          const chordGeo = isEW ? new THREE.BoxGeometry(spanL, 0.18, 0.18) : new THREE.BoxGeometry(0.18, 0.18, spanL);
+          const chord = new THREE.Mesh(chordGeo, steelYellowMat);
+          chord.position.set(isEW ? 0 : sidePos, chordH + 0.09, isEW ? sidePos : 0);
+          bridgeGroup.add(chord);
+        });
+
+        // 頂部屋頂縱向主弦桿
+        const topChordGeo = isEW ? new THREE.BoxGeometry(spanL, 0.22, 0.22) : new THREE.BoxGeometry(0.22, 0.22, spanL);
+        const topChord = new THREE.Mesh(topChordGeo, steelYellowMat);
+        topChord.position.set(isEW ? 0 : sidePos, topRoofH, isEW ? sidePos : 0);
+        bridgeGroup.add(topChord);
+      });
+
+      // 4. Warren 桁架三角斜撐 (Triangular Diagonal Truss Web Bracing)
+      [-walkW / 2, walkW / 2].forEach(sidePos => {
+        for (let b = 0; b < bayCount; b++) {
+          const x0 = -spanL / 2 + b * bayStep;
+          const x1 = x0 + bayStep;
+          const xMid = (x0 + x1) / 2;
+
+          floors.forEach(f => {
+            const y0 = (f - 1) * FH + 0.15;
+            const y1 = f * FH - 0.15;
+            const diagH = y1 - y0;
+            const halfBay = bayStep / 2;
+            const diagLen = Math.hypot(halfBay, diagH);
+            const angle = Math.atan2(halfBay, diagH);
+
+            // 第一道斜撐 (上升)
+            const strut1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, diagLen, 0.12), steelYellowMat);
+            strut1.position.set(
+              isEW ? (x0 + halfBay / 2) : sidePos,
+              (y0 + y1) / 2,
+              isEW ? sidePos : (x0 + halfBay / 2)
+            );
+            if (isEW) strut1.rotation.z = -angle;
+            else strut1.rotation.x = angle;
+            strut1.castShadow = true;
+            bridgeGroup.add(strut1);
+
+            // 第二道斜撐 (下降)
+            const strut2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, diagLen, 0.12), steelYellowMat);
+            strut2.position.set(
+              isEW ? (xMid + halfBay / 2) : sidePos,
+              (y0 + y1) / 2,
+              isEW ? sidePos : (xMid + halfBay / 2)
+            );
+            if (isEW) strut2.rotation.z = angle;
+            else strut2.rotation.x = -angle;
+            strut2.castShadow = true;
+            bridgeGroup.add(strut2);
+
+            // 側邊透明安全防風護板
+            const glassPanelGeo = isEW ? new THREE.BoxGeometry(bayStep - 0.08, diagH - 0.12, 0.04) : new THREE.BoxGeometry(0.04, diagH - 0.12, bayStep - 0.08);
+            const glassPanel = new THREE.Mesh(glassPanelGeo, glassMat);
+            glassPanel.position.set(
+              isEW ? xMid : sidePos,
+              (y0 + y1) / 2,
+              isEW ? sidePos : xMid
+            );
+            bridgeGroup.add(glassPanel);
+          });
+        }
+      });
+
+      // 5. 頂部採光拱形雨遮天幕 (Arched Vault Translucent Canopy Roof)
+      const canopyArcShape = new THREE.Shape();
+      const halfW = walkW / 2 + 0.35;
+      const arcH = 0.85;
+      canopyArcShape.moveTo(-halfW, 0);
+      canopyArcShape.quadraticCurveTo(0, arcH, halfW, 0);
+      canopyArcShape.lineTo(halfW, 0.08);
+      canopyArcShape.quadraticCurveTo(0, arcH + 0.08, -halfW, 0.08);
+      canopyArcShape.closePath();
+
+      const extrudeSettings = { depth: spanL, bevelEnabled: false };
+      const canopyGeo = new THREE.ExtrudeGeometry(canopyArcShape, extrudeSettings);
+      const canopyMesh = new THREE.Mesh(canopyGeo, canopyMat);
+
+      if (isEW) {
+        canopyMesh.rotation.y = Math.PI / 2;
+        canopyMesh.position.set(-spanL / 2, topRoofH, 0);
+      } else {
+        canopyMesh.position.set(0, topRoofH, -spanL / 2);
+      }
+      canopyMesh.castShadow = true;
+      bridgeGroup.add(canopyMesh);
+
+      // 6. STEAM / 自然科學實驗室穿堂彩繪圖騰護板 (Science Decal Plaque)
+      if (hasDecal) {
+        const decalTex = createScienceDecalTexture();
+        const decalMat = new THREE.MeshBasicMaterial({ map: decalTex, side: THREE.DoubleSide });
+        const decalW = Math.min(spanL * 0.55, 7.2);
+        const decalH = 1.8;
+        const decalMesh = new THREE.Mesh(new THREE.PlaneGeometry(decalW, decalH), decalMat);
+
+        let decalSideOffset = (decalSide === "south" || decalSide === "east") ? (walkW / 2 + 0.15) : (-walkW / 2 - 0.15);
+        let decalY = (floors.includes(2) && floors.includes(3)) ? (FH * 1.5) : (FH * 0.9);
+
+        if (isEW) {
+          decalMesh.position.set(0, decalY, decalSideOffset);
+          if (decalSide === "north") decalMesh.rotation.y = Math.PI;
+        } else {
+          decalMesh.position.set(decalSideOffset, decalY, 0);
+          decalMesh.rotation.y = (decalSide === "west") ? -Math.PI / 2 : Math.PI / 2;
+        }
+        bridgeGroup.add(decalMesh);
+      }
+
+      // 7. 外側實體防摔碰撞阻擋牆 (Wall Colliders along both sides)
+      if (isEW) {
+        registerWallCollider(x - spanL / 2, x + spanL / 2, z - walkW / 2 - 0.35, z - walkW / 2 + 0.35, 0, topRoofH + 1.0);
+        registerWallCollider(x - spanL / 2, x + spanL / 2, z + walkW / 2 - 0.35, z + walkW / 2 + 0.35, 0, topRoofH + 1.0);
+      } else {
+        registerWallCollider(x - walkW / 2 - 0.35, x - walkW / 2 + 0.35, z - spanL / 2, z + spanL / 2, 0, topRoofH + 1.0);
+        registerWallCollider(x + walkW / 2 - 0.35, x + walkW / 2 + 0.35, z - spanL / 2, z + spanL / 2, 0, topRoofH + 1.0);
+      }
+
+      bridgeGroup.userData.roomId = id;
+      scene.add(bridgeGroup);
+
+      if (id && name) {
+        ROOMS_DB[id] = {
+          id: id,
+          code: code || "SKY-01",
+          name: name,
+          buildingId: "bridge",
+          buildingName: "空中連通穿堂",
+          floor: 2,
+          cat: "special",
+          node: id
+        };
+      }
+      return bridgeGroup;
     }
-    createBreezeway(-12, 32, 6, 14); // 行政前後棟中央通道
-    createBreezeway(-5, 32, 8, 4);   // 行政棟通往中庭通廊
-    createBreezeway(15, 8, 26, 4);   // 九年級與八年級中棟北端橫向通廊
-    createBreezeway(15, 52, 26, 4);  // 九年級與八年級中棟南端橫向通廊
-    createBreezeway(12, 2, 4, 8);    // 通往健康中心棟通廊
+
+    // 建置各大樓黃色鋼桁架空中連通穿堂 (Yellow Truss Skybridges)
+    // 1. 北側黃色鋼桁架空中穿堂 (九年級棟 ↔ 八年級中棟北端 2F/3F 連通)
+    createYellowTrussSkybridge({
+      id: "bridge-g9g8-n",
+      name: "北側黃色鋼桁架空中穿堂 (STEAM科技廊)",
+      code: "SKY-N",
+      x: 15, z: 8,
+      length: 26, width: 4.2,
+      orientation: "ew",
+      floors: [2, 3],
+      hasDecal: true,
+      decalSide: "south"
+    });
+
+    // 2. 南側黃色鋼桁架空中穿堂 (九年級棟 ↔ 八年級中棟南端 2F/3F 連通)
+    createYellowTrussSkybridge({
+      id: "bridge-g9g8-s",
+      name: "南側黃色鋼桁架空中穿堂 (創客藝術廊)",
+      code: "SKY-S",
+      x: 15, z: 50,
+      length: 26, width: 4.2,
+      orientation: "ew",
+      floors: [2, 3],
+      hasDecal: true,
+      decalSide: "north"
+    });
+
+    // 3. 行政大樓中央採光空中穿廊 (行政前棟 ↔ 行政後棟 1F/2F/3F 連通)
+    createYellowTrussSkybridge({
+      id: "bridge-admin",
+      name: "行政大樓中央採光空中穿廊",
+      code: "SKY-ADM",
+      x: -12, z: 32,
+      length: 14, width: 6.0,
+      orientation: "ns",
+      floors: [1, 2, 3],
+      hasDecal: false
+    });
+
+    // 4. 行政棟通往中庭連通風雨廊
+    createYellowTrussSkybridge({
+      id: "bridge-adm-g9",
+      name: "行政棟通往中庭連通風雨廊",
+      code: "SKY-W",
+      x: -5, z: 32,
+      length: 8, width: 4.0,
+      orientation: "ew",
+      floors: [1, 2],
+      hasDecal: false
+    });
+
+    // 5. 科技館與綜合大樓連通穿堂
+    createYellowTrussSkybridge({
+      id: "bridge-tech-multi",
+      name: "科技館與綜合大樓連通穿堂",
+      code: "SKY-TECH",
+      x: 74, z: -5.5,
+      length: 19, width: 4.8,
+      orientation: "ns",
+      floors: [2],
+      hasDecal: true,
+      decalSide: "west"
+    });
+
+    // 6. 健康中心棟前連廊
+    createYellowTrussSkybridge({
+      id: "bridge-health",
+      name: "健康中心棟前連廊",
+      code: "SKY-HLT",
+      x: 12, z: 2,
+      length: 8, width: 4.0,
+      orientation: "ns",
+      floors: [1, 2],
+      hasDecal: false
+    });
 
     // 4.10 綜合大樓中庭平面停車場 (Parking Lot P)
     function createMultiBuildingParking() {
@@ -4868,6 +5426,7 @@
       pLot.rotation.x = -Math.PI / 2;
       pLot.position.set(74, 0.03, -23);
       pLot.receiveShadow = true;
+      pLot.userData.roomId = "parking-lot";
       scene.add(pLot);
 
       ROOMS_DB["parking-lot"] = {
@@ -5640,14 +6199,16 @@
   "admin-f-stair-mid1": { id: "admin-f-stair-mid1", x: -22, y: 1.8, z: 44, neighbors: ["admin-f-stair-1f", "admin-f-stair-2f"] },
   "admin-f-stair-2f": { id: "admin-f-stair-2f", x: -22, y: 3.6, z: 44, neighbors: ["admin-f-stair-mid1", "admin-f-2f-w", "admin-f-stair-mid2"] },
   "admin-f-2f-w": { id: "admin-f-2f-w", x: -18, y: 3.6, z: 44, neighbors: ["admin-f-stair-2f", "admin-f-2f-c"] },
-  "admin-f-2f-c": { id: "admin-f-2f-c", x: -12, y: 3.6, z: 44, neighbors: ["admin-f-2f-w", "admin-f-2f-e"] },
+  "admin-f-2f-c": { id: "admin-f-2f-c", x: -12, y: 3.6, z: 44, neighbors: ["admin-f-2f-w", "admin-f-2f-e", "bridge-admin-2f"] },
   "admin-f-2f-e": { id: "admin-f-2f-e", x: -6, y: 3.6, z: 44, neighbors: ["admin-f-2f-c"] },
   "admin-f-stair-mid2": { id: "admin-f-stair-mid2", x: -22, y: 5.4, z: 44, neighbors: ["admin-f-stair-2f", "admin-f-stair-3f"] },
   "admin-f-stair-3f": { id: "admin-f-stair-3f", x: -22, y: 7.2, z: 44, neighbors: ["admin-f-stair-mid2", "admin-f-3f-w"] },
   "admin-f-3f-w": { id: "admin-f-3f-w", x: -18, y: 7.2, z: 44, neighbors: ["admin-f-stair-3f", "admin-f-3f-e"] },
-  "admin-f-3f-e": { id: "admin-f-3f-e", x: -6, y: 7.2, z: 44, neighbors: ["admin-f-3f-w"] },
+  "admin-f-3f-e": { id: "admin-f-3f-e", x: -6, y: 7.2, z: 44, neighbors: ["admin-f-3f-w", "bridge-admin-3f"] },
 
   "admin-bridge": { id: "admin-bridge", x: -12, y: 0, z: 32, neighbors: ["admin-f-porch", "admin-b-porch", "breezeway-west"] },
+  "bridge-admin-2f": { id: "bridge-admin-2f", x: -12, y: 3.6, z: 32, neighbors: ["admin-f-2f-c", "admin-b-2f-c"] },
+  "bridge-admin-3f": { id: "bridge-admin-3f", x: -12, y: 7.2, z: 32, neighbors: ["admin-f-3f-e", "admin-b-3f-e"] },
 
   "admin-b-porch": { id: "admin-b-porch", x: -12, y: 0, z: 14, neighbors: ["admin-bridge", "admin-b-1f-w", "admin-b-1f-c", "admin-b-1f-e", "admin-b-stair-1f"] },
   "admin-b-1f-w": { id: "admin-b-1f-w", x: -18, y: 0, z: 20, neighbors: ["admin-b-porch"] },
@@ -5657,16 +6218,23 @@
   "admin-b-stair-mid1": { id: "admin-b-stair-mid1", x: -22, y: 1.8, z: 20, neighbors: ["admin-b-stair-1f", "admin-b-stair-2f"] },
   "admin-b-stair-2f": { id: "admin-b-stair-2f", x: -22, y: 3.6, z: 20, neighbors: ["admin-b-stair-mid1", "admin-b-2f-w", "admin-b-stair-mid2"] },
   "admin-b-2f-w": { id: "admin-b-2f-w", x: -14, y: 3.6, z: 20, neighbors: ["admin-b-stair-2f", "admin-b-2f-e"] },
+  "admin-b-2f-c": { id: "admin-b-2f-c", x: -12, y: 3.6, z: 20, neighbors: ["admin-b-porch", "bridge-admin-2f"] },
   "admin-b-2f-e": { id: "admin-b-2f-e", x: -6, y: 3.6, z: 20, neighbors: ["admin-b-2f-w"] },
   "admin-b-stair-mid2": { id: "admin-b-stair-mid2", x: -22, y: 5.4, z: 20, neighbors: ["admin-b-stair-2f", "admin-b-stair-3f"] },
   "admin-b-stair-3f": { id: "admin-b-stair-3f", x: -22, y: 7.2, z: 20, neighbors: ["admin-b-stair-mid2", "admin-b-3f-w"] },
   "admin-b-3f-w": { id: "admin-b-3f-w", x: -16, y: 7.2, z: 20, neighbors: ["admin-b-stair-3f", "admin-b-3f-e"] },
-  "admin-b-3f-e": { id: "admin-b-3f-e", x: -6, y: 7.2, z: 20, neighbors: ["admin-b-3f-w"] },
+  "admin-b-3f-e": { id: "admin-b-3f-e", x: -6, y: 7.2, z: 20, neighbors: ["admin-b-3f-w", "bridge-admin-3f"] },
 
-  // 5. 通廊 (Breezeways) 與中央庭園
+  // 5. 通廊 (Breezeways) 與空中穿堂
   "breezeway-west": { id: "breezeway-west", x: -5, y: 0, z: 32, neighbors: ["admin-bridge", "g9-porch-s", "g9-porch-n"] },
   "breezeway-mid": { id: "breezeway-mid", x: 15, y: 0, z: 28, neighbors: ["g9-porch-s", "g8m-porch-s", "g9-porch-n", "g8m-porch-n"] },
   "breezeway-north": { id: "breezeway-north", x: 15, y: 0, z: 6, neighbors: ["health-porch", "g9-porch-n", "g8m-porch-n", "bb-gate"] },
+
+  // 黃色鋼桁架空中穿堂立體導航點 (2F & 3F Skybridges)
+  "bridge-g9g8-n-2f": { id: "bridge-g9g8-n-2f", x: 15, y: 3.6, z: 8, neighbors: ["g9-2f-clubs", "g8m-2f-math-res"] },
+  "bridge-g9g8-n-3f": { id: "bridge-g9g8-n-3f", x: 15, y: 7.2, z: 8, neighbors: ["g9-3f-901", "g8m-3f-nl"] },
+  "bridge-g9g8-s-2f": { id: "bridge-g9g8-s-2f", x: 15, y: 3.6, z: 50, neighbors: ["g9-2f-905", "g8m-2f-804"] },
+  "bridge-g9g8-s-3f": { id: "bridge-g9g8-s-3f", x: 15, y: 7.2, z: 50, neighbors: ["g9-3f-903", "g8m-3f-inter"] },
 
   // 6. 健康中心棟 (北橫棟)
   "health-porch": { id: "health-porch", x: 12, y: 0, z: 2, neighbors: ["breezeway-north", "bb-gate", "health-1f-w", "health-1f-e", "health-stair-1f"] },
@@ -5704,15 +6272,15 @@
   "g9-stair-s-1f": { id: "g9-stair-s-1f", x: 2, y: 0, z: 46, neighbors: ["g9-porch-s", "g9-stair-s-mid1"] },
   "g9-stair-s-mid1": { id: "g9-stair-s-mid1", x: 2, y: 1.8, z: 46, neighbors: ["g9-stair-s-1f", "g9-stair-s-2f"] },
   "g9-stair-s-2f": { id: "g9-stair-s-2f", x: 2, y: 3.6, z: 46, neighbors: ["g9-stair-s-mid1", "g9-2f-905", "g9-stair-s-mid2"] },
-  "g9-2f-905": { id: "g9-2f-905", x: 2, y: 3.6, z: 42, neighbors: ["g9-stair-s-2f", "g9-2f-904"] },
+  "g9-2f-905": { id: "g9-2f-905", x: 2, y: 3.6, z: 42, neighbors: ["g9-stair-s-2f", "g9-2f-904", "bridge-g9g8-s-2f"] },
   "g9-2f-904": { id: "g9-2f-904", x: 2, y: 3.6, z: 28, neighbors: ["g9-2f-905", "g9-2f-clubs"] },
-  "g9-2f-clubs": { id: "g9-2f-clubs", x: 2, y: 3.6, z: 14, neighbors: ["g9-2f-904"] },
+  "g9-2f-clubs": { id: "g9-2f-clubs", x: 2, y: 3.6, z: 14, neighbors: ["g9-2f-904", "bridge-g9g8-n-2f"] },
 
   "g9-stair-s-mid2": { id: "g9-stair-s-mid2", x: 2, y: 5.4, z: 46, neighbors: ["g9-stair-s-2f", "g9-stair-s-3f"] },
   "g9-stair-s-3f": { id: "g9-stair-s-3f", x: 2, y: 7.2, z: 46, neighbors: ["g9-stair-s-mid2", "g9-3f-903"] },
-  "g9-3f-903": { id: "g9-3f-903", x: 2, y: 7.2, z: 42, neighbors: ["g9-stair-s-3f", "g9-3f-902"] },
+  "g9-3f-903": { id: "g9-3f-903", x: 2, y: 7.2, z: 42, neighbors: ["g9-stair-s-3f", "g9-3f-902", "bridge-g9g8-s-3f"] },
   "g9-3f-902": { id: "g9-3f-902", x: 2, y: 7.2, z: 28, neighbors: ["g9-3f-903", "g9-3f-901"] },
-  "g9-3f-901": { id: "g9-3f-901", x: 2, y: 7.2, z: 14, neighbors: ["g9-3f-902"] },
+  "g9-3f-901": { id: "g9-3f-901", x: 2, y: 7.2, z: 14, neighbors: ["g9-3f-902", "bridge-g9g8-n-3f"] },
 
   // 9. 八年級中棟與專科教室 (中東縱向棟，直立南北向)
   "g8m-porch-s": { id: "g8m-porch-s", x: 28, y: 0, z: 50, neighbors: ["g8f-porch", "breezeway-mid", "driveway-m1", "g8m-1f-wood", "g8m-stair-s-1f"] },
@@ -5725,15 +6293,15 @@
   "g8m-stair-s-1f": { id: "g8m-stair-s-1f", x: 28, y: 0, z: 46, neighbors: ["g8m-porch-s", "g8m-stair-s-mid1"] },
   "g8m-stair-s-mid1": { id: "g8m-stair-s-mid1", x: 28, y: 1.8, z: 46, neighbors: ["g8m-stair-s-1f", "g8m-stair-s-2f"] },
   "g8m-stair-s-2f": { id: "g8m-stair-s-2f", x: 28, y: 3.6, z: 46, neighbors: ["g8m-stair-s-mid1", "g8m-2f-804", "g8m-stair-s-mid2"] },
-  "g8m-2f-804": { id: "g8m-2f-804", x: 28, y: 3.6, z: 42, neighbors: ["g8m-stair-s-2f", "g8m-2f-805"] },
+  "g8m-2f-804": { id: "g8m-2f-804", x: 28, y: 3.6, z: 42, neighbors: ["g8m-stair-s-2f", "g8m-2f-805", "bridge-g9g8-s-2f"] },
   "g8m-2f-805": { id: "g8m-2f-805", x: 28, y: 3.6, z: 32, neighbors: ["g8m-2f-804", "g8m-2f-math-res"] },
-  "g8m-2f-math-res": { id: "g8m-2f-math-res", x: 28, y: 3.6, z: 22, neighbors: ["g8m-2f-805"] },
+  "g8m-2f-math-res": { id: "g8m-2f-math-res", x: 28, y: 3.6, z: 22, neighbors: ["g8m-2f-805", "bridge-g9g8-n-2f"] },
 
   "g8m-stair-s-mid2": { id: "g8m-stair-s-mid2", x: 28, y: 5.4, z: 46, neighbors: ["g8m-stair-s-2f", "g8m-stair-s-3f"] },
   "g8m-stair-s-3f": { id: "g8m-stair-s-3f", x: 28, y: 7.2, z: 46, neighbors: ["g8m-stair-s-mid2", "g8m-3f-inter"] },
-  "g8m-3f-inter": { id: "g8m-3f-inter", x: 28, y: 7.2, z: 38, neighbors: ["g8m-stair-s-3f", "g8m-3f-drama"] },
+  "g8m-3f-inter": { id: "g8m-3f-inter", x: 28, y: 7.2, z: 38, neighbors: ["g8m-stair-s-3f", "g8m-3f-drama", "bridge-g9g8-s-3f"] },
   "g8m-3f-drama": { id: "g8m-3f-drama", x: 28, y: 7.2, z: 26, neighbors: ["g8m-3f-inter", "g8m-3f-nl"] },
-  "g8m-3f-nl": { id: "g8m-3f-nl", x: 28, y: 7.2, z: 14, neighbors: ["g8m-3f-drama"] },
+  "g8m-3f-nl": { id: "g8m-3f-nl", x: 28, y: 7.2, z: 14, neighbors: ["g8m-3f-drama", "bridge-g9g8-n-3f"] },
 
   // 10. 中央南北向車道 (Main Driveway)
   "driveway-s1": { id: "driveway-s1", x: 30, y: 0, z: 86, neighbors: ["gate-guard", "driveway-m1", "bike-shed"] },
@@ -6566,6 +7134,52 @@
     const btnImportExcel = document.getElementById("btn-import-excel");
     if (btnImportExcel) btnImportExcel.addEventListener("click", importFromExcel);
 
+    // 7.2 CSV 檔案下載與上傳 (Excel 友善含 UTF-8 BOM)
+    function downloadCSV() {
+      const rows = [["\uFEFF教室代號", "教室名稱", "所屬大樓", "樓層", "類別代碼"]];
+      BUILDINGS_CONFIG.forEach(cfg => {
+        if (!cfg.rooms) return;
+        cfg.rooms.forEach(r => {
+          const name = getRoomDisplayName(r);
+          const code = r.code || r.id;
+          rows.push([code, name, cfg.name, r.floor, r.cat || cfg.category || "academic"]);
+        });
+      });
+      const csvContent = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `大溪國中115學年度教室配置表_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast("📥 教室配置 CSV 檔案已成功下載！可直接以 Excel 開啟編輯。");
+    }
+
+    const btnDownloadCSV = document.getElementById("btn-download-csv");
+    if (btnDownloadCSV) btnDownloadCSV.addEventListener("click", downloadCSV);
+
+    const btnUploadCSV = document.getElementById("btn-upload-csv");
+    const fileUploadCSV = document.getElementById("file-upload-csv");
+    if (btnUploadCSV && fileUploadCSV) {
+      btnUploadCSV.addEventListener("click", () => fileUploadCSV.click());
+      fileUploadCSV.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const text = evt.target.result;
+          const textarea = document.getElementById("batch-excel-area");
+          if (textarea) textarea.value = text;
+          importFromExcel();
+          fileUploadCSV.value = "";
+        };
+        reader.readAsText(file, "UTF-8");
+      });
+    }
+
     /* ==========================================================================
        8. VENUE CARD, NAVIGATION & CAMERA TRANSITIONS (大勇國小概念)
        ========================================================================== */
@@ -6736,6 +7350,25 @@
     if (vcBtnBird) {
       vcBtnBird.addEventListener("click", () => {
         if (currentSelectedRoomId) focusRoomBirdEye(currentSelectedRoomId);
+      });
+    }
+
+    const vcBtnShare = document.getElementById("vc-btn-share");
+    if (vcBtnShare) {
+      vcBtnShare.addEventListener("click", () => {
+        if (!currentSelectedRoomId) return;
+        const room = ROOMS_DB[currentSelectedRoomId];
+        const shareUrl = `${window.location.origin}${window.location.pathname}?to=${encodeURIComponent(currentSelectedRoomId)}`;
+        const rName = room ? getRoomDisplayName(room) : currentSelectedRoomId;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareUrl).then(() => {
+            showToast(`📋 已複製【${rName}】專屬分享連結！`);
+          }).catch(() => {
+            prompt(`請複製【${rName}】專屬連結：`, shareUrl);
+          });
+        } else {
+          prompt(`請複製【${rName}】專屬連結：`, shareUrl);
+        }
       });
     }
 
@@ -7029,13 +7662,40 @@
       }
     }
 
+    let mouseClickDownPos = { x: 0, y: 0 };
     renderer.domElement.addEventListener("mousedown", (e) => {
+      mouseClickDownPos = { x: e.clientX, y: e.clientY };
       if ((mouseTurnMode === "left" && e.button === 0) || (mouseTurnMode === "right" && e.button === 2) || currentMode === "avatar") {
         isMouseDownDragging = true;
       }
     });
-    window.addEventListener("mouseup", () => {
+    window.addEventListener("mouseup", (e) => {
       isMouseDownDragging = false;
+      // 3D 空間射線點擊交互 (大勇國小特色：點選建築、公共藝術、地標即彈出地點資訊卡)
+      if (e && e.target === renderer.domElement) {
+        const dx = e.clientX - mouseClickDownPos.x;
+        const dy = e.clientY - mouseClickDownPos.y;
+        if (Math.hypot(dx, dy) < 6) {
+          const rect = renderer.domElement.getBoundingClientRect();
+          const mouse = new THREE.Vector2(
+            ((e.clientX - rect.left) / rect.width) * 2 - 1,
+            -((e.clientY - rect.top) / rect.height) * 2 + 1
+          );
+          const raycaster = new THREE.Raycaster();
+          raycaster.setFromCamera(mouse, camera);
+          const intersects = raycaster.intersectObjects(scene.children, true);
+          for (let hit of intersects) {
+            let cur = hit.object;
+            while (cur && cur !== scene) {
+              if (cur.userData && cur.userData.roomId) {
+                openVenueCard(cur.userData.roomId);
+                return;
+              }
+              cur = cur.parent;
+            }
+          }
+        }
+      }
     });
     renderer.domElement.addEventListener("contextmenu", (e) => {
       if (mouseTurnMode === "right" || currentMode === "avatar") {
@@ -7849,6 +8509,22 @@ miniCanvas.addEventListener("click", (e) => {
 
       if (stairPadCooldown > 0) {
         stairPadCooldown -= delta;
+      }
+
+      // 5. 樓梯口雙軌光圈動態自轉與微幅呼吸浮動效果 (Stair Teleport Pads Glow & Pulse)
+      if (STAIR_PADS.length > 0) {
+        const padTime = clock.getElapsedTime();
+        for (let i = 0; i < STAIR_PADS.length; i++) {
+          const pad = STAIR_PADS[i];
+          if (pad.padBaseMesh) {
+            pad.padBaseMesh.rotation.y = padTime * 0.75 + i;
+            pad.padBaseMesh.position.y = pad.basePos.y + 0.05 + Math.sin(padTime * 3.5 + i) * 0.03;
+          }
+          if (pad.padTopMesh) {
+            pad.padTopMesh.rotation.y = -padTime * 0.75 - i;
+            pad.padTopMesh.position.y = pad.topPos.y + 0.05 + Math.sin(padTime * 3.5 + i + 1.5) * 0.03;
+          }
+        }
       }
 
       // Space-bar Jump Hop (依據當前樓層地面高度落地，不穿破樓板)
