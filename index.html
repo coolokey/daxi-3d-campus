@@ -1831,6 +1831,8 @@
     <div class="venue-chip" data-to="gym">🏀 學生活動中心禮堂</div>
     <div class="venue-chip" data-to="grandstand">🏃 操場司令台</div>
     <div class="venue-chip" data-to="statue">🗿 蔣公銅像庭園</div>
+    <div class="venue-chip" data-to="rubiks-cube">🎲 彩色魔術方塊地標</div>
+    <div class="venue-chip" data-to="peacock">🦚 綠彩孔雀雕塑</div>
     <div class="venue-chip" data-to="court-bb">🏀 籃球場群</div>
     <div class="venue-chip" data-to="volleyball-out">🏐 戶外排球場</div>
   </div>
@@ -2189,10 +2191,10 @@
     color: 0xf3ede2,
     roofColor: 0xd63031,
     hasPitchedRoof: true,
-    x: 16, z: 60, width: 44, depth: 10, floors: 3,
+    x: 24, z: 60, width: 38, depth: 10, floors: 3,
     stairs: [
-      { x: -6, z: 60, name: "八年級西側半圓樓梯塔", floors: 3 },
-      { x: 36, z: 60, name: "八年級東側樓梯", floors: 3 }
+      { x: 5, z: 60, name: "八年級西側半圓樓梯塔", floors: 3 },
+      { x: 42, z: 60, name: "八年級東側樓梯", floors: 3 }
     ],
     rooms: [
       { id: "kindergarten", code: "8F1-K", name: "非營利幼兒園 (1F)", floor: 1, node: "g8f-1f-k", cat: "admin" },
@@ -3298,6 +3300,48 @@
       return tex;
     }
 
+    function createTrackLaneNumberTexture(num) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, 128, 128);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 96px 'Barlow Condensed', 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(String(num), 64, 64);
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    function createPodiumBackdropTexture() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1024;
+      canvas.height = 256;
+      const ctx = canvas.getContext("2d");
+      const grad = ctx.createLinearGradient(0, 0, 1024, 0);
+      grad.addColorStop(0, "#1e3a8a");
+      grad.addColorStop(0.5, "#0284c7");
+      grad.addColorStop(1, "#1e3a8a");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1024, 256);
+      ctx.strokeStyle = "#fbbf24";
+      ctx.lineWidth = 10;
+      ctx.strokeRect(10, 10, 1004, 236);
+      ctx.fillStyle = "#f8fafc";
+      ctx.font = "900 48px 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("桃園市立大溪國民中學", 512, 70);
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "900 66px 'Noto Sans TC', sans-serif";
+      ctx.shadowColor = "rgba(0,0,0,0.6)";
+      ctx.shadowBlur = 8;
+      ctx.fillText("多元展能 ★ 榮耀大溪", 512, 160);
+      ctx.shadowBlur = 0;
+      return new THREE.CanvasTexture(canvas);
+    }
+
     // 4.1 Ground Lawn & Driveways
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(460, 380),
@@ -3539,6 +3583,447 @@
     }
     createStatueCourtyard();
 
+    // 4.3.1 中庭核心公共藝術：立體彩色魔術方塊裝置藝術 (照片 S__66011285 靈魂地標)
+    function createRubiksCubeArt(px = 6, pz = 58) {
+      const artGroup = new THREE.Group();
+      artGroup.position.set(px, 0, pz);
+
+      // 1. 八角/圓形石造景觀花壇基座
+      const planterCurb = new THREE.Mesh(
+        new THREE.CylinderGeometry(3.0, 3.2, 0.45, 24),
+        new THREE.MeshLambertMaterial({ color: 0xe2e8f0 })
+      );
+      planterCurb.position.y = 0.225;
+      planterCurb.receiveShadow = true;
+      artGroup.add(planterCurb);
+
+      const planterSoil = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.8, 2.8, 0.48, 24),
+        new THREE.MeshLambertMaterial({ color: 0x166534 })
+      );
+      planterSoil.position.y = 0.25;
+      artGroup.add(planterSoil);
+
+      // 花壇周邊盛開灌木矮花叢
+      for (let i = 0; i < 12; i++) {
+        const ang = (i * Math.PI * 2) / 12;
+        const flowerBush = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(0.35, 1),
+          new THREE.MeshLambertMaterial({ color: (i % 2 === 0) ? 0xf59e0b : 0xec4899 })
+        );
+        flowerBush.position.set(Math.cos(ang) * 2.3, 0.55, Math.sin(ang) * 2.3);
+        artGroup.add(flowerBush);
+      }
+
+      // 2. 黑色金屬斜角支撐基座與鋼柱
+      const standPost = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.18, 0.28, 2.2, 12),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.3 })
+      );
+      standPost.position.y = 1.1;
+      standPost.castShadow = true;
+      artGroup.add(standPost);
+
+      // 3. 傾斜 3x3x3 彩色魔術方塊主體 (單角頂點朝下立體翻轉)
+      const cubeGroup = new THREE.Group();
+      cubeGroup.position.set(0, 3.1, 0);
+      cubeGroup.rotation.x = Math.PI / 4.2;
+      cubeGroup.rotation.z = Math.PI / 3.8;
+      cubeGroup.rotation.y = Math.PI / 5;
+
+      const blockSize = 0.62;
+      const gap = 0.04;
+      const step = blockSize + gap;
+
+      const colors = {
+        top: 0xf8fafc,    // +Y 白
+        bottom: 0xfacc15, // -Y 黃
+        right: 0xef4444,  // +X 紅
+        left: 0xf97316,   // -X 橙
+        front: 0x2563eb,  // +Z 藍
+        back: 0x16a34a    // -Z 綠
+      };
+
+      const blackCoreMat = new THREE.MeshLambertMaterial({ color: 0x09090b });
+      const blockGeo = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
+
+      for (let ix = -1; ix <= 1; ix++) {
+        for (let iy = -1; iy <= 1; iy++) {
+          for (let iz = -1; iz <= 1; iz++) {
+            const subMesh = new THREE.Mesh(blockGeo, blackCoreMat);
+            subMesh.position.set(ix * step, iy * step, iz * step);
+            subMesh.castShadow = true;
+
+            const stickerOffset = blockSize * 0.505;
+            const stickerGeo = new THREE.PlaneGeometry(blockSize * 0.86, blockSize * 0.86);
+
+            // +X 右面
+            if (ix === 1) {
+              const st = new THREE.Mesh(stickerGeo, new THREE.MeshLambertMaterial({ color: colors.right }));
+              st.position.set(stickerOffset, 0, 0);
+              st.rotation.y = Math.PI / 2;
+              subMesh.add(st);
+            }
+            // -X 左面
+            if (ix === -1) {
+              const st = new THREE.Mesh(stickerGeo, new THREE.MeshLambertMaterial({ color: colors.left }));
+              st.position.set(-stickerOffset, 0, 0);
+              st.rotation.y = -Math.PI / 2;
+              subMesh.add(st);
+            }
+            // +Y 頂面
+            if (iy === 1) {
+              const st = new THREE.Mesh(stickerGeo, new THREE.MeshLambertMaterial({ color: colors.top }));
+              st.position.set(0, stickerOffset, 0);
+              st.rotation.x = -Math.PI / 2;
+              subMesh.add(st);
+            }
+            // -Y 底面
+            if (iy === -1) {
+              const st = new THREE.Mesh(stickerGeo, new THREE.MeshLambertMaterial({ color: colors.bottom }));
+              st.position.set(0, -stickerOffset, 0);
+              st.rotation.x = Math.PI / 2;
+              subMesh.add(st);
+            }
+            // +Z 前面
+            if (iz === 1) {
+              const st = new THREE.Mesh(stickerGeo, new THREE.MeshLambertMaterial({ color: colors.front }));
+              st.position.set(0, 0, stickerOffset);
+              subMesh.add(st);
+            }
+            // -Z 後面
+            if (iz === -1) {
+              const st = new THREE.Mesh(stickerGeo, new THREE.MeshLambertMaterial({ color: colors.back }));
+              st.position.set(0, 0, -stickerOffset);
+              st.rotation.y = Math.PI;
+              subMesh.add(st);
+            }
+
+            cubeGroup.add(subMesh);
+          }
+        }
+      }
+      artGroup.add(cubeGroup);
+      scene.add(artGroup);
+
+      // 實體碰撞體阻擋穿透魔術方塊
+      registerWallCollider(px - 2.8, px + 2.8, pz - 2.8, pz + 2.8, 0, 5.5);
+
+      ROOMS_DB["rubiks-cube"] = {
+        id: "rubiks-cube",
+        code: "ART-CUBE",
+        name: "彩色魔術方塊公共藝術",
+        buildingId: "garden",
+        buildingName: "中庭公共藝術景觀",
+        floor: 1,
+        cat: "special",
+        node: "rubik-node"
+      };
+    }
+
+    // 4.3.2 中庭左側花圃：孔雀綠彩馬賽克藝術立體造景 (照片 S__66011287 靈魂地標)
+    function createPeacockSculpture(px = -26, pz = 58) {
+      const pGroup = new THREE.Group();
+      pGroup.position.set(px, 0, pz);
+
+      // 1. 景觀花台基座
+      const curb = new THREE.Mesh(
+        new THREE.BoxGeometry(5.4, 0.45, 3.6),
+        new THREE.MeshLambertMaterial({ color: 0xe2e8f0 })
+      );
+      curb.position.y = 0.225;
+      curb.receiveShadow = true;
+      pGroup.add(curb);
+
+      const turf = new THREE.Mesh(
+        new THREE.BoxGeometry(5.0, 0.48, 3.2),
+        new THREE.MeshLambertMaterial({ color: 0x166534 })
+      );
+      turf.position.y = 0.25;
+      pGroup.add(turf);
+
+      // 2. 白色花崗岩圓台座
+      const pedestal = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.0, 1.25, 0.65, 20),
+        new THREE.MeshLambertMaterial({ color: 0xf1f5f9 })
+      );
+      pedestal.position.y = 0.65;
+      pedestal.castShadow = true;
+      pGroup.add(pedestal);
+
+      // 3. 孔雀開屏巨型扇形馬賽克背飾 (Peacock Mosaic Fan)
+      const fanGroup = new THREE.Group();
+      fanGroup.position.set(0, 1.1, -0.4);
+
+      // 弧形扇背板
+      const fanBack = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.3, 2.3, 0.14, 24, 1, false, -Math.PI * 0.5, Math.PI),
+        new THREE.MeshLambertMaterial({ color: 0x0f766e, side: THREE.DoubleSide })
+      );
+      fanBack.rotation.x = Math.PI / 2;
+      fanBack.rotation.z = Math.PI / 2;
+      fanBack.position.y = 1.0;
+      fanBack.castShadow = true;
+      fanGroup.add(fanBack);
+
+      // 15 支輻射狀孔雀開屏羽翎 (Mosaic Feather Ribs & Eyes)
+      const featherColors = [0x0d9488, 0x059669, 0x1d4ed8, 0x2563eb];
+      for (let i = 0; i <= 14; i++) {
+        const ang = (i / 14) * Math.PI - Math.PI / 2;
+        const rib = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.04, 0.06, 2.2, 8),
+          new THREE.MeshLambertMaterial({ color: 0x14b8a6 })
+        );
+        rib.position.set(Math.sin(ang) * 1.1, 1.0 + Math.cos(ang) * 1.1, 0.08);
+        rib.rotation.z = -ang;
+        fanGroup.add(rib);
+
+        // 羽翎末端彩色馬賽克同心圓眼飾 (Feacock Feather Eyes)
+        const outerEye = new THREE.Mesh(
+          new THREE.CircleGeometry(0.24, 16),
+          new THREE.MeshLambertMaterial({ color: featherColors[i % featherColors.length], side: THREE.DoubleSide })
+        );
+        outerEye.position.set(Math.sin(ang) * 2.1, 1.0 + Math.cos(ang) * 2.1, 0.12);
+        fanGroup.add(outerEye);
+
+        const innerEye = new THREE.Mesh(
+          new THREE.CircleGeometry(0.12, 16),
+          new THREE.MeshLambertMaterial({ color: 0xfacc15, side: THREE.DoubleSide })
+        );
+        innerEye.position.set(Math.sin(ang) * 2.1, 1.0 + Math.cos(ang) * 2.1, 0.13);
+        fanGroup.add(innerEye);
+
+        const centerDot = new THREE.Mesh(
+          new THREE.CircleGeometry(0.06, 12),
+          new THREE.MeshLambertMaterial({ color: 0x1e3a8a, side: THREE.DoubleSide })
+        );
+        centerDot.position.set(Math.sin(ang) * 2.1, 1.0 + Math.cos(ang) * 2.1, 0.14);
+        fanGroup.add(centerDot);
+      }
+      pGroup.add(fanGroup);
+
+      // 4. 孔雀立體雕塑身軀與昂首頸項 (Peacock Body & Head)
+      const bodyGroup = new THREE.Group();
+      bodyGroup.position.set(0, 1.1, 0.2);
+
+      // 寶藍色豐滿胸膛與軀體
+      const bodyMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.48, 16, 16),
+        new THREE.MeshLambertMaterial({ color: 0x0284c7 })
+      );
+      bodyMesh.scale.set(1.0, 1.3, 1.4);
+      bodyMesh.position.set(0, 0.35, 0);
+      bodyMesh.castShadow = true;
+      bodyGroup.add(bodyMesh);
+
+      // S 型優雅昂首長頸
+      const neckCurve = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.12, 0.16, 0.9, 12),
+        new THREE.MeshLambertMaterial({ color: 0x0369a1 })
+      );
+      neckCurve.position.set(0, 1.0, 0.25);
+      neckCurve.rotation.x = 0.28;
+      bodyGroup.add(neckCurve);
+
+      // 靈動孔雀頭部
+      const headMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.16, 12, 12),
+        new THREE.MeshLambertMaterial({ color: 0x0284c7 })
+      );
+      headMesh.position.set(0, 1.45, 0.38);
+      bodyGroup.add(headMesh);
+
+      // 金色鳥喙
+      const beak = new THREE.Mesh(
+        new THREE.ConeGeometry(0.06, 0.24, 8),
+        new THREE.MeshLambertMaterial({ color: 0xf59e0b })
+      );
+      beak.position.set(0, 1.43, 0.54);
+      beak.rotation.x = Math.PI / 2;
+      bodyGroup.add(beak);
+
+      // 3 根頭頂金色扇形冠羽 (Crest Plumes)
+      [-0.05, 0, 0.05].forEach((cox, cIdx) => {
+        const crest = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.015, 0.015, 0.22, 6),
+          new THREE.MeshLambertMaterial({ color: 0xfacc15 })
+        );
+        crest.position.set(cox, 1.62, 0.36);
+        crest.rotation.z = (cIdx - 1) * 0.25;
+        bodyGroup.add(crest);
+
+        const crestTip = new THREE.Mesh(
+          new THREE.SphereGeometry(0.035, 8, 8),
+          new THREE.MeshLambertMaterial({ color: 0x0d9488 })
+        );
+        crestTip.position.set(cox * 1.5, 1.74, 0.36);
+        bodyGroup.add(crestTip);
+      });
+
+      pGroup.add(bodyGroup);
+      scene.add(pGroup);
+
+      // 實體碰撞體阻擋
+      registerWallCollider(px - 2.8, px + 2.8, pz - 1.9, pz + 1.9, 0, 4.2);
+
+      ROOMS_DB["peacock"] = {
+        id: "peacock",
+        code: "ART-PEACOCK",
+        name: "綠彩馬賽克孔雀雕塑",
+        buildingId: "garden",
+        buildingName: "中庭公共藝術景觀",
+        floor: 1,
+        cat: "special",
+        node: "peacock-node"
+      };
+    }
+
+    // 4.3.3 大溪國中標誌性迎賓龍柏 (修長尖塔圓錐常綠樹，對稱矗立正門兩側)
+    function createIconicCypressTree(x, z) {
+      const tree = new THREE.Group();
+      tree.position.set(x, 0, z);
+
+      // 白色緣石植穴花座
+      const curb = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.3, 1.4, 0.35, 18),
+        new THREE.MeshLambertMaterial({ color: 0xf1f5f9 })
+      );
+      curb.position.y = 0.175;
+      tree.add(curb);
+
+      const mulch = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.2, 1.2, 0.38, 18),
+        new THREE.MeshLambertMaterial({ color: 0x451a03 })
+      );
+      mulch.position.y = 0.19;
+      tree.add(mulch);
+
+      // 樹幹
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.2, 0.3, 1.6, 10),
+        new THREE.MeshLambertMaterial({ color: 0x422006 })
+      );
+      trunk.position.y = 0.8;
+      trunk.castShadow = true;
+      tree.add(trunk);
+
+      // 4 段漸進緊實尖塔樹冠 (深深綠色龍柏經典螺旋外觀)
+      const tiers = [
+        { r: 1.25, h: 2.2, y: 2.1, color: 0x14532d },
+        { r: 1.05, h: 2.1, y: 3.4, color: 0x166534 },
+        { r: 0.82, h: 2.0, y: 4.7, color: 0x15803d },
+        { r: 0.50, h: 1.8, y: 5.9, color: 0x16a34a }
+      ];
+
+      tiers.forEach(t => {
+        const cone = new THREE.Mesh(
+          new THREE.ConeGeometry(t.r, t.h, 12),
+          new THREE.MeshLambertMaterial({ color: t.color })
+        );
+        cone.position.y = t.y;
+        cone.castShadow = true;
+        cone.receiveShadow = true;
+        tree.add(cone);
+      });
+
+      return tree;
+    }
+
+    // 4.3.4 行政大樓正門無障礙斜坡、雙層不銹鋼拋光扶手與歐式景觀花缽 (照片 05 / S__66011285 實景)
+    function createAdminEntranceAccessibilityRamps() {
+      const entranceGroup = new THREE.Group();
+      entranceGroup.position.set(-12, 0, 49);
+
+      // 正中央大門寬闊迎賓踏階 (3 階花崗岩防滑階梯)
+      for (let s = 1; s <= 3; s++) {
+        const step = new THREE.Mesh(
+          new THREE.BoxGeometry(6.4, 0.15, 0.6),
+          new THREE.MeshLambertMaterial({ color: 0xe2e8f0 })
+        );
+        step.position.set(0, (s - 0.5) * 0.15, 1.5 - s * 0.45);
+        step.receiveShadow = true;
+        entranceGroup.add(step);
+      }
+
+      // 西側與東側雙向無障礙緩坡道 (寬 1.6m, 長 4.2m, 高度由 0 緩升至 0.45m)
+      [-1, 1].forEach(side => {
+        const rx = side * 5.2;
+        const rampGeo = new THREE.BoxGeometry(1.6, 0.15, 3.8);
+        const rampMesh = new THREE.Mesh(
+          rampGeo,
+          new THREE.MeshLambertMaterial({ color: 0xcfd8dc })
+        );
+        rampMesh.position.set(rx, 0.22, 1.2);
+        rampMesh.rotation.x = 0.11; // 緩坡傾角
+        rampMesh.receiveShadow = true;
+        entranceGroup.add(rampMesh);
+
+        // 雙層高質感拋光鏡面不鏽鋼圓管扶手 (Upper & Lower Stainless Handrails)
+        [-0.75, 0.75].forEach(postOffset => {
+          const px = rx + postOffset;
+          // 上層扶手 (高 0.85m)
+          const railTop = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.025, 0.025, 4.0, 10),
+            new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.95, roughness: 0.08 })
+          );
+          railTop.position.set(px, 0.85, 1.2);
+          railTop.rotation.x = Math.PI / 2 + 0.11;
+          entranceGroup.add(railTop);
+
+          // 下層兒童與輪椅防護扶手 (高 0.60m)
+          const railMid = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.02, 0.02, 4.0, 10),
+            new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.95, roughness: 0.08 })
+          );
+          railMid.position.set(px, 0.60, 1.2);
+          railMid.rotation.x = Math.PI / 2 + 0.11;
+          entranceGroup.add(railMid);
+
+          // 垂直不鏽鋼立柱
+          for (let pz = -0.5; pz <= 3.0; pz += 1.2) {
+            const post = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.025, 0.025, 0.9, 10),
+              new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.95, roughness: 0.08 })
+            );
+            post.position.set(px, 0.45, pz);
+            entranceGroup.add(post);
+          }
+        });
+
+        // 註冊無障礙斜坡攀爬坡度
+        const wMinX = -12 + rx - 0.85, wMaxX = -12 + rx + 0.85;
+        registerWalkRamp(wMinX, wMaxX, 49 + 3.1, 49 - 0.7, 'z', 49 + 3.1, 0, 49 - 0.7, 0.45);
+      });
+
+      // 正門階梯兩端歐式古典花缽 (Classical Planter Urns)
+      [-3.6, 3.6].forEach(ux => {
+        const urnBase = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.5, 0.65, 0.85, 16),
+          new THREE.MeshLambertMaterial({ color: 0xf8fafc })
+        );
+        urnBase.position.set(ux, 0.42, 0.2);
+        urnBase.castShadow = true;
+        entranceGroup.add(urnBase);
+
+        // 缽內盛開迎賓花球
+        const flowers = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(0.48, 1),
+          new THREE.MeshLambertMaterial({ color: 0xf59e0b })
+        );
+        flowers.position.set(ux, 0.95, 0.2);
+        entranceGroup.add(flowers);
+      });
+
+      scene.add(entranceGroup);
+    }
+
+    // 實體部署第一優先特色地標 (對應照片 S__66011285 迎賓中庭對稱佈局)
+    createRubiksCubeArt(-3.5, 55.5);
+    createPeacockSculpture(-20.5, 55.5);
+    scene.add(createIconicCypressTree(-16, 50.5));
+    scene.add(createIconicCypressTree(-8, 50.5));
+    createAdminEntranceAccessibilityRamps();
+
     function createCypressTree(x, z) {
       const tree = new THREE.Group();
       tree.position.set(x, 0, z);
@@ -3667,13 +4152,13 @@
       return stairGroup;
     }
 
-    // 4.5 200m 操場及綜合球場 (真實照片特徵：深灰黑瀝青橡膠跑道＋清晰白標線＋足球草坪＋藍磁磚紅浪板司令台＋三面銀旗桿)
+    // 4.5 200m 操場及綜合球場 (依 20191022 操場照片集高精確還原：紅褐色PU跑道＋1~6分道白標號＋雙寶藍D區＋紅硬地球場＋足球門＋跳遠沙坑＋黃白條紋看台司令台)
     function createTrackAndPlatform() {
       const trackGroup = new THREE.Group();
       trackGroup.position.set(-84, 0.03, -25);
 
-      // 照片實況：現代深色黑灰橡膠瀝青跑道 (Black Rubber Surface)
-      const trackMat = new THREE.MeshLambertMaterial({ color: 0x23272f });
+      // 1. 照片實況：200m 標準 6 道紅褐色橡膠跑道 (Terracotta Red PU Rubber Surface)
+      const trackMat = new THREE.MeshLambertMaterial({ color: 0xb91c1c });
       const trackShape = new THREE.Shape();
       const r = 27; // 半徑27m，直道50m
       trackShape.moveTo(-25, -r);
@@ -3688,7 +4173,7 @@
       trackMesh.receiveShadow = true;
       trackGroup.add(trackMesh);
 
-      // 跑道純白分道線 (6道清晰標線)
+      // 跑道純白分道線 (6 道清晰同心標線)
       for (let lane = 1; lane <= 5; lane++) {
         const laneR = 18 + lane * 1.7;
         const laneShape = new THREE.Shape();
@@ -3708,152 +4193,386 @@
         trackGroup.add(laneLine);
       }
 
-      // 直道起跑白標線 (Straightaway Start Markings)
+      // 南側直道起跑線 (Straightaway Start Markings)
       for (let s = -20; s <= 20; s += 8) {
         const startLine = new THREE.Mesh(
-          new THREE.PlaneGeometry(0.12, 9),
+          new THREE.PlaneGeometry(0.12, 10.2),
           new THREE.MeshBasicMaterial({ color: 0xffffff })
         );
         startLine.rotation.x = -Math.PI / 2;
-        startLine.position.set(s, 0.02, 22.5);
+        startLine.position.set(s, 0.02, 23.1);
         trackGroup.add(startLine);
       }
 
-      // 內圈翠綠足球天然草坪 (Vivid Soccer Lawn)
-      const innerShape = new THREE.Shape();
-      const ir = 18;
-      innerShape.moveTo(-25, -ir);
-      innerShape.lineTo(25, -ir);
-      innerShape.absarc(25, 0, ir, -Math.PI / 2, Math.PI / 2, false);
-      innerShape.lineTo(-25, ir);
-      innerShape.absarc(-25, 0, ir, Math.PI / 2, 3 * Math.PI / 2, false);
-      innerShape.closePath();
+      // 跑道起跑點 1～6 分道清晰白字標號 (Decals for Lanes 1 to 6)
+      for (let lane = 1; lane <= 6; lane++) {
+        const laneCenterZ = 18 + (lane - 0.5) * 1.7;
+        const numMesh = new THREE.Mesh(
+          new THREE.PlaneGeometry(1.2, 1.2),
+          new THREE.MeshBasicMaterial({
+            map: createTrackLaneNumberTexture(lane),
+            transparent: true,
+            side: THREE.DoubleSide
+          })
+        );
+        numMesh.rotation.x = -Math.PI / 2;
+        numMesh.position.set(-18, 0.025, laneCenterZ);
+        trackGroup.add(numMesh);
+      }
 
-      const innerMesh = new THREE.Mesh(new THREE.ShapeGeometry(innerShape), new THREE.MeshLambertMaterial({ color: 0x16a34a }));
-      innerMesh.rotation.x = -Math.PI / 2;
-      innerMesh.position.y = 0.02;
-      innerMesh.receiveShadow = true;
-      trackGroup.add(innerMesh);
+      // 2. 操場內圈雙「寶藍色 D 區」PU 地坪 (East & West Semi-Circular D-Zones in Royal Blue)
+      const dZoneMat = new THREE.MeshLambertMaterial({ color: 0x1d65d4 });
 
-      // 白色足球球門 (Soccer Goals at both ends)
-      [-22, 22].forEach(gx => {
+      // 西側半圓 D 區
+      const dWestShape = new THREE.Shape();
+      dWestShape.absarc(-25, 0, 18, Math.PI / 2, 3 * Math.PI / 2, false);
+      dWestShape.closePath();
+      const dWestMesh = new THREE.Mesh(new THREE.ShapeGeometry(dWestShape), dZoneMat);
+      dWestMesh.rotation.x = -Math.PI / 2;
+      dWestMesh.position.y = 0.018;
+      dWestMesh.receiveShadow = true;
+      trackGroup.add(dWestMesh);
+
+      // 東側半圓 D 區
+      const dEastShape = new THREE.Shape();
+      dEastShape.absarc(25, 0, 18, -Math.PI / 2, Math.PI / 2, false);
+      dEastShape.closePath();
+      const dEastMesh = new THREE.Mesh(new THREE.ShapeGeometry(dEastShape), dZoneMat);
+      dEastMesh.rotation.x = -Math.PI / 2;
+      dEastMesh.position.y = 0.018;
+      dEastMesh.receiveShadow = true;
+      trackGroup.add(dEastMesh);
+
+      // 3. 內圈中央天然草坪足球場 (Soccer Green Lawn)
+      const innerLawnMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(50, 36),
+        new THREE.MeshLambertMaterial({ color: 0x2e7d32 })
+      );
+      innerLawnMesh.rotation.x = -Math.PI / 2;
+      innerLawnMesh.position.set(0, 0.02, 0);
+      innerLawnMesh.receiveShadow = true;
+      trackGroup.add(innerLawnMesh);
+
+      // 4. 東側綜合球場：兩座紅橙色標準排球/羽球/躲避球硬地球場 (Regulation Hard Courts)
+      const courtGroup = new THREE.Group();
+      courtGroup.position.set(13, 0.025, 0);
+
+      const courtFloor = new THREE.Mesh(
+        new THREE.PlaneGeometry(18, 28),
+        new THREE.MeshLambertMaterial({ color: 0xc2410c })
+      );
+      courtFloor.rotation.x = -Math.PI / 2;
+      courtFloor.receiveShadow = true;
+      courtGroup.add(courtFloor);
+
+      // 球場白色界線、中線與攻擊線
+      const courtLineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      [-6.5, 6.5].forEach(courtZ => {
+        // 外框線
+        const border = new THREE.Mesh(new THREE.PlaneGeometry(16, 11), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
+        border.rotation.x = -Math.PI / 2;
+        border.position.set(0, 0.005, courtZ);
+        courtGroup.add(border);
+
+        // 中線
+        const midLine = new THREE.Mesh(new THREE.PlaneGeometry(16, 0.1), courtLineMat);
+        midLine.rotation.x = -Math.PI / 2;
+        midLine.position.set(0, 0.006, courtZ);
+        courtGroup.add(midLine);
+
+        // 排球立柱與白色網
+        [-8.2, 8.2].forEach(px => {
+          const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.4, 8), new THREE.MeshLambertMaterial({ color: 0x1e293b }));
+          post.position.set(px, 1.2, courtZ);
+          courtGroup.add(post);
+        });
+
+        const net = new THREE.Mesh(
+          new THREE.PlaneGeometry(16.4, 0.8),
+          new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.75, side: THREE.DoubleSide })
+        );
+        net.position.set(0, 2.0, courtZ);
+        courtGroup.add(net);
+      });
+      trackGroup.add(courtGroup);
+
+      // 5. 白色鋼管足球門 (含兩端側斜拉管與白色防護球網)
+      [-23, 23].forEach(gx => {
         const goal = new THREE.Group();
         goal.position.set(gx, 0.02, 0);
         goal.rotation.y = gx < 0 ? Math.PI / 2 : -Math.PI / 2;
-        const gMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
-        const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.4, 8), gMat);
-        postL.position.set(-2.5, 1.2, 0);
+
+        const gMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
+        const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 2.4, 8), gMat);
+        postL.position.set(-2.6, 1.2, 0);
         goal.add(postL);
-        const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.4, 8), gMat);
-        postR.position.set(2.5, 1.2, 0);
+
+        const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 2.4, 8), gMat);
+        postR.position.set(2.6, 1.2, 0);
         goal.add(postR);
-        const crossbar = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 5.0, 8), gMat);
+
+        const crossbar = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 5.3, 8), gMat);
         crossbar.position.set(0, 2.4, 0);
         crossbar.rotation.z = Math.PI / 2;
         goal.add(crossbar);
+
+        // 後方三角形側斜撐桿與球網
+        [-2.6, 2.6].forEach(px => {
+          const stay = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.8, 6), gMat);
+          stay.position.set(px, 1.2, -0.9);
+          stay.rotation.x = 0.65;
+          goal.add(stay);
+        });
+
+        const netBack = new THREE.Mesh(
+          new THREE.PlaneGeometry(5.2, 2.8),
+          new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.65, side: THREE.DoubleSide })
+        );
+        netBack.position.set(0, 1.2, -0.9);
+        netBack.rotation.x = 0.65;
+        goal.add(netBack);
+
         trackGroup.add(goal);
       });
 
-      // 操場東彎道內雙面紅PU排球場 (對應空拍照片 05_斜向俯瞰日字型校舍群)
-      const inVbFloor = new THREE.Mesh(
-        new THREE.PlaneGeometry(16, 26),
-        new THREE.MeshLambertMaterial({ color: 0xb91c1c })
-      );
-      inVbFloor.rotation.x = -Math.PI / 2;
-      inVbFloor.position.set(16, 0.025, 0);
-      trackGroup.add(inVbFloor);
+      // 6. 跳遠沙坑 (覆蓋防雨防塵藍色帆布與橘色反光三角錐)
+      const sandGroup = new THREE.Group();
+      sandGroup.position.set(-2, 0.02, 20.2);
 
-      const inVbBorder = new THREE.Mesh(
-        new THREE.PlaneGeometry(14, 24),
-        new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
+      // 沙坑基座
+      const sandPit = new THREE.Mesh(
+        new THREE.BoxGeometry(7.2, 0.12, 2.4),
+        new THREE.MeshLambertMaterial({ color: 0xd4b996 })
       );
-      inVbBorder.rotation.x = -Math.PI / 2;
-      inVbBorder.position.set(16, 0.03, 0);
-      trackGroup.add(inVbBorder);
+      sandPit.position.y = 0.06;
+      sandGroup.add(sandPit);
 
-      // 操場司令台 (坐南朝北 x=22, z=37 相對於操場群即真實坐標 x=-62, z=12)
-      // 真實照片特徵：淺天藍色磁磚側壁＋紅鋼構斜屋頂＋白色階梯＋三座銀旗桿
+      // 藍色防水帆布覆蓋 (Blue Protective Tarp)
+      const blueTarp = new THREE.Mesh(
+        new THREE.BoxGeometry(7.0, 0.14, 2.2),
+        new THREE.MeshLambertMaterial({ color: 0x1e40af })
+      );
+      blueTarp.position.y = 0.08;
+      sandGroup.add(blueTarp);
+
+      // 沙坑四角亮橘色警示三角錐 (High-Vis Safety Cones)
+      [
+        { cx: -3.3, cz: -0.95 }, { cx: 3.3, cz: -0.95 },
+        { cx: -3.3, cz: 0.95 }, { cx: 3.3, cz: 0.95 }
+      ].forEach(cp => {
+        const cone = new THREE.Mesh(
+          new THREE.ConeGeometry(0.18, 0.6, 12),
+          new THREE.MeshLambertMaterial({ color: 0xf97316 })
+        );
+        cone.position.set(cp.cx, 0.3, cp.cz);
+        sandGroup.add(cone);
+
+        // 反光白環
+        const stripe = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.11, 0.13, 0.12, 12),
+          new THREE.MeshLambertMaterial({ color: 0xffffff })
+        );
+        stripe.position.set(cp.cx, 0.28, cp.cz);
+        sandGroup.add(stripe);
+      });
+      trackGroup.add(sandGroup);
+
+      // 7. 操場司令台全套重構 (第三優先：黃白相間看台階梯＋深紅金屬曲面遮雨棚＋三座不鏽鋼升旗桿＋多元展能精神背板)
       const standGroup = new THREE.Group();
       standGroup.position.set(22, 0, 37);
 
-      // 淺天藍色磁磚台身基座 (照片 LINE_ALBUM_3D_261007_26 特徵)
-      const standBase = new THREE.Mesh(
-        new THREE.BoxGeometry(16, 2.6, 7.5),
-        new THREE.MeshLambertMaterial({ color: 0x6ba4b8 })
-      );
-      standBase.position.y = 1.3;
-      standBase.castShadow = true;
-      standGroup.add(standBase);
-
-      // 前端白色石階步道通往跑道
-      for (let s = 1; s <= 4; s++) {
-        const step = new THREE.Mesh(new THREE.BoxGeometry(14, 0.35, 1.0), new THREE.MeshLambertMaterial({ color: 0xf8fafc }));
-        step.position.set(0, s * 0.35, -3.8 + s * 0.8);
-        standGroup.add(step);
+      // 7.1 司令台正面黃色與白色相間的層次看台階梯 (Yellow & White Striped Tiers - 大溪國中標誌性看台)
+      const tierColors = [0xf59e0b, 0xffffff, 0xf59e0b, 0xffffff];
+      for (let t = 0; t < 4; t++) {
+        const tierMesh = new THREE.Mesh(
+          new THREE.BoxGeometry(18.2, 0.36, 1.1),
+          new THREE.MeshLambertMaterial({ color: tierColors[t] })
+        );
+        tierMesh.position.set(0, (t + 0.5) * 0.36, -3.8 + t * 0.85);
+        tierMesh.castShadow = true;
+        tierMesh.receiveShadow = true;
+        standGroup.add(tierMesh);
       }
 
-      // 大紅鋼構斜屋頂＋白色飛簷收邊
+      // 7.2 司令台中央大理石演講平台 (Raised Commander Platform Deck)
+      const deckMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(12.6, 0.35, 5.2),
+        new THREE.MeshLambertMaterial({ color: 0xe2e8f0 })
+      );
+      deckMesh.position.set(0, 1.85, 0.2);
+      deckMesh.castShadow = true;
+      deckMesh.receiveShadow = true;
+      standGroup.add(deckMesh);
+
+      // 註冊司令台平台行走踏面 (讓人物可以走上司令台俯瞰全場)
+      registerWalkFlat(-84 + 22 - 6.0, -84 + 22 + 6.0, -25 + 37 - 2.4, -25 + 37 + 2.6, 1.85);
+
+      // 平台前方藍色金屬安全護欄與不鏽鋼扶手
+      const frontRail = new THREE.Mesh(
+        new THREE.BoxGeometry(12.4, 0.85, 0.08),
+        new THREE.MeshStandardMaterial({ color: 0x1e3a8a, metalness: 0.6, roughness: 0.3 })
+      );
+      frontRail.position.set(0, 2.4, -2.35);
+      standGroup.add(frontRail);
+
+      // 中央發言講台 (Speaker Lectern with School Emblem)
+      const lectern = new THREE.Mesh(
+        new THREE.BoxGeometry(0.9, 1.15, 0.6),
+        new THREE.MeshLambertMaterial({ color: 0x78350f })
+      );
+      lectern.position.set(0, 2.42, -1.8);
+      lectern.castShadow = true;
+      standGroup.add(lectern);
+
+      const lecternPlate = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.18, 0.18, 0.04, 16),
+        new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.8, roughness: 0.2 })
+      );
+      lecternPlate.position.set(0, 2.6, -1.5);
+      lecternPlate.rotation.x = Math.PI / 2;
+      standGroup.add(lecternPlate);
+
+      // 7.3 後壁「多元展能 ★ 榮耀大溪」高畫質精神彩繪背板
+      const backdrop = new THREE.Mesh(
+        new THREE.BoxGeometry(12.6, 3.4, 0.25),
+        new THREE.MeshLambertMaterial({ color: 0x0f172a })
+      );
+      backdrop.position.set(0, 3.55, 2.7);
+      backdrop.castShadow = true;
+      standGroup.add(backdrop);
+
+      const backdropCanvasMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(12.4, 3.2),
+        new THREE.MeshBasicMaterial({ map: createPodiumBackdropTexture(), side: THREE.DoubleSide })
+      );
+      backdropCanvasMesh.position.set(0, 3.55, 2.56);
+      standGroup.add(backdropCanvasMesh);
+
+      // 7.4 深紅棕/紫褐色波浪金屬斜頂大遮雨棚 (Deep Burgundy Canopy Roof)
       const roofShape = new THREE.Shape();
-      roofShape.moveTo(-4.2, 0);
-      roofShape.lineTo(0, 2.2);
-      roofShape.lineTo(4.2, 0);
+      roofShape.moveTo(-3.2, 0);
+      roofShape.lineTo(0, 1.6);
+      roofShape.lineTo(3.2, 0);
       roofShape.closePath();
-      const roof = new THREE.Mesh(
-        new THREE.ExtrudeGeometry(roofShape, { depth: 17.5, bevelEnabled: false }),
-        new THREE.MeshLambertMaterial({ color: 0xdc2626 })
+      const canopyRoof = new THREE.Mesh(
+        new THREE.ExtrudeGeometry(roofShape, { depth: 14.2, bevelEnabled: false }),
+        new THREE.MeshLambertMaterial({ color: 0x7f1d1d })
       );
-      roof.position.set(0, 3.2, -8.75);
-      roof.rotation.y = Math.PI / 2;
-      roof.castShadow = true;
-      standGroup.add(roof);
+      canopyRoof.position.set(0, 5.2, -7.1);
+      canopyRoof.rotation.y = Math.PI / 2;
+      canopyRoof.castShadow = true;
+      standGroup.add(canopyRoof);
 
-      // 白邊前額飾板
-      const fascia = new THREE.Mesh(
-        new THREE.BoxGeometry(17.6, 0.35, 0.2),
-        new THREE.MeshLambertMaterial({ color: 0xffffff })
+      // 白色飛簷外包飾板
+      const fasciaTrim = new THREE.Mesh(
+        new THREE.BoxGeometry(14.3, 0.35, 0.2),
+        new THREE.MeshLambertMaterial({ color: 0xf8fafc })
       );
-      fascia.position.set(0, 3.3, -4.3);
-      standGroup.add(fascia);
+      fasciaTrim.position.set(0, 5.25, -3.2);
+      standGroup.add(fasciaTrim);
 
-      // 司令台後方三根高聳銀白色國旗桿 (照片特徵)
-      [-2.2, 0, 2.2].forEach((px, idx) => {
-        const poleH = (idx === 1) ? 14.0 : 12.5;
-        const pole = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.08, 0.1, poleH, 12),
-          new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.15 })
+      // 雨棚下方白色廣播大號角喇叭 (PA Horn Speakers)
+      [-4.0, 4.0].forEach(sx => {
+        const horn = new THREE.Mesh(
+          new THREE.ConeGeometry(0.24, 0.5, 12),
+          new THREE.MeshLambertMaterial({ color: 0xf1f5f9 })
         );
-        pole.position.set(px, poleH / 2, 3.6);
+        horn.position.set(sx, 5.0, -2.8);
+        horn.rotation.x = -Math.PI / 3;
+        standGroup.add(horn);
+      });
+
+      // 鋼構支撐柱 (Steel Support Columns)
+      [
+        { cx: -5.8, cz: -2.3 }, { cx: 5.8, cz: -2.3 },
+        { cx: -5.8, cz: 2.6 }, { cx: 5.8, cz: 2.6 }
+      ].forEach(cp => {
+        const pillar = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.14, 0.14, 4.2, 12),
+          new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.7, roughness: 0.3 })
+        );
+        pillar.position.set(cp.cx, 3.5, cp.cz);
+        pillar.castShadow = true;
+        standGroup.add(pillar);
+      });
+
+      // 7.5 三座高聳鏡面不銹鋼升旗桿 (三旗桿陣列：中央國旗、兩側大溪校旗)
+      [-2.6, 0, 2.6].forEach((px, idx) => {
+        const poleH = (idx === 1) ? 14.5 : 13.0;
+        const pole = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.08, 0.11, poleH, 12),
+          new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.95, roughness: 0.1 })
+        );
+        pole.position.set(px, poleH / 2, 4.2);
         pole.castShadow = true;
         standGroup.add(pole);
 
+        // 旗桿基座
+        const poleBase = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.4, 0.45, 0.6, 12),
+          new THREE.MeshLambertMaterial({ color: 0x94a3b8 })
+        );
+        poleBase.position.set(px, 0.3, 4.2);
+        standGroup.add(poleBase);
+
         if (idx === 1) {
-          // 中華民國國旗 (青天白日滿地紅)
+          // 中華民國青天白日滿地紅國旗
           const flag = new THREE.Mesh(
-            new THREE.PlaneGeometry(2.6, 1.7),
+            new THREE.PlaneGeometry(2.7, 1.8),
             new THREE.MeshBasicMaterial({ color: 0xdc2626, side: THREE.DoubleSide })
           );
-          flag.position.set(1.3, poleH - 0.9, 3.6);
+          flag.position.set(1.35, poleH - 1.0, 4.2);
           standGroup.add(flag);
 
           const blueSky = new THREE.Mesh(
-            new THREE.PlaneGeometry(1.3, 0.85),
+            new THREE.PlaneGeometry(1.35, 0.9),
             new THREE.MeshBasicMaterial({ color: 0x1e3a8a, side: THREE.DoubleSide })
           );
-          blueSky.position.set(0.65, poleH - 0.5, 3.61);
+          blueSky.position.set(0.68, poleH - 0.55, 4.21);
           standGroup.add(blueSky);
+        } else {
+          // 大溪國中精神校旗 (白底金徽藍帶)
+          const sFlag = new THREE.Mesh(
+            new THREE.PlaneGeometry(2.4, 1.6),
+            new THREE.MeshBasicMaterial({ color: 0xf8fafc, side: THREE.DoubleSide })
+          );
+          sFlag.position.set(px > 0 ? 1.2 : -1.2, poleH - 1.0, 4.2);
+          standGroup.add(sFlag);
+
+          const emblem = new THREE.Mesh(
+            new THREE.CircleGeometry(0.45, 16),
+            new THREE.MeshBasicMaterial({ color: 0x2563eb, side: THREE.DoubleSide })
+          );
+          emblem.position.set(px > 0 ? 1.2 : -1.2, poleH - 1.0, 4.21);
+          standGroup.add(emblem);
         }
       });
 
-      // 馬賽克彩繪洗手台 (照片旁之藝術水台)
-      const basin = new THREE.Mesh(
-        new THREE.BoxGeometry(2.0, 1.2, 1.2),
-        new THREE.MeshLambertMaterial({ color: 0x38bdf8 })
-      );
-      basin.position.set(9.5, 0.6, 2.5);
-      standGroup.add(basin);
+      // 7.6 司令台後方兩側紅磚樹壇休憩看台矮牆與高大濃蔭老榕樹
+      [-9.8, 9.8].forEach(bx => {
+        const planter = new THREE.Mesh(
+          new THREE.BoxGeometry(4.2, 0.7, 4.2),
+          new THREE.MeshLambertMaterial({ color: 0x991b1b })
+        );
+        planter.position.set(bx, 0.35, 2.5);
+        standGroup.add(planter);
+
+        const planterSoil = new THREE.Mesh(
+          new THREE.BoxGeometry(3.8, 0.72, 3.8),
+          new THREE.MeshLambertMaterial({ color: 0x166534 })
+        );
+        planterSoil.position.set(bx, 0.36, 2.5);
+        standGroup.add(planterSoil);
+
+        const shadeTree = createBroadleafTree(bx, 2.5, 1.35);
+        standGroup.add(shadeTree);
+      });
 
       trackGroup.add(standGroup);
       scene.add(trackGroup);
+
+      // 實體碰撞阻擋體 (防止穿透司令台背牆與後側建築)
+      registerWallCollider(-84 + 22 - 7.0, -84 + 22 + 7.0, -25 + 37 + 2.2, -25 + 37 + 4.5, 0, 8.0);
 
       ROOMS_DB["grandstand"] = {
         id: "grandstand",
@@ -3863,7 +4582,7 @@
         buildingName: "操場及綜合球場",
         floor: 1,
         cat: "sports",
-        node: "stand-podium"
+        node: "stand-front"
       };
     }
     createTrackAndPlatform();
@@ -4841,6 +5560,8 @@
       { name: "操場及綜合球場", x: -84, y: 1.8, z: -25 },
       { name: "司令台", x: -62, y: 3.5, z: 12 },
       { name: "蔣公銅像", x: -36, y: 2.5, z: 32 },
+      { name: "魔術方塊地標", x: -3.5, y: 3.5, z: 55.5 },
+      { name: "孔雀造景雕塑", x: -20.5, y: 3.0, z: 55.5 },
       { name: "戶外排球場", x: -22, y: 1.8, z: -38 },
       { name: "籃球場群", x: 12, y: 1.8, z: -38 },
       { name: "蘭亭訓平池", x: -18, y: 2.2, z: -66 },
@@ -4848,7 +5569,7 @@
       { name: "警衛室", x: 6, y: 3.2, z: 86 },
       { name: "學生活動中心", x: -80, y: 6.0, z: 58 },
       { name: "行政大樓", x: -12, y: 6.0, z: 32 },
-      { name: "八年級棟 (南棟)", x: 16, y: 6.0, z: 60 },
+      { name: "八年級棟 (南棟)", x: 24, y: 6.0, z: 60 },
       { name: "九年級棟 (縱向)", x: 2, y: 6.0, z: 28 },
       { name: "八年級中棟 (縱向)", x: 28, y: 6.0, z: 28 },
       { name: "健康中心棟", x: 12, y: 4.5, z: -4 },
@@ -4881,11 +5602,13 @@
        5. A* NAVIGATION GRAPH & WAYPOINTS
        ========================================================================== */
     const NAV_NODES = {
-  // 1. 正門、迎賓廣場、銅像
+  // 1. 正門、迎賓廣場、銅像與中庭公共藝術
   "gate": { id: "gate", x: -10, y: 0, z: 86, neighbors: ["gate-guard", "plaza-center", "driveway-s1"] },
   "gate-guard": { id: "gate-guard", x: 6, y: 0, z: 86, neighbors: ["gate", "plaza-center", "driveway-s1"] },
-  "plaza-center": { id: "plaza-center", x: -10, y: 0, z: 72, neighbors: ["gate", "gate-guard", "statue-node", "admin-f-porch", "g8f-porch"] },
-  "statue-node": { id: "statue-node", x: -36, y: 0, z: 32, neighbors: ["plaza-center", "gym-path-1", "admin-f-porch", "stand-front"] },
+  "plaza-center": { id: "plaza-center", x: -10, y: 0, z: 72, neighbors: ["gate", "gate-guard", "statue-node", "admin-f-porch", "g8f-porch", "rubik-node", "peacock-node"] },
+  "rubik-node": { id: "rubik-node", x: -3.5, y: 0, z: 61.5, yaw: Math.PI, neighbors: ["plaza-center", "admin-f-porch"] },
+  "peacock-node": { id: "peacock-node", x: -20.5, y: 0, z: 61.5, yaw: Math.PI, neighbors: ["plaza-center", "statue-node", "admin-f-porch"] },
+  "statue-node": { id: "statue-node", x: -36, y: 0, z: 32, neighbors: ["plaza-center", "gym-path-1", "admin-f-porch", "stand-front", "peacock-node"] },
 
   // 2. 西側：學生活動中心 & 資源回收室
   "gym-path-1": { id: "gym-path-1", x: -60, y: 0, z: 58, neighbors: ["statue-node", "gym-1f-hall", "gym-fire-1f", "gym-stair-s-1f", "recycle-path"] },
@@ -4901,7 +5624,7 @@
   "recycle-1f": { id: "recycle-1f", x: -106, y: 0, z: 58, neighbors: ["recycle-path"] },
 
   // 3. 操場、司令台、排球場、蘭亭訓平池
-  "stand-front": { id: "stand-front", x: -62, y: 0, z: 18, neighbors: ["statue-node", "stand-podium", "track-center", "vb-outer"] },
+  "stand-front": { id: "stand-front", x: -62, y: 0, z: 27, yaw: Math.PI, neighbors: ["statue-node", "stand-podium", "track-center", "vb-outer"] },
   "stand-podium": { id: "stand-podium", x: -62, y: 1.8, z: 12, neighbors: ["stand-front"] },
   "track-center": { id: "track-center", x: -84, y: 0, z: -25, neighbors: ["stand-front", "vb-inner"] },
   "vb-inner": { id: "vb-inner", x: -65, y: 0, z: -25, neighbors: ["track-center", "vb-outer"] },
@@ -4955,21 +5678,21 @@
   "health-2f-e": { id: "health-2f-e", x: 18, y: 3.6, z: -4, neighbors: ["health-2f-w"] },
 
   // 7. 八年級南棟 (南橫棟 / 幼兒園)
-  "g8f-porch": { id: "g8f-porch", x: 16, y: 0, z: 53, neighbors: ["plaza-center", "g9-porch-s", "g8m-porch-s", "g8f-1f-k", "g8f-stair-w-1f"] },
-  "g8f-1f-k": { id: "g8f-1f-k", x: 16, y: 0, z: 60, neighbors: ["g8f-porch"] },
-  "g8f-stair-w-1f": { id: "g8f-stair-w-1f", x: -6, y: 0, z: 60, neighbors: ["g8f-porch", "g8f-stair-w-mid1"] },
-  "g8f-stair-w-mid1": { id: "g8f-stair-w-mid1", x: -6, y: 1.8, z: 60, neighbors: ["g8f-stair-w-1f", "g8f-stair-w-2f"] },
-  "g8f-stair-w-2f": { id: "g8f-stair-w-2f", x: -6, y: 3.6, z: 60, neighbors: ["g8f-stair-w-mid1", "g8f-2f-807", "g8f-stair-w-mid2"] },
-  "g8f-2f-807": { id: "g8f-2f-807", x: 6, y: 3.6, z: 60, neighbors: ["g8f-stair-w-2f", "g8f-2f-801"] },
-  "g8f-2f-801": { id: "g8f-2f-801", x: 14, y: 3.6, z: 60, neighbors: ["g8f-2f-807", "g8f-2f-802"] },
-  "g8f-2f-802": { id: "g8f-2f-802", x: 22, y: 3.6, z: 60, neighbors: ["g8f-2f-801", "g8f-2f-803"] },
-  "g8f-2f-803": { id: "g8f-2f-803", x: 30, y: 3.6, z: 60, neighbors: ["g8f-2f-802"] },
-  "g8f-stair-w-mid2": { id: "g8f-stair-w-mid2", x: -6, y: 5.4, z: 60, neighbors: ["g8f-stair-w-2f", "g8f-stair-w-3f"] },
-  "g8f-stair-w-3f": { id: "g8f-stair-w-3f", x: -6, y: 7.2, z: 60, neighbors: ["g8f-stair-w-mid2", "g8f-3f-wood"] },
-  "g8f-3f-wood": { id: "g8f-3f-wood", x: 6, y: 7.2, z: 60, neighbors: ["g8f-stair-w-3f", "g8f-3f-806"] },
-  "g8f-3f-806": { id: "g8f-3f-806", x: 14, y: 7.2, z: 60, neighbors: ["g8f-3f-wood", "g8f-3f-808"] },
-  "g8f-3f-808": { id: "g8f-3f-808", x: 22, y: 7.2, z: 60, neighbors: ["g8f-3f-806", "g8f-3f-bg"] },
-  "g8f-3f-bg": { id: "g8f-3f-bg", x: 30, y: 7.2, z: 60, neighbors: ["g8f-3f-808"] },
+  "g8f-porch": { id: "g8f-porch", x: 24, y: 0, z: 53, neighbors: ["plaza-center", "g9-porch-s", "g8m-porch-s", "g8f-1f-k", "g8f-stair-w-1f"] },
+  "g8f-1f-k": { id: "g8f-1f-k", x: 24, y: 0, z: 60, neighbors: ["g8f-porch"] },
+  "g8f-stair-w-1f": { id: "g8f-stair-w-1f", x: 5, y: 0, z: 60, neighbors: ["g8f-porch", "g9-porch-s", "g8f-stair-w-mid1"] },
+  "g8f-stair-w-mid1": { id: "g8f-stair-w-mid1", x: 5, y: 1.8, z: 60, neighbors: ["g8f-stair-w-1f", "g8f-stair-w-2f"] },
+  "g8f-stair-w-2f": { id: "g8f-stair-w-2f", x: 5, y: 3.6, z: 60, neighbors: ["g8f-stair-w-mid1", "g8f-2f-807", "g8f-stair-w-mid2"] },
+  "g8f-2f-807": { id: "g8f-2f-807", x: 14, y: 3.6, z: 60, neighbors: ["g8f-stair-w-2f", "g8f-2f-801"] },
+  "g8f-2f-801": { id: "g8f-2f-801", x: 22, y: 3.6, z: 60, neighbors: ["g8f-2f-807", "g8f-2f-802"] },
+  "g8f-2f-802": { id: "g8f-2f-802", x: 30, y: 3.6, z: 60, neighbors: ["g8f-2f-801", "g8f-2f-803"] },
+  "g8f-2f-803": { id: "g8f-2f-803", x: 38, y: 3.6, z: 60, neighbors: ["g8f-2f-802"] },
+  "g8f-stair-w-mid2": { id: "g8f-stair-w-mid2", x: 5, y: 5.4, z: 60, neighbors: ["g8f-stair-w-2f", "g8f-stair-w-3f"] },
+  "g8f-stair-w-3f": { id: "g8f-stair-w-3f", x: 5, y: 7.2, z: 60, neighbors: ["g8f-stair-w-mid2", "g8f-3f-wood"] },
+  "g8f-3f-wood": { id: "g8f-3f-wood", x: 14, y: 7.2, z: 60, neighbors: ["g8f-stair-w-3f", "g8f-3f-806"] },
+  "g8f-3f-806": { id: "g8f-3f-806", x: 22, y: 7.2, z: 60, neighbors: ["g8f-3f-wood", "g8f-3f-808"] },
+  "g8f-3f-808": { id: "g8f-3f-808", x: 30, y: 7.2, z: 60, neighbors: ["g8f-3f-806", "g8f-3f-bg"] },
+  "g8f-3f-bg": { id: "g8f-3f-bg", x: 38, y: 7.2, z: 60, neighbors: ["g8f-3f-808"] },
 
   // 8. 九年級教學棟 (中西縱向棟，直立南北向)
   "g9-porch-s": { id: "g9-porch-s", x: 2, y: 0, z: 50, neighbors: ["g8f-porch", "breezeway-west", "breezeway-mid", "g9-1f-908", "g9-stair-s-1f"] },
@@ -5938,11 +6661,30 @@
           setFloorFilter("all");
         }
 
+        if (targetNode.yaw !== undefined) {
+          avatarAngle = targetNode.yaw;
+        } else if (roomId === "rubiks-cube" || roomId === "peacock" || roomId === "grandstand") {
+          avatarAngle = Math.PI;
+        }
+        avatarGroup.rotation.y = avatarAngle;
+        avatarPitch = 0.05;
+
         if (currentMode === "bird") {
           setControlMode("avatar");
         }
-        camera.position.set(targetNode.x - Math.sin(avatarAngle) * 3.5, (targetNode.y || 0) + 2.0, targetNode.z - Math.cos(avatarAngle) * 3.5);
-        camera.lookAt(targetNode.x, (targetNode.y || 0) + 1.2, targetNode.z);
+        const cosP = Math.cos(avatarPitch);
+        const sinP = Math.sin(avatarPitch);
+        const camDist = 3.6;
+        camera.position.set(
+          targetNode.x - Math.sin(avatarAngle) * cosP * camDist,
+          (targetNode.y || 0) + 1.8 - sinP * camDist,
+          targetNode.z - Math.cos(avatarAngle) * cosP * camDist
+        );
+        camera.lookAt(
+          targetNode.x + Math.sin(avatarAngle) * 6,
+          (targetNode.y || 0) + 1.5,
+          targetNode.z + Math.cos(avatarAngle) * 6
+        );
 
         showToast(`⚡ 已瞬間傳送至 [${room.buildingName} ${room.floor}F] ${getRoomDisplayName(room)} 門口！`);
       }
@@ -6543,14 +7285,14 @@
         miniCtx.fillRect(toMiniX(-18 + i * 3), toMiniZ(82), 1.8, toMiniZ(94) - toMiniZ(82));
       }
 
-      // 4. 操場及綜合球場 (西北側，水平橫向橢圓跑道)
+      // 4. 操場及綜合球場 (依真實校園照片重繪：紅褐色PU跑道＋雙寶藍D區＋黃白司令台)
       const trackCX = toMiniX(-84);
       const trackCZ = toMiniZ(-25);
       const trackW = 84 * (328 / 250) * 0.5;
       const trackH = 54 * (328 / 180) * 0.5;
 
-      // 紅色PU跑道
-      miniCtx.fillStyle = "#dc2626";
+      // 紅褐色PU跑道
+      miniCtx.fillStyle = "#b91c1c";
       miniCtx.beginPath();
       miniCtx.ellipse(trackCX, trackCZ, trackW, trackH, 0, 0, Math.PI * 2);
       miniCtx.fill();
@@ -6564,33 +7306,77 @@
         miniCtx.stroke();
       }
 
-      // 內圈綠色草皮
-      miniCtx.fillStyle = "#22c55e";
+      // 內圈綠色足球草皮
+      miniCtx.fillStyle = "#2e7d32";
       miniCtx.beginPath();
       miniCtx.ellipse(trackCX, trackCZ, trackW * 0.5, trackH * 0.5, 0, 0, Math.PI * 2);
       miniCtx.fill();
 
-      // 操場內東半側綜合球場 / 排球場 (紅色)
+      // 西側半圓寶藍色 D 區
+      const dWestX = toMiniX(-84 - 25);
+      const dRadX = 18 * (328 / 250);
+      const dRadZ = 18 * (328 / 180);
+      miniCtx.fillStyle = "#1d65d4";
+      miniCtx.beginPath();
+      miniCtx.ellipse(dWestX, trackCZ, dRadX, dRadZ, 0, Math.PI / 2, 3 * Math.PI / 2);
+      miniCtx.fill();
+
+      // 東側半圓寶藍色 D 區
+      const dEastX = toMiniX(-84 + 25);
+      miniCtx.beginPath();
+      miniCtx.ellipse(dEastX, trackCZ, dRadX, dRadZ, 0, -Math.PI / 2, Math.PI / 2);
+      miniCtx.fill();
+
+      // 操場內東半側綜合球場 / 排球場 (紅橙色硬地)
       const inVbX = toMiniX(-84 + 10);
       const inVbZ = toMiniZ(-25 - 12);
       const inVbW = 16 * (328 / 250);
       const inVbH = 24 * (328 / 180);
-      miniCtx.fillStyle = "#b91c1c";
+      miniCtx.fillStyle = "#c2410c";
       miniCtx.fillRect(inVbX, inVbZ, inVbW, inVbH);
       miniCtx.strokeStyle = "#ffffff";
       miniCtx.lineWidth = 1;
       miniCtx.strokeRect(inVbX, inVbZ, inVbW, inVbH);
 
-      // 操場司令台 (位於南側直道下方)
+      // 操場司令台 (黃白相間看台＋深紅金屬雨棚)
       const standX = toMiniX(-62 - 8);
       const standZ = toMiniZ(12 - 3);
       const standW = 16 * (328 / 250);
       const standH = 7 * (328 / 180);
-      miniCtx.fillStyle = "#3b82f6";
+      miniCtx.fillStyle = "#7f1d1d";
       miniCtx.fillRect(standX, standZ, standW, standH);
+      // 黃白階梯
+      for (let s = 0; s < 4; s++) {
+        miniCtx.fillStyle = (s % 2 === 0) ? "#f59e0b" : "#ffffff";
+        miniCtx.fillRect(standX, standZ + s * (standH * 0.18), standW, standH * 0.16);
+      }
       miniCtx.strokeStyle = "#ffffff";
       miniCtx.lineWidth = 1.2;
       miniCtx.strokeRect(standX, standZ, standW, standH);
+
+      // 4.1 中庭彩色魔術方塊地標 (Rubik's Cube on Minimap)
+      const cubeX = toMiniX(-3.5);
+      const cubeZ = toMiniZ(55.5);
+      miniCtx.fillStyle = "#facc15";
+      miniCtx.fillRect(cubeX - 4, cubeZ - 4, 8, 8);
+      miniCtx.fillStyle = "#ef4444";
+      miniCtx.fillRect(cubeX - 4, cubeZ - 4, 4, 4);
+      miniCtx.fillStyle = "#2563eb";
+      miniCtx.fillRect(cubeX, cubeZ, 4, 4);
+      miniCtx.strokeStyle = "#ffffff";
+      miniCtx.lineWidth = 1;
+      miniCtx.strokeRect(cubeX - 4, cubeZ - 4, 8, 8);
+
+      // 4.2 中庭綠彩孔雀雕塑地標 (Peacock on Minimap)
+      const peaX = toMiniX(-20.5);
+      const peaZ = toMiniZ(55.5);
+      miniCtx.fillStyle = "#0d9488";
+      miniCtx.beginPath();
+      miniCtx.arc(peaX, peaZ, 5, 0, Math.PI * 2);
+      miniCtx.fill();
+      miniCtx.strokeStyle = "#facc15";
+      miniCtx.lineWidth = 1.2;
+      miniCtx.stroke();
 
       // 5. 戶外排球場 (綠色, 位於操場與籃球場之間 x=-22, z=-38)
       const vbX = toMiniX(-22 - 7);
@@ -6697,7 +7483,7 @@
       });
 
       // 八年級南棟西側半圓樓梯標記
-      const roundStairX = toMiniX(16 - 22);
+      const roundStairX = toMiniX(5);
       const roundStairZ = toMiniZ(60);
       miniCtx.fillStyle = "#d97706";
       miniCtx.beginPath();
@@ -6715,6 +7501,8 @@
       miniCtx.fillText("排球", inVbX + inVbW / 2, inVbZ + inVbH / 2);
       miniCtx.fillText("司令台", standX + standW / 2, standZ + standH / 2);
       miniCtx.fillText("銅像", statueX, statueZ + 8);
+      miniCtx.fillText("魔方", toMiniX(-4), toMiniZ(53) + 7);
+      miniCtx.fillText("孔雀", toMiniX(-20), toMiniZ(53) + 7);
       miniCtx.fillText("排球場", vbX + vbW / 2, vbZ + vbH / 2);
       miniCtx.fillText("籃球場", bbX + bbW / 2, bbZ + bbH / 2);
       miniCtx.fillText("蘭亭", lanX, lanZ - 8);
