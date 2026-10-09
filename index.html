@@ -2583,8 +2583,11 @@
       armL: null, elbL: null,
       armR: null, elbR: null
     };
-    let avatarAngle = Math.PI; // 預設面向校園北側 (朝前)
-    let avatarPitch = -0.14;   // 預設略微向下俯視角色
+    let avatarAngle = Math.PI; // 相容別名
+    let avatarPitch = -0.14;   // 相容別名
+    let cameraOrbitYaw = Math.PI; // 相機水平環視方位角 (可 360° 繞人物旋轉，轉至正面觀察學生)
+    let cameraOrbitPitch = -0.14; // 相機垂直俯仰角 (-0.65 ~ 0.75 弧度)
+    let avatarBodyAngle = Math.PI; // 人物身體當前面向 (站立時身體不動，滑鼠環視可看人物正面)
     let cameraDistance = 4.4; // 鏡頭距離角色適中距離，支援滑鼠滾輪無縫平滑縮放 (對標大勇國小)
     const cameraHeight = 1.95;  // 鏡頭跟隨高度，俯看校園前進方向無阻擋
     let prevAvatarPos = new THREE.Vector3(0, 0, 96);
@@ -2747,7 +2750,9 @@
       avatarGroup = new THREE.Group();
       avatarGroup.position.set(0, 0, 96);
       avatarAngle = Math.PI; // 預設面向校園北側 (朝前)
-      avatarGroup.rotation.y = avatarAngle;
+      avatarBodyAngle = Math.PI;
+      cameraOrbitYaw = Math.PI;
+      avatarGroup.rotation.y = avatarBodyAngle;
       prevAvatarPos.copy(avatarGroup.position);
 
       const headTex = createHeadTexture();
@@ -7213,30 +7218,30 @@ function createGymSignTexture() {
         controls.enabled = false;
         if (avatarGroup) avatarGroup.visible = true;
         if (bottomCtrls) bottomCtrls.style.display = "flex";
-        showToast("切換為「第三人稱跟隨視角」！WASD 跑步漫遊，鏡頭緊跟角色正後方。");
+        showToast("切換為「第三人稱漫遊視角」！滑鼠可 360° 繞人物環顧全景與正面，WASD 自由奔跑。");
         if (avatarGroup) {
-          avatarAngle = avatarGroup.rotation.y;
-          const cosP = Math.cos(avatarPitch);
-          const sinP = Math.sin(avatarPitch);
+          avatarGroup.rotation.y = avatarBodyAngle;
+          const cosP = Math.cos(cameraOrbitPitch);
+          const sinP = Math.sin(cameraOrbitPitch);
           const behindPos = new THREE.Vector3(
-            avatarGroup.position.x - Math.sin(avatarAngle) * cosP * cameraDistance,
+            avatarGroup.position.x - Math.sin(cameraOrbitYaw) * cosP * cameraDistance,
             avatarGroup.position.y + cameraHeight - sinP * cameraDistance,
-            avatarGroup.position.z - Math.cos(avatarAngle) * cosP * cameraDistance
+            avatarGroup.position.z - Math.cos(cameraOrbitYaw) * cosP * cameraDistance
           );
-          const targetLookAt = avatarGroup.position.clone().add(new THREE.Vector3(0, 0.85, 0));
+          const targetLookAt = avatarGroup.position.clone().add(new THREE.Vector3(0, 0.95, 0));
           animateCameraTo(behindPos, targetLookAt);
         }
       } else if (mode === "firstperson") {
         controls.enabled = false;
         if (avatarGroup) avatarGroup.visible = false;
         if (bottomCtrls) bottomCtrls.style.display = "flex";
-        showToast("切換為「第一人稱步行視角」！滑鼠環顧、WASD 漫遊。");
+        showToast("切換為「第一人稱沉浸視角」！滑鼠自由環顧四周景色。");
         if (avatarGroup) {
           const eyePos = avatarGroup.position.clone().add(new THREE.Vector3(0, 1.25, 0));
           const lookPos = new THREE.Vector3(
-            avatarGroup.position.x + Math.sin(avatarAngle) * 10,
-            avatarGroup.position.y + 1.25 + Math.sin(avatarPitch) * 10,
-            avatarGroup.position.z + Math.cos(avatarAngle) * 10
+            avatarGroup.position.x + Math.sin(cameraOrbitYaw) * 10,
+            avatarGroup.position.y + 1.25 + Math.sin(cameraOrbitPitch) * 10,
+            avatarGroup.position.z + Math.cos(cameraOrbitYaw) * 10
           );
           animateCameraTo(eyePos, lookPos, 600);
         }
@@ -7436,8 +7441,8 @@ function createGymSignTexture() {
         el.classList.add("pressed");
         if (interval) clearInterval(interval);
         interval = setInterval(() => {
-          avatarAngle += (isLeft ? 0.045 : -0.045) * turnSensitivityMultiplier;
-          if (avatarGroup) avatarGroup.rotation.y = avatarAngle;
+          cameraOrbitYaw += (isLeft ? 0.045 : -0.045) * turnSensitivityMultiplier;
+          avatarAngle = cameraOrbitYaw;
         }, 16);
       };
       const stop = (e) => {
@@ -7913,27 +7918,32 @@ function createGymSignTexture() {
 
         if (targetNode.yaw !== undefined) {
           avatarAngle = targetNode.yaw;
+          avatarBodyAngle = targetNode.yaw;
+          cameraOrbitYaw = targetNode.yaw;
         } else if (roomId === "rubiks-cube" || roomId === "peacock" || roomId === "grandstand") {
           avatarAngle = Math.PI;
+          avatarBodyAngle = Math.PI;
+          cameraOrbitYaw = Math.PI;
         }
-        avatarGroup.rotation.y = avatarAngle;
+        avatarGroup.rotation.y = avatarBodyAngle;
         avatarPitch = 0.05;
+        cameraOrbitPitch = 0.05;
 
         if (currentMode === "bird") {
           setControlMode("avatar");
         }
-        const cosP = Math.cos(avatarPitch);
-        const sinP = Math.sin(avatarPitch);
+        const cosP = Math.cos(cameraOrbitPitch);
+        const sinP = Math.sin(cameraOrbitPitch);
         const camDist = 3.6;
         camera.position.set(
-          targetNode.x - Math.sin(avatarAngle) * cosP * camDist,
+          targetNode.x - Math.sin(cameraOrbitYaw) * cosP * camDist,
           (targetNode.y || 0) + 1.8 - sinP * camDist,
-          targetNode.z - Math.cos(avatarAngle) * cosP * camDist
+          targetNode.z - Math.cos(cameraOrbitYaw) * cosP * camDist
         );
         camera.lookAt(
-          targetNode.x + Math.sin(avatarAngle) * 6,
+          targetNode.x + Math.sin(cameraOrbitYaw) * 6,
           (targetNode.y || 0) + 1.5,
-          targetNode.z + Math.cos(avatarAngle) * 6
+          targetNode.z + Math.cos(cameraOrbitYaw) * 6
         );
 
         showToast(`⚡ 已瞬間傳送至 [${room.buildingName} ${room.floor}F] ${getRoomDisplayName(room)} 門口！`);
@@ -8279,11 +8289,11 @@ function createGymSignTexture() {
       const inv = isInvertY ? -1 : 1;
 
       if (currentMode === "avatar" || currentMode === "firstperson") {
-        avatarAngle -= deltaX * 0.0035 * rotSens;
-        avatarPitch = Math.max(-0.55, Math.min(0.55, avatarPitch - deltaY * 0.0035 * rotSens * inv));
-        if (avatarGroup) {
-          avatarGroup.rotation.y = avatarAngle;
-        }
+        cameraOrbitYaw -= deltaX * 0.0035 * rotSens;
+        cameraOrbitPitch = Math.max(-0.65, Math.min(0.75, cameraOrbitPitch - deltaY * 0.0035 * rotSens * inv));
+        avatarAngle = cameraOrbitYaw;
+        avatarPitch = cameraOrbitPitch;
+        // 注意：滑鼠旋轉時人物身體 avatarBodyAngle 保持不動，相機可 360° 繞至正面清楚看見學生！
       } else {
         const thetaAngle = -deltaX * 0.0035 * rotSens;
         const phiAngle = -deltaY * 0.0035 * rotSens * inv;
@@ -9116,7 +9126,7 @@ function createGymSignTexture() {
         const pX = toMiniX(avatarGroup.position.x);
         const pZ = toMiniZ(avatarGroup.position.z);
         
-        let yaw = avatarAngle;
+        let yaw = cameraOrbitYaw;
         if (currentMode === "bird") {
           const camDir = new THREE.Vector3();
           camera.getWorldDirection(camDir);
@@ -9219,8 +9229,10 @@ miniCanvas.addEventListener("click", (e) => {
             const dir = targetPos.clone().sub(curPos).normalize();
             curPos.addScaledVector(dir, stepDist);
             if (autoTurnWithNav) {
-              avatarAngle = Math.atan2(dir.x, dir.z);
-              avatarGroup.rotation.y = avatarAngle;
+              avatarBodyAngle = Math.atan2(dir.x, dir.z);
+              avatarAngle = avatarBodyAngle;
+              cameraOrbitYaw = avatarBodyAngle;
+              avatarGroup.rotation.y = avatarBodyAngle;
             }
           }
         } else {
@@ -9231,20 +9243,20 @@ miniCanvas.addEventListener("click", (e) => {
       else if (avatarGroup && (currentMode === "avatar" || currentMode === "firstperson")) {
         // Q / E 或 ← / → 鍵旋轉人物與鏡頭視角 (向左轉身 / 向右轉身)
         if (moveInput.turnLeft) {
-          avatarAngle += 2.2 * delta;
-          avatarGroup.rotation.y = avatarAngle;
+          cameraOrbitYaw += 2.2 * delta;
+          avatarAngle = cameraOrbitYaw;
         }
         if (moveInput.turnRight) {
-          avatarAngle -= 2.2 * delta;
-          avatarGroup.rotation.y = avatarAngle;
+          cameraOrbitYaw -= 2.2 * delta;
+          avatarAngle = cameraOrbitYaw;
         }
 
-        // 以人物當前面向 (avatarAngle) 作為前進正前方方向向量 (Forward Vector)
-        const fwdX = Math.sin(avatarAngle);
-        const fwdZ = Math.cos(avatarAngle);
-        // 右側向量 (Right Vector: 當面向北朝前時，右方為東 +X)
-        const rightX = Math.sin(avatarAngle - Math.PI / 2);
-        const rightZ = Math.cos(avatarAngle - Math.PI / 2);
+        // 以相機當前環視面向 (cameraOrbitYaw) 作為前進正前方方向向量 (Forward Vector)
+        const fwdX = Math.sin(cameraOrbitYaw);
+        const fwdZ = Math.cos(cameraOrbitYaw);
+        // 右側向量 (Right Vector: 相對鏡頭視野的右側 +X)
+        const rightX = Math.sin(cameraOrbitYaw - Math.PI / 2);
+        const rightZ = Math.cos(cameraOrbitYaw - Math.PI / 2);
 
         let moveFwd = 0;
         let moveSide = 0;
@@ -9262,6 +9274,19 @@ miniCanvas.addEventListener("click", (e) => {
           const dx = (fwdX * moveFwd + rightX * moveSide) * currentSpeed;
           const dz = (fwdZ * moveFwd + rightZ * moveSide) * currentSpeed;
           const curPos = avatarGroup.position;
+
+          // 當有移動輸入時，人物身體平滑轉向運動向量方向 (放開按鍵時身體保持最後朝向，滑鼠可自由環顧欣賞正面)
+          if (currentMode === "avatar") {
+            const targetBodyAngle = Math.atan2(dx, dz);
+            let diff = targetBodyAngle - avatarBodyAngle;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            avatarBodyAngle += diff * Math.min(1.0, 16 * delta);
+            avatarGroup.rotation.y = avatarBodyAngle;
+          } else if (currentMode === "firstperson") {
+            avatarBodyAngle = cameraOrbitYaw;
+            avatarGroup.rotation.y = avatarBodyAngle;
+          }
 
           // 連續微步碰撞檢測 (Continuous Sub-Stepping CCD)：
           // 每次微步最多 0.05m，徹底杜絕快速奔跑、掉幀或任何穿牆現象，並保留滑順沿牆滑行
@@ -9449,18 +9474,18 @@ miniCanvas.addEventListener("click", (e) => {
           }
         }
 
-        // Camera Follow in Avatar / First-Person Mode (正後方跟隨視角，如大勇國小)
+        // Camera Follow in Avatar / First-Person Mode (環視跟隨視角，對標大勇國小)
         if (currentMode === "avatar") {
-          avatarGroup.rotation.y = avatarAngle;
+          avatarGroup.rotation.y = avatarBodyAngle;
           if (!isCameraAnimating) {
-            const cosP = Math.cos(avatarPitch);
-            const sinP = Math.sin(avatarPitch);
+            const cosP = Math.cos(cameraOrbitPitch);
+            const sinP = Math.sin(cameraOrbitPitch);
             const headX = avatarGroup.position.x;
             const headY = avatarGroup.position.y + 1.15;
             const headZ = avatarGroup.position.z;
 
-            const rawDirX = -Math.sin(avatarAngle) * cosP;
-            const rawDirZ = -Math.cos(avatarAngle) * cosP;
+            const rawDirX = -Math.sin(cameraOrbitYaw) * cosP;
+            const rawDirZ = -Math.cos(cameraOrbitYaw) * cosP;
             const rawDirY = (cameraHeight - 1.15) - sinP * cameraDistance;
 
             let safeDist = cameraDistance;
@@ -9492,9 +9517,9 @@ miniCanvas.addEventListener("click", (e) => {
           if (!isCameraAnimating) {
             camera.position.set(avatarGroup.position.x, avatarGroup.position.y + 1.25, avatarGroup.position.z);
             camera.lookAt(
-              avatarGroup.position.x + Math.sin(avatarAngle) * 10,
-              avatarGroup.position.y + 1.25 + Math.sin(avatarPitch) * 10,
-              avatarGroup.position.z + Math.cos(avatarAngle) * 10
+              avatarGroup.position.x + Math.sin(cameraOrbitYaw) * 10,
+              avatarGroup.position.y + 1.25 + Math.sin(cameraOrbitPitch) * 10,
+              avatarGroup.position.z + Math.cos(cameraOrbitYaw) * 10
             );
           }
         } else if (currentMode === "bird") {
