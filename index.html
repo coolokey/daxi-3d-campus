@@ -2451,6 +2451,16 @@
     let avatarGroup = null;
     let avatarLeftArm = null, avatarRightArm = null;
     let avatarLeftLeg = null, avatarRightLeg = null;
+    let avatarParts = {
+      root: null,
+      torsoGroup: null,
+      headGroup: null,
+      eyes: [],
+      hipL: null, kneeL: null, ankL: null,
+      hipR: null, kneeR: null, ankR: null,
+      armL: null, elbL: null,
+      armR: null, elbR: null
+    };
     let avatarAngle = Math.PI; // 預設面向校園北側 (朝前)
     let avatarPitch = -0.14;   // 預設略微向下俯視角色
     const cameraDistance = 4.4; // 鏡頭距離角色適中距離，人物小巧置於螢幕下方，視野開闊 (如 media_1791468841860_b8c925a6.png)
@@ -2591,6 +2601,26 @@
       return tex;
     }
 
+    function createNameTagTexture() {
+      const cvs = document.createElement("canvas");
+      cvs.width = 128;
+      cvs.height = 48;
+      const ctx = cvs.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 128, 48);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#1e3a8a";
+      ctx.strokeRect(2, 2, 124, 44);
+      ctx.fillStyle = "#1e3a8a";
+      ctx.font = "bold 16px 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("大溪 70101", 64, 24);
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
     function createStudentAvatar() {
       avatarGroup = new THREE.Group();
       avatarGroup.position.set(0, 0, 96);
@@ -2610,6 +2640,14 @@
       shadow.position.y = 0.04;
       avatarGroup.add(shadow);
 
+      const nameTagTex = createNameTagTexture();
+
+      // 軀幹群組 (Torso Group，支援呼吸與跑步起伏浮動)
+      const torsoGroup = new THREE.Group();
+      torsoGroup.position.y = 1.45;
+      avatarParts.torsoGroup = torsoGroup;
+      avatarGroup.add(torsoGroup);
+
       // 身體軀幹 (Box 搭配六面材質，胸前為校服貼圖)
       const torsoMatArray = [
         new THREE.MeshLambertMaterial({ color: 0x38bdf8 }), // +X (水藍側邊)
@@ -2623,21 +2661,65 @@
         new THREE.BoxGeometry(0.82, 1.15, 0.46),
         torsoMatArray
       );
-      torso.position.y = 1.45;
       torso.castShadow = true;
-      avatarGroup.add(torso);
+      torsoGroup.add(torso);
+
+      // 胸前學生學號布牌 (繡有「大溪 70101」)
+      const nameTag = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.24, 0.09),
+        new THREE.MeshBasicMaterial({ map: nameTagTex, transparent: true })
+      );
+      nameTag.position.set(-0.21, 0.28, 0.233);
+      torsoGroup.add(nameTag);
+
+      // 3D 雙肩人體工學書包 (背於身後 -Z，深藍＋反光條＋前側拉鍊袋，對標大勇國小)
+      const backpackGroup = new THREE.Group();
+      backpackGroup.position.set(0, 0.06, -0.27);
+      
+      const backpackMat = new THREE.MeshLambertMaterial({ color: 0x0f172a }); // 深藍黑主體
+      const bagPocketMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a }); // 寶藍前袋
+      const bagStripeMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8 }); // 水藍反光條
+
+      const bagMain = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.82, 0.26), backpackMat);
+      bagMain.castShadow = true;
+      backpackGroup.add(bagMain);
+
+      const bagPocket = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.45, 0.12), bagPocketMat);
+      bagPocket.position.set(0, -0.12, -0.14);
+      bagPocket.castShadow = true;
+      backpackGroup.add(bagPocket);
+
+      // 書包夜間反光條
+      const bagStripe = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.04, 0.02), bagStripeMat);
+      bagStripe.position.set(0, 0.02, -0.201);
+      backpackGroup.add(bagStripe);
+
+      // 書包雙肩帶 (貼附肩膀)
+      const strapMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+      const strapL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.95, 0.04), strapMat);
+      strapL.position.set(-0.24, 0.08, 0.24);
+      strapL.rotation.x = 0.05;
+      torsoGroup.add(strapL);
+
+      const strapR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.95, 0.04), strapMat);
+      strapR.position.set(0.24, 0.08, 0.24);
+      strapR.rotation.x = 0.05;
+      torsoGroup.add(strapR);
+
+      torsoGroup.add(backpackGroup);
 
       // 立領結構 (內白外深藍)
       const collar = new THREE.Mesh(
         new THREE.CylinderGeometry(0.24, 0.28, 0.16, 16),
         new THREE.MeshLambertMaterial({ color: 0x1e3a8a })
       );
-      collar.position.y = 2.05;
-      avatarGroup.add(collar);
+      collar.position.y = 0.60;
+      torsoGroup.add(collar);
 
-      // 頭部 (圓形球體直接貼附五官與黑髮紋理，完全無紙面片接縫，完美還原 media_1791355365994.png)
+      // 頭部群組 (Head Group，掛於 torsoGroup 上方，支援獨立轉頭與呼吸同動)
       const headGroup = new THREE.Group();
-      headGroup.position.y = 2.42;
+      headGroup.position.y = 0.97;
+      avatarParts.headGroup = headGroup;
 
       const headGeo = new THREE.SphereGeometry(0.38, 32, 32);
       const headMat = new THREE.MeshLambertMaterial({ map: headTex });
@@ -2655,7 +2737,17 @@
       earR.position.set(0.38, -0.02, 0);
       headGroup.add(earR);
 
-      // 標誌性小黃帽 (圓球帽頂 + 前沿遮陽帽舌，完美還原 media_1791355365994.png)
+      // 動態眨眼瞳孔片 (雙眼精確覆蓋，scale.y 支援每 3.7 秒自動眨眼)
+      const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111827 });
+      const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.075, 0.02), eyeMat);
+      eyeL.position.set(-0.115, 0.02, 0.365);
+      headGroup.add(eyeL);
+      const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.075, 0.02), eyeMat);
+      eyeR.position.set(0.115, 0.02, 0.365);
+      headGroup.add(eyeR);
+      avatarParts.eyes = [eyeL, eyeR];
+
+      // 標誌性小黃帽 (圓球帽頂 + 前沿遮陽帽舌，完美還原校園照片)
       const capMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
       const capDome = new THREE.Mesh(
         new THREE.SphereGeometry(0.395, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.52),
@@ -2682,98 +2774,134 @@
       visor.castShadow = true;
       headGroup.add(visor);
 
-      avatarGroup.add(headGroup);
+      torsoGroup.add(headGroup);
 
-      // 手臂結構 (左臂 / 右臂：深藍袖身＋水藍側條，膚色小臂與手掌)
+      // 二段式關節手臂結構 (Shoulder -> UpperArm -> Elbow -> Forearm + Hand)
       const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
       const stripeMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
 
-      function buildArm(isLeft) {
-        const armGroup = new THREE.Group();
+      function buildArticulatedArm(isLeft) {
         const sideSign = isLeft ? -1 : 1;
-        armGroup.position.set(sideSign * 0.52, 1.95, 0);
+        // 肩部轉軸關節
+        const shoulder = new THREE.Group();
+        shoulder.position.set(sideSign * 0.52, 1.95, 0);
 
         // 短袖肩膀
         const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.125, 0.115, 0.36, 12), sleeveMat);
         sleeve.position.y = -0.18;
         sleeve.castShadow = true;
-        armGroup.add(sleeve);
+        shoulder.add(sleeve);
 
         // 水藍色肩飾條
         const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.36, 0.12), stripeMat);
         stripe.position.set(sideSign * 0.11, -0.18, 0);
-        armGroup.add(stripe);
+        shoulder.add(stripe);
+
+        // 肘部轉軸關節 (Elbow)
+        const elbow = new THREE.Group();
+        elbow.position.set(0, -0.34, 0);
 
         // 膚色前臂
-        const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.44, 12), skinMat);
-        forearm.position.y = -0.54;
+        const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.38, 12), skinMat);
+        forearm.position.y = -0.19;
         forearm.castShadow = true;
-        armGroup.add(forearm);
+        elbow.add(forearm);
 
         // 手掌
         const hand = new THREE.Mesh(new THREE.SphereGeometry(0.105, 10, 10), skinMat);
-        hand.position.y = -0.78;
+        hand.position.y = -0.42;
         hand.castShadow = true;
-        armGroup.add(hand);
+        elbow.add(hand);
 
-        return armGroup;
+        shoulder.add(elbow);
+
+        return { shoulder, elbow };
       }
 
-      avatarLeftArm = buildArm(true);
-      avatarGroup.add(avatarLeftArm);
-      avatarRightArm = buildArm(false);
-      avatarGroup.add(avatarRightArm);
+      const armLeftObj = buildArticulatedArm(true);
+      avatarParts.armL = armLeftObj.shoulder;
+      avatarParts.elbL = armLeftObj.elbow;
+      avatarLeftArm = armLeftObj.shoulder;
+      avatarGroup.add(armLeftObj.shoulder);
+
+      const armRightObj = buildArticulatedArm(false);
+      avatarParts.armR = armRightObj.shoulder;
+      avatarParts.elbR = armRightObj.elbow;
+      avatarRightArm = armRightObj.shoulder;
+      avatarGroup.add(armRightObj.shoulder);
 
       // 腿部結構 (深藍運動短褲＋側邊白條，膚色膝腿，純白運動短襪，黑底白邊運動鞋)
       const shortsMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
       const whiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
       const shoeBodyMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
 
-      function buildLeg(isLeft) {
-        const legGroup = new THREE.Group();
+      function buildArticulatedLeg(isLeft) {
         const sideSign = isLeft ? -1 : 1;
-        legGroup.position.set(sideSign * 0.22, 0.9, 0);
+        // 髖關節轉軸
+        const hip = new THREE.Group();
+        hip.position.set(sideSign * 0.22, 0.90, 0);
 
-        // 大溪國中運動短褲
-        const shorts = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.145, 0.44, 12), shortsMat);
-        shorts.position.y = -0.22;
+        // 大溪國中運動短褲 (大腿)
+        const shorts = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.145, 0.40, 12), shortsMat);
+        shorts.position.y = -0.20;
         shorts.castShadow = true;
-        legGroup.add(shorts);
+        hip.add(shorts);
 
-        // 短褲外側白邊飾條 (如 media_1791355660385.png)
-        const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.44, 0.11), whiteMat);
-        stripe.position.set(sideSign * 0.145, -0.22, 0);
-        legGroup.add(stripe);
+        // 短褲外側白邊飾條
+        const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.40, 0.11), whiteMat);
+        stripe.position.set(sideSign * 0.145, -0.20, 0);
+        hip.add(stripe);
+
+        // 膝關節轉軸 (Knee)
+        const knee = new THREE.Group();
+        knee.position.set(0, -0.38, 0);
 
         // 膚色小腿
-        const calf = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.105, 0.32, 12), skinMat);
-        calf.position.y = -0.52;
+        const calf = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.105, 0.24, 12), skinMat);
+        calf.position.y = -0.12;
         calf.castShadow = true;
-        legGroup.add(calf);
+        knee.add(calf);
 
         // 白色學生運動襪 (純白襪筒)
-        const sock = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.115, 0.22, 12), whiteMat);
-        sock.position.y = -0.68;
+        const sock = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.115, 0.20, 12), whiteMat);
+        sock.position.y = -0.28;
         sock.castShadow = true;
-        legGroup.add(sock);
+        knee.add(sock);
 
-        // 運動鞋 (深藍黑鞋身＋白色橡膠大底，完全符合 media_1791355365994.png)
-        const shoeBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.18, 0.44), shoeBodyMat);
-        shoeBody.position.set(0, -0.81, 0.08);
+        // 腳踝轉軸 (Ankle)
+        const ankle = new THREE.Group();
+        ankle.position.set(0, -0.38, 0);
+
+        // 運動鞋 (深藍黑鞋身＋白色橡膠大底)
+        const shoeBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.42), shoeBodyMat);
+        shoeBody.position.set(0, -0.06, 0.08);
         shoeBody.castShadow = true;
-        legGroup.add(shoeBody);
+        ankle.add(shoeBody);
 
-        const shoeSole = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.07, 0.46), whiteMat);
-        shoeSole.position.set(0, -0.87, 0.08);
-        legGroup.add(shoeSole);
+        const shoeSole = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.06, 0.44), whiteMat);
+        shoeSole.position.set(0, -0.13, 0.08);
+        shoeSole.castShadow = true;
+        ankle.add(shoeSole);
 
-        return legGroup;
+        knee.add(ankle);
+        hip.add(knee);
+
+        return { hip, knee, ankle };
       }
 
-      avatarLeftLeg = buildLeg(true);
-      avatarGroup.add(avatarLeftLeg);
-      avatarRightLeg = buildLeg(false);
-      avatarGroup.add(avatarRightLeg);
+      const legLeftObj = buildArticulatedLeg(true);
+      avatarParts.hipL = legLeftObj.hip;
+      avatarParts.kneeL = legLeftObj.knee;
+      avatarParts.ankL = legLeftObj.ankle;
+      avatarLeftLeg = legLeftObj.hip;
+      avatarGroup.add(legLeftObj.hip);
+
+      const legRightObj = buildArticulatedLeg(false);
+      avatarParts.hipR = legRightObj.hip;
+      avatarParts.kneeR = legRightObj.knee;
+      avatarParts.ankR = legRightObj.ankle;
+      avatarRightLeg = legRightObj.hip;
+      avatarGroup.add(legRightObj.hip);
 
       // 人物縮小尺寸，身形小巧置於視窗下方，前方視野完全開闊 (如 media_1791468841860_b8c925a6.png 與 media_1791468841831_414f259e.png)
       avatarGroup.scale.set(0.48, 0.48, 0.48);
@@ -3221,7 +3349,140 @@
     }
 
     // 活動中心立體招牌紋理 (中英文)
-    function createGymSignTexture() {
+                // 4.11.1 大溪校訓精神石碑紋理產生器 (勤學・勵志・熱情・感恩)
+    function createSchoolMottoTexture() {
+      const cvs = document.createElement('canvas');
+      cvs.width = 256;
+      cvs.height = 256;
+      const ctx = cvs.getContext('2d');
+      // 花崗岩基底色
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(0, 0, 256, 256);
+      // 金紅刻字銘牌
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(16, 16, 224, 224);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#facc15';
+      ctx.strokeRect(20, 20, 216, 216);
+
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 26px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('桃園市立大溪國中', 128, 62);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '900 32px "Noto Sans TC", sans-serif';
+      ctx.fillText('勤　學', 128, 110);
+      ctx.fillText('勵　志', 128, 150);
+      ctx.fillText('熱　情', 128, 190);
+      ctx.fillText('感　恩', 128, 230);
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    // 4.11.2 彩色跳格子地繪紋理產生器 (1~10 繽紛方格地繪，依據照片 04_02 與大勇國小 hopscotch)
+    function createHopscotchTexture() {
+      const cvs = document.createElement('canvas');
+      cvs.width = 256;
+      cvs.height = 512;
+      const ctx = cvs.getContext('2d');
+      // 透明底
+      ctx.clearRect(0, 0, 256, 512);
+
+      // 格子配置 [格數, x, y, w, h, 顏色]
+      const tiles = [
+        { num: '1', x: 78, y: 430, w: 100, h: 70, col: '#f43f5e' },
+        { num: '2', x: 78, y: 350, w: 100, h: 70, col: '#f97316' },
+        { num: '3', x: 78, y: 270, w: 100, h: 70, col: '#eab308' },
+        { num: '4', x: 22, y: 190, w: 100, h: 70, col: '#22c55e' },
+        { num: '5', x: 134, y: 190, w: 100, h: 70, col: '#06b6d4' },
+        { num: '6', x: 78, y: 110, w: 100, h: 70, col: '#3b82f6' },
+        { num: '7', x: 22, y: 30, w: 100, h: 70, col: '#8b5cf6' },
+        { num: '8', x: 134, y: 30, w: 100, h: 70, col: '#ec4899' },
+      ];
+
+      tiles.forEach(t => {
+        ctx.fillStyle = t.col;
+        ctx.fillRect(t.x, t.y, t.w, t.h);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#ffffff';
+        ctx.strokeRect(t.x, t.y, t.w, t.h);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 36px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(t.num, t.x + t.w / 2, t.y + t.h / 2);
+      });
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+function createSolarPanelTexture() {
+      const cvs = document.createElement('canvas');
+      cvs.width = 128;
+      cvs.height = 128;
+      const ctx = cvs.getContext('2d');
+      ctx.fillStyle = '#0f172a'; // 深藍黑底色
+      ctx.fillRect(0, 0, 128, 128);
+      // 太陽能電池晶圓格 (Solar Cells)
+      ctx.fillStyle = '#0369a1';
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 4; c++) {
+          ctx.fillRect(c * 32 + 2, r * 32 + 2, 28, 28);
+        }
+      }
+      // 銀白匯流條與格線
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      for (let i = 16; i < 128; i += 32) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0); ctx.lineTo(i, 128); ctx.stroke();
+      }
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(4, 2);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+function createPinkTileTexture() {
+      const cvs = document.createElement('canvas');
+      cvs.width = 128;
+      cvs.height = 128;
+      const ctx = cvs.getContext('2d');
+      // 基底粉橘紅二丁掛磁磚色
+      ctx.fillStyle = '#f472b6';
+      ctx.fillRect(0, 0, 128, 128);
+      // 水平與垂直白色灰漿勾縫
+      ctx.strokeStyle = '#fce7f3';
+      ctx.lineWidth = 2;
+      for (let y = 0; y < 128; y += 16) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(128, y);
+        ctx.stroke();
+        const offset = (y / 16 % 2) * 16;
+        for (let x = offset; x < 128; x += 32) {
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x, y + 16);
+          ctx.stroke();
+        }
+      }
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(3, 8);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+function createGymSignTexture() {
       const canvas = document.createElement("canvas");
       canvas.width = 512;
       canvas.height = 128;
@@ -6031,15 +6292,77 @@
         bldGroup.add(solarGroup);
       }
 
-      // 八年級南橫棟西側半圓弧樓梯塔 (平面圖特徵)
-      if (cfg.id === "grade8-front") {
-        const roundTower = new THREE.Mesh(
-          new THREE.CylinderGeometry(5.2, 5.2, totalH, 24, 1, false, Math.PI / 2, Math.PI),
-          new THREE.MeshLambertMaterial({ color: cfg.color })
+      // 中庭標誌性粉紅雙圓柱螺旋樓梯塔樓 (依據校園照片 03_02、03_03 精確還原：粉紅二丁掛磁磚＋豎向採光玻璃長窗＋圓形挑簷帽頂)
+      if (cfg.id === "grade8-front" || cfg.id === "grade8-mid") {
+        const pinkTileTex = createPinkTileTexture();
+        const pinkTileMat = new THREE.MeshLambertMaterial({ map: pinkTileTex, color: 0xfbcfe8 });
+        const whiteTrimMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
+        const glassMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 });
+
+        const towerGroup = new THREE.Group();
+        const posX = -cfg.width / 2 - 0.6;
+        const towerH = totalH + 1.8;
+
+        // 雙圓柱主體 (Twin Cylinders)
+        [-2.0, 2.0].forEach((offsetZ, idx) => {
+          const colMesh = new THREE.Mesh(
+            new THREE.CylinderGeometry(3.0, 3.0, towerH, 32),
+            pinkTileMat
+          );
+          colMesh.position.set(0, towerH / 2, offsetZ);
+          colMesh.castShadow = true;
+          towerGroup.add(colMesh);
+
+          // 圓柱縱向豎條玻璃採光窗 (Vertical Slit Windows)
+          for (let w = -1; w <= 1; w++) {
+            const slitWin = new THREE.Mesh(
+              new THREE.BoxGeometry(0.35, towerH - 3.0, 0.45),
+              glassMat
+            );
+            const ang = (idx === 0 ? -1 : 1) * Math.PI * 0.4 + w * 0.42;
+            slitWin.position.set(Math.cos(ang) * 2.9, towerH / 2 + 0.5, offsetZ + Math.sin(ang) * 2.9);
+            towerGroup.add(slitWin);
+          }
+
+          // 圓形水平挑簷帽蓋 (Circular Roof Cornice)
+          const capMesh = new THREE.Mesh(
+            new THREE.CylinderGeometry(3.35, 3.35, 0.45, 32),
+            whiteTrimMat
+          );
+          capMesh.position.set(0, towerH + 0.22, offsetZ);
+          capMesh.castShadow = true;
+          towerGroup.add(capMesh);
+
+          // 頂樓避雷針
+          const rodMesh = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.04, 0.08, 1.8, 8),
+            new THREE.MeshLambertMaterial({ color: 0x94a3b8 })
+          );
+          rodMesh.position.set(0, towerH + 1.2, offsetZ);
+          towerGroup.add(rodMesh);
+        });
+
+        // 雙圓柱中央連通抱廈結構
+        const connector = new THREE.Mesh(
+          new THREE.BoxGeometry(3.8, towerH, 3.6),
+          pinkTileMat
         );
-        roundTower.position.set(-cfg.width / 2, totalH / 2, 0);
-        roundTower.castShadow = true;
-        bldGroup.add(roundTower);
+        connector.position.set(0, towerH / 2, 0);
+        connector.castShadow = true;
+        towerGroup.add(connector);
+
+        // 各樓層水平白色分層腰線
+        for (let fl = 1; fl <= cfg.floors; fl++) {
+          const band = new THREE.Mesh(
+            new THREE.BoxGeometry(6.4, 0.25, 7.8),
+            whiteTrimMat
+          );
+          band.position.set(0, fl * FH, 0);
+          towerGroup.add(band);
+        }
+
+        towerGroup.position.set(posX, 0, 0);
+        bldGroup.add(towerGroup);
       }
 
       // 屋頂 (Pitched Roof or Flat Roof)
@@ -6065,6 +6388,53 @@
         roofMesh.position.y = totalH + 0.4;
         roofMesh.castShadow = true;
         bldGroup.add(roofMesh);
+      }
+
+      // 頂樓高架太陽能光電遮陽棚 (依據空拍照 01_06 與大勇國小 solarRoof：高架鋼構立柱＋面南傾斜深藍單晶矽太陽能板矩陣)
+      if (cfg.id === "grade9-back" || cfg.id === "grade7-new" || cfg.id === "multi-building") {
+        const solarTex = createSolarPanelTexture();
+        const solarMat = new THREE.MeshStandardMaterial({
+          map: solarTex,
+          color: 0x38bdf8,
+          metalness: 0.85,
+          roughness: 0.25
+        });
+        const steelMat = new THREE.MeshLambertMaterial({ color: 0x64748b }); // 鍍鋅鋼構立柱
+        const roofSolarGroup = new THREE.Group();
+        const roofBaseY = totalH + 0.8;
+
+        const pWidth = cfg.width - 4.0;
+        const pDepth = cfg.depth - 2.4;
+        const rows = Math.max(2, Math.floor(pDepth / 3.2));
+        const postH = 2.2; // 挑高 2.2 公尺，下方為通風隔熱遮陽空間
+
+        // 陣列高架立柱 (Steel Posts)
+        for (let colX = -pWidth / 2 + 2; colX <= pWidth / 2 - 2; colX += 6.0) {
+          for (let rowZ = -pDepth / 2 + 1; rowZ <= pDepth / 2 - 1; rowZ += 3.2) {
+            const post = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.08, 0.08, postH, 8),
+              steelMat
+            );
+            post.position.set(colX, roofBaseY + postH / 2, rowZ);
+            post.castShadow = true;
+            roofSolarGroup.add(post);
+          }
+        }
+
+        // 傾斜面南太陽能模組排 (Solar Rows tilted south)
+        for (let r = 0; r < rows; r++) {
+          const rowZ = -pDepth / 2 + 1.8 + r * 3.0;
+          const panelMesh = new THREE.Mesh(
+            new THREE.BoxGeometry(pWidth, 0.12, 2.6),
+            solarMat
+          );
+          panelMesh.position.set(0, roofBaseY + postH + 0.1, rowZ);
+          panelMesh.rotation.x = -0.30; // 朝南微傾斜 17 度
+          panelMesh.castShadow = true;
+          roofSolarGroup.add(panelMesh);
+        }
+
+        bldGroup.add(roofSolarGroup);
       }
 
       scene.add(bldGroup);
@@ -6113,6 +6483,128 @@
         worldPos: new THREE.Vector3(cfg.x, totalH + 3.6, cfg.z)
       });
     });
+
+    // 4.12 中庭校訓精神石碑與彩色跳格子地繪 (依據照片 03_01、03_06、04_02 與大勇國小 hopscotch)
+    function setupCourtyardMottoAndHopscotch() {
+      // 1. 大溪國中校訓精神景觀石碑 (勤學・勵志・熱情・感恩)
+      const mottoGroup = new THREE.Group();
+      mottoGroup.position.set(-15, 0, 72);
+
+      // 粗獷花崗石底座
+      const stoneBase = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.4, 2.8, 0.7, 8),
+        new THREE.MeshLambertMaterial({ color: 0x64748b })
+      );
+      stoneBase.position.y = 0.35;
+      stoneBase.castShadow = true;
+      mottoGroup.add(stoneBase);
+
+      // 主碑石 (正面刻校訓，背面刻精神)
+      const slabMat = [
+        new THREE.MeshLambertMaterial({ color: 0x475569 }),
+        new THREE.MeshLambertMaterial({ color: 0x475569 }),
+        new THREE.MeshLambertMaterial({ color: 0x334155 }),
+        new THREE.MeshLambertMaterial({ color: 0x334155 }),
+        new THREE.MeshLambertMaterial({ map: createSchoolMottoTexture() }), // 正面朝南
+        new THREE.MeshLambertMaterial({ color: 0x475569 })
+      ];
+      const mottoSlab = new THREE.Mesh(
+        new THREE.BoxGeometry(2.5, 3.2, 0.6),
+        slabMat
+      );
+      mottoSlab.position.y = 2.25;
+      mottoSlab.castShadow = true;
+      mottoGroup.add(mottoSlab);
+
+      // 周圍綠化矮花台與卵石環
+      const ring = new THREE.Mesh(
+        new THREE.CylinderGeometry(3.2, 3.4, 0.28, 16),
+        new THREE.MeshLambertMaterial({ color: 0x10b981 })
+      );
+      ring.position.y = 0.14;
+      mottoGroup.add(ring);
+
+      scene.add(mottoGroup);
+
+      // 2. 彩色跳格子地繪 (Hopscotch Court，長度約 8m，1~10 數字方格)
+      const hopTex = createHopscotchTexture();
+      const hopMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(3.6, 7.8),
+        new THREE.MeshLambertMaterial({ map: hopTex, transparent: true })
+      );
+      hopMesh.rotation.x = -Math.PI / 2;
+      hopMesh.position.set(12, 0.05, 42); // 位於中庭一樓穿堂前平坦地磚上
+      scene.add(hopMesh);
+    }
+    setupCourtyardMottoAndHopscotch();
+
+    // 4.13 校園四周邊界防護圍欄 (依據照片 01_08、07_06 與大勇國小 fence：南界通透鋼欄＋北側山腳防護安全圍籬)
+    function setupCampusBoundaryFences() {
+      const fenceMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.3 });
+      const greenFenceMat = new THREE.MeshStandardMaterial({ color: 0x15803d, metalness: 0.6, roughness: 0.4 });
+      const baseMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 }); // 混凝土矮基座
+
+      // A. 南側校界圍欄 (沿道路 z = 94，在校門口 x = -14 ~ 14 留空)
+      const southFenceGroup = new THREE.Group();
+      [-1, 1].forEach(side => {
+        const startX = side === -1 ? -120 : 16;
+        const endX = side === -1 ? -16 : 120;
+        const len = endX - startX;
+        const midX = (startX + endX) / 2;
+
+        // 水泥矮基座
+        const base = new THREE.Mesh(new THREE.BoxGeometry(len, 0.45, 0.4), baseMat);
+        base.position.set(midX, 0.225, 94);
+        base.receiveShadow = true;
+        southFenceGroup.add(base);
+
+        // 上方通透防護欄杆水平橫樑 (上/中/下 3 道橫桿)
+        [0.75, 1.25, 1.75].forEach(barY => {
+          const rail = new THREE.Mesh(new THREE.BoxGeometry(len, 0.06, 0.06), fenceMat);
+          rail.position.set(midX, barY, 94);
+          southFenceGroup.add(rail);
+        });
+
+        // 間隔立柱 (Pillars every 3.2m)
+        for (let px = startX; px <= endX; px += 3.2) {
+          const post = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 1.85, 8), fenceMat);
+          post.position.set(px, 0.925, 94);
+          post.castShadow = true;
+          southFenceGroup.add(post);
+
+          // 柱頂金色/白銀飾球
+          const finial = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), fenceMat);
+          finial.position.set(px, 1.9, 94);
+          southFenceGroup.add(finial);
+        }
+      });
+      scene.add(southFenceGroup);
+
+      // B. 北側後山山腳擋土與安全防墜圍籬 (沿操場後方 z = -75，全長 240m)
+      const northFenceGroup = new THREE.Group();
+      const nLen = 240;
+      const nBase = new THREE.Mesh(new THREE.BoxGeometry(nLen, 0.5, 0.5), baseMat);
+      nBase.position.set(0, 0.25, -75);
+      northFenceGroup.add(nBase);
+
+      // 墨綠色安全防護網板 (菱形格柵半透明質感)
+      const meshPanel = new THREE.Mesh(
+        new THREE.BoxGeometry(nLen, 1.6, 0.04),
+        new THREE.MeshLambertMaterial({ color: 0x166534, transparent: true, opacity: 0.65 })
+      );
+      meshPanel.position.set(0, 1.3, -75);
+      northFenceGroup.add(meshPanel);
+
+      // 支撐立柱
+      for (let px = -120; px <= 120; px += 4.0) {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.2, 8), greenFenceMat);
+        post.position.set(px, 1.1, -75);
+        post.castShadow = true;
+        northFenceGroup.add(post);
+      }
+      scene.add(northFenceGroup);
+    }
+    setupCampusBoundaryFences();
 
     // 4.3 Ground Landmark Pills (操場, 司令台, 排球場, 籃球場, 蘭亭, 校大門, 警衛室, 停車場等)
     const LANDMARKS = [
@@ -8540,17 +9032,76 @@ miniCanvas.addEventListener("click", (e) => {
 
       // 3. AVATAR WALKING LIMB ANIMATION & CAMERA FOLLOW
       if (avatarGroup) {
+        const padTime = clock.getElapsedTime();
+        // 自動眨眼系統 (對標大勇國小：每 3.7 秒自動眨眼一次，持續約 140ms)
+        const isBlinking = (Math.floor(padTime * 1000) % 3700 < 140);
+        if (avatarParts.eyes && avatarParts.eyes.length) {
+          const blinkScale = isBlinking ? 0.12 : 1.0;
+          avatarParts.eyes.forEach(eye => { eye.scale.y = blinkScale; });
+        }
+
         if (isMoving) {
-          walkAnimCycle += delta * (moveInput.sprint ? 16 : 10);
-          avatarLeftLeg.rotation.x = Math.sin(walkAnimCycle) * 0.65;
-          avatarRightLeg.rotation.x = -Math.sin(walkAnimCycle) * 0.65;
-          avatarLeftArm.rotation.x = -Math.sin(walkAnimCycle) * 0.55;
-          avatarRightArm.rotation.x = Math.sin(walkAnimCycle) * 0.55;
+          const speedMult = moveInput.sprint ? 16 : 10;
+          walkAnimCycle += delta * speedMult;
+
+          // 跑步與行走的骨盆垂直起伏 (Pelvis Bob)
+          if (avatarParts.torsoGroup) {
+            avatarParts.torsoGroup.position.y = 1.45 + Math.abs(Math.sin(walkAnimCycle)) * (moveInput.sprint ? 0.05 : 0.035);
+            // 身體重心自然前傾
+            avatarParts.torsoGroup.rotation.x = moveInput.sprint ? 0.16 : 0.07;
+            // 身體左右側擺動
+            avatarParts.torsoGroup.rotation.y = Math.sin(walkAnimCycle) * 0.06;
+            avatarParts.torsoGroup.scale.set(1.0, 1.0, 1.0);
+          }
+
+          // 腿部與膝關節二段式連動 (IK Gait：腳往後離地提起時自然屈膝折疊)
+          const legSwing = Math.sin(walkAnimCycle) * (moveInput.sprint ? 0.85 : 0.65);
+          if (avatarParts.hipL && avatarParts.kneeL) {
+            avatarParts.hipL.rotation.x = legSwing;
+            avatarParts.kneeL.rotation.x = Math.max(0, -legSwing) * 0.95;
+          }
+          if (avatarParts.hipR && avatarParts.kneeR) {
+            avatarParts.hipR.rotation.x = -legSwing;
+            avatarParts.kneeR.rotation.x = Math.max(0, legSwing) * 0.95;
+          }
+
+          // 手臂與手肘二段式連動 (手臂向前擺動時肘關節自然微微屈曲)
+          const armSwing = Math.sin(walkAnimCycle) * (moveInput.sprint ? 0.75 : 0.55);
+          if (avatarParts.armL && avatarParts.elbL) {
+            avatarParts.armL.rotation.x = -armSwing;
+            avatarParts.elbL.rotation.x = Math.max(0, -armSwing) * 0.55;
+          }
+          if (avatarParts.armR && avatarParts.elbR) {
+            avatarParts.armR.rotation.x = armSwing;
+            avatarParts.elbR.rotation.x = Math.max(0, armSwing) * 0.55;
+          }
+
+          // 跑步時頭部保持平視正前方
+          if (avatarParts.headGroup) {
+            avatarParts.headGroup.rotation.y = -Math.sin(walkAnimCycle) * 0.03;
+            avatarParts.headGroup.rotation.x = 0;
+          }
         } else {
-          avatarLeftLeg.rotation.x = 0;
-          avatarRightLeg.rotation.x = 0;
-          avatarLeftArm.rotation.x = 0;
-          avatarRightArm.rotation.x = 0;
+          // 待機 Idle 模式：關節回正
+          if (avatarParts.hipL) { avatarParts.hipL.rotation.x = 0; avatarParts.kneeL.rotation.x = 0; }
+          if (avatarParts.hipR) { avatarParts.hipR.rotation.x = 0; avatarParts.kneeR.rotation.x = 0; }
+          if (avatarParts.armL) { avatarParts.armL.rotation.x = 0; avatarParts.elbL.rotation.x = 0; }
+          if (avatarParts.armR) { avatarParts.armR.rotation.x = 0; avatarParts.elbR.rotation.x = 0; }
+
+          // 胸腔呼吸起伏動效 (Chest Breathing)
+          const breath = Math.sin(padTime * 2.2) * 0.02;
+          if (avatarParts.torsoGroup) {
+            avatarParts.torsoGroup.position.y = 1.45 + breath * 0.4;
+            avatarParts.torsoGroup.rotation.x = 0;
+            avatarParts.torsoGroup.rotation.y = 0;
+            avatarParts.torsoGroup.scale.set(1.0 + breath * 0.3, 1.0 + breath, 1.0 + breath * 0.3);
+          }
+
+          // 待機時頭部悠閒環顧四周微動效
+          if (avatarParts.headGroup) {
+            avatarParts.headGroup.rotation.y = Math.sin(padTime * 0.75) * 0.12;
+            avatarParts.headGroup.rotation.x = Math.sin(padTime * 1.1) * 0.04;
+          }
         }
 
         // Camera Follow in Avatar / First-Person Mode (正後方跟隨視角，如大勇國小)
