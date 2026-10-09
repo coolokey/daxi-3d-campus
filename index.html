@@ -2149,8 +2149,8 @@
       <button class="room-tab" data-bld="grade8-front">八年級(南棟)</button>
       <button class="room-tab" data-bld="grade8-mid">八年級(中棟)</button>
       <button class="room-tab" data-bld="grade9-back">九年級大樓</button>
-      <button class="room-tab" data-bld="art-building">藝術館</button>
-      <button class="room-tab" data-bld="tech-building">科技館</button>
+      <button class="room-tab" data-bld="art-building">藝術閣</button>
+      <button class="room-tab" data-bld="tech-building">科技閣</button>
       <button class="room-tab" data-bld="multi-building">綜合大樓</button>
       <button class="room-tab" data-bld="new-grade7">七年級新大樓</button>
     </div>
@@ -2442,16 +2442,16 @@
     ]
   },
 
-  // 11. 科技館 (東側中棟，2層樓)
+  // 11. 科技閣 (東側中棟，2層樓)
   {
     id: "tech-building",
-    name: "科技館",
+    name: "科技閣 (Technology Building)",
     category: "special",
     color: 0xe4f2ef,
     roofColor: 0x1b675e,
     x: 74, z: 12, width: 28, depth: 22, floors: 2,
     stairs: [
-      { x: 62, z: 12, name: "科技館樓梯", floors: 2 }
+      { x: 62, z: 12, name: "科技閣樓梯", floors: 2 }
     ],
     rooms: [
       { id: "audiovisual-1f", code: "TC1-AV", name: "視聽多媒體教室 (1F)", floor: 1, node: "tech-1f-av", cat: "special" },
@@ -2465,16 +2465,16 @@
     ]
   },
 
-  // 12. 藝術館 (東側南棟，直立長條，4層樓)
+  // 12. 藝術閣 (東側南棟，直立長條，4層樓)
   {
     id: "art-building",
-    name: "藝術館",
+    name: "藝術閣 (Art Building)",
     category: "special",
     color: 0xf8e9eb,
     roofColor: 0x82414f,
     x: 74, z: 46, width: 14, depth: 32, floors: 4,
     stairs: [
-      { x: 68, z: 46, name: "藝術館主樓梯間", floors: 4 }
+      { x: 68, z: 46, name: "藝術閣主樓梯間", floors: 4 }
     ],
     rooms: [
       { id: "broadwood", code: "ART1-BW", name: "樂活體能教室 (1F)", floor: 1, node: "art-1f-bw", cat: "sports" },
@@ -4158,23 +4158,99 @@ function createGymSignTexture() {
         }
       });
 
-      // 機車與腳踏車停車棚
-      const motoCanopy = new THREE.Mesh(new THREE.BoxGeometry(20, 0.3, 6), new THREE.MeshLambertMaterial({ color: 0x64748b }));
-      motoCanopy.position.set(26, 3.0, 90);
-      motoCanopy.castShadow = true;
-      scene.add(motoCanopy);
+      // 3. 機車停車棚 (正門東側 x=26, z=90)
+      const motoGroup = new THREE.Group();
+      motoGroup.position.set(26, 0, 90);
 
-      const bikeCanopy = new THREE.Mesh(new THREE.BoxGeometry(26, 0.3, 6), new THREE.MeshLambertMaterial({ color: 0x475569 }));
-      bikeCanopy.position.set(80, 3.0, 90);
+      const motoCanopy = new THREE.Mesh(new THREE.BoxGeometry(20, 0.25, 5.5), new THREE.MeshLambertMaterial({ color: 0x475569 }));
+      motoCanopy.position.y = 2.8;
+      motoCanopy.castShadow = true;
+      motoGroup.add(motoCanopy);
+
+      // 支撐立柱
+      [-9, 0, 9].forEach(cx => {
+        const cPost = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.8, 8), new THREE.MeshLambertMaterial({ color: 0x94a3b8 }));
+        cPost.position.set(cx, 1.4, -2.4);
+        cPost.castShadow = true;
+        motoGroup.add(cPost);
+      });
+      scene.add(motoGroup);
+
+      // 4. 學生腳踏車停車棚 (東南角 x=80, z=90，依 115 平面圖設有藍色車棚與腳踏車架)
+      const bikeGroup = new THREE.Group();
+      bikeGroup.position.set(80, 0, 90);
+
+      // 藍色現代弧形/斜頂遮雨棚
+      const bikeCanopy = new THREE.Mesh(new THREE.BoxGeometry(26, 0.25, 6), new THREE.MeshLambertMaterial({ color: 0x0284c7 }));
+      bikeCanopy.position.y = 2.8;
+      bikeCanopy.rotation.x = -0.06;
       bikeCanopy.castShadow = true;
-      scene.add(bikeCanopy);
+      bikeGroup.add(bikeCanopy);
+
+      // 鋼柱支架與腳踏車停放架 (Bicycle Racks)
+      [-12, -4, 4, 12].forEach(bx => {
+        const bPost = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 2.8, 8), new THREE.MeshLambertMaterial({ color: 0xe2e8f0 }));
+        bPost.position.set(bx, 1.4, -2.6);
+        bPost.castShadow = true;
+        bikeGroup.add(bPost);
+      });
+
+      // 腳踏車前輪卡槽鋼架 (Wheel Lock Racks)
+      for (let rx = -11; rx <= 11; rx += 2.2) {
+        const rackBar = new THREE.Mesh(new THREE.TorusGeometry(0.35, 0.03, 8, 16), new THREE.MeshLambertMaterial({ color: 0x64748b }));
+        rackBar.position.set(rx, 0.35, 0);
+        rackBar.rotation.y = Math.PI / 2;
+        bikeGroup.add(rackBar);
+      }
+
+      // 「P 學生腳踏車停車棚」藍色識別標牌
+      const bSign = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.8, 0.08), new THREE.MeshLambertMaterial({ color: 0x0284c7 }));
+      bSign.position.set(0, 3.2, 2.9);
+      bikeGroup.add(bSign);
+
+      scene.add(bikeGroup);
+
+      // 5. 公用電話亭 (Payphone Kiosk，位於腳踏車棚旁 x=94, z=90)
+      const phoneGroup = new THREE.Group();
+      phoneGroup.position.set(94, 0, 90);
+
+      // 電話亭亭身與透明側板
+      const phoneBooth = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.4, 1.2), new THREE.MeshLambertMaterial({ color: 0x16a34a }));
+      phoneBooth.position.y = 1.2;
+      phoneBooth.castShadow = true;
+      phoneGroup.add(phoneBooth);
+
+      const phoneGlass = new THREE.Mesh(
+        new THREE.BoxGeometry(1.0, 1.6, 1.05),
+        new THREE.MeshLambertMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.55 })
+      );
+      phoneGlass.position.y = 1.3;
+      phoneGroup.add(phoneGlass);
+
+      // 紅色話機
+      const phoneSet = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.45, 0.25), new THREE.MeshLambertMaterial({ color: 0xdc2626 }));
+      phoneSet.position.set(0, 1.25, 0);
+      phoneGroup.add(phoneSet);
+
+      scene.add(phoneGroup);
 
       ROOMS_DB["bike-shed"] = {
         id: "bike-shed",
         code: "PARK-BIKE",
-        name: "學生腳踏車停車棚",
+        name: "學生腳踏車停車棚 (P)",
         buildingId: "park",
         buildingName: "校園停車設施",
+        floor: 1,
+        cat: "admin",
+        node: "bike-shed"
+      };
+
+      ROOMS_DB["payphone"] = {
+        id: "payphone",
+        code: "TEL-01",
+        name: "校園公用電話亭",
+        buildingId: "park",
+        buildingName: "校園公共設施",
         floor: 1,
         cat: "admin",
         node: "bike-shed"
@@ -5239,38 +5315,106 @@ function createGymSignTexture() {
     }
     createTrackAndPlatform();
 
-    // 4.6 戶外排球場 (位於操場與籃球場之間 x=-22, z=-38，綠色地坪)
+    // 4.6 戶外排球場群與西側灰色階梯看台 (依 115 官方平面圖：緊鄰籃球場西側之綠色排球地坪，設有階梯看台與雙面場地)
     function createVolleyballCourt() {
       const vbGroup = new THREE.Group();
-      vbGroup.position.set(-22, 0.04, -38);
+      vbGroup.position.set(-8, 0.04, -36);
 
+      // 綠色 PU 地坪緩衝區 (16m x 42m)
       const vbFloor = new THREE.Mesh(
-        new THREE.PlaneGeometry(14, 28),
+        new THREE.PlaneGeometry(16, 42),
         new THREE.MeshLambertMaterial({ color: 0x16a34a })
       );
       vbFloor.rotation.x = -Math.PI / 2;
       vbFloor.receiveShadow = true;
       vbGroup.add(vbFloor);
 
-      const vbBorder = new THREE.Mesh(
-        new THREE.PlaneGeometry(12, 26),
-        new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
-      );
-      vbBorder.rotation.x = -Math.PI / 2;
-      vbBorder.position.y = 0.01;
-      vbGroup.add(vbBorder);
+      // 雙面南北排列標準排球場 (Offset Z: -10.5, 10.5)
+      [-10.5, 10.5].forEach(courtZ => {
+        // 白色排球場邊線 (9m x 18m)
+        const vbBorder = new THREE.Mesh(
+          new THREE.PlaneGeometry(10, 18),
+          new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
+        );
+        vbBorder.rotation.x = -Math.PI / 2;
+        vbBorder.position.set(0, 0.01, courtZ);
+        vbGroup.add(vbBorder);
 
-      // 排球柱與球網
-      const post1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2, 8), new THREE.MeshLambertMaterial({ color: 0x1e293b }));
-      post1.position.set(-7, 1.6, 0);
-      vbGroup.add(post1);
-      const post2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2, 8), new THREE.MeshLambertMaterial({ color: 0x1e293b }));
-      post2.position.set(7, 1.6, 0);
-      vbGroup.add(post2);
+        // 排球中線 (Net line)
+        const midLine = new THREE.Mesh(
+          new THREE.PlaneGeometry(10, 0.1),
+          new THREE.MeshBasicMaterial({ color: 0xffffff })
+        );
+        midLine.rotation.x = -Math.PI / 2;
+        midLine.position.set(0, 0.015, courtZ);
+        vbGroup.add(midLine);
 
-      const net = new THREE.Mesh(new THREE.PlaneGeometry(14, 1.2), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.85 }));
-      net.position.set(0, 2.4, 0);
-      vbGroup.add(net);
+        // 3m 攻擊線 (Attack Lines: +/- 3m from net)
+        [-3, 3].forEach(offZ => {
+          const attackLine = new THREE.Mesh(
+            new THREE.PlaneGeometry(10, 0.08),
+            new THREE.MeshBasicMaterial({ color: 0xffffff })
+          );
+          attackLine.rotation.x = -Math.PI / 2;
+          attackLine.position.set(0, 0.015, courtZ + offZ);
+          vbGroup.add(attackLine);
+        });
+
+        // 兩側排球立柱與球網 (東西兩側立柱，球網橫貫東西)
+        const post1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 3.2, 8), new THREE.MeshLambertMaterial({ color: 0x1e293b }));
+        post1.position.set(-5.6, 1.6, courtZ);
+        vbGroup.add(post1);
+
+        const post2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 3.2, 8), new THREE.MeshLambertMaterial({ color: 0x1e293b }));
+        post2.position.set(5.6, 1.6, courtZ);
+        vbGroup.add(post2);
+
+        const net = new THREE.Mesh(
+          new THREE.PlaneGeometry(11.2, 1.1),
+          new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+        );
+        net.position.set(0, 2.3, courtZ);
+        vbGroup.add(net);
+      });
+
+      // 灰色混凝土三階看台 (位於排球場西側、面向球場，長 40m，寬 3.6m，銜接操場彎道)
+      const bleacherGroup = new THREE.Group();
+      bleacherGroup.position.set(-11, 0, 0);
+
+      const tierMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+      // 第 1 階
+      const t1 = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.35, 40), tierMat);
+      t1.position.set(0, 0.175, 0);
+      t1.castShadow = true;
+      t1.receiveShadow = true;
+      bleacherGroup.add(t1);
+
+      // 第 2 階
+      const t2 = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.35, 40), tierMat);
+      t2.position.set(-0.6, 0.525, 0);
+      t2.castShadow = true;
+      t2.receiveShadow = true;
+      bleacherGroup.add(t2);
+
+      // 第 3 階
+      const t3 = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.35, 40), tierMat);
+      t3.position.set(-1.2, 0.875, 0);
+      t3.castShadow = true;
+      t3.receiveShadow = true;
+      bleacherGroup.add(t3);
+
+      // 看台頂部不鏽鋼安全護欄
+      for (let rz = -18; rz <= 18; rz += 6) {
+        const rPost = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.0, 6), new THREE.MeshLambertMaterial({ color: 0x475569 }));
+        rPost.position.set(-1.75, 1.55, rz);
+        bleacherGroup.add(rPost);
+      }
+      const railBar = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 38, 8), new THREE.MeshLambertMaterial({ color: 0x475569 }));
+      railBar.rotation.x = Math.PI / 2;
+      railBar.position.set(-1.75, 2.05, 0);
+      bleacherGroup.add(railBar);
+
+      vbGroup.add(bleacherGroup);
 
       vbGroup.userData.roomId = "volleyball-out";
       scene.add(vbGroup);
@@ -5278,7 +5422,7 @@ function createGymSignTexture() {
       ROOMS_DB["volleyball-out"] = {
         id: "volleyball-out",
         code: "OUT-VB",
-        name: "戶外排球場",
+        name: "戶外排球場與階梯看台",
         buildingId: "court",
         buildingName: "綜合運動設施",
         floor: 1,
@@ -5288,40 +5432,40 @@ function createGymSignTexture() {
     }
     createVolleyballCourt();
 
-    // 4.7 戶外籃球場群 (依照片 04_戶外PU籃球場劃線與配色垂直鳥瞰 真實重現：天藍主場＋磚紅禁區中圈＋草綠緩衝走道＋純白專業劃線)
+    // 4.7 戶外籃球場群 (依 115 官方平面圖 真實重現：3面全場為「東西向」水平橫向排列，西側與東側設置專業籃球架)
     function createBasketballComplex() {
       const courtGroup = new THREE.Group();
-      courtGroup.position.set(12, 0.04, -38);
+      courtGroup.position.set(18, 0.04, -36);
 
-      // 1. 外圍與球場緩衝隔離帶：高彩度草綠色 (Lime Green Buffer)
+      // 1. 外圍與球場緩衝隔離帶：高彩度草綠色 (Lime Green Buffer, 34m x 44m)
       const greenBuffer = new THREE.Mesh(
-        new THREE.PlaneGeometry(46, 34),
+        new THREE.PlaneGeometry(34, 44),
         new THREE.MeshLambertMaterial({ color: 0x65a30d })
       );
       greenBuffer.rotation.x = -Math.PI / 2;
       greenBuffer.receiveShadow = true;
       courtGroup.add(greenBuffer);
 
-      // 2. 三面全場籃球場 (Offset X: -14, 0, 14)
-      [-14, 0, 14].forEach(courtX => {
-        // 天藍色主要活動球場面 (Vivid Ocean Blue Playing Area: 12.6m x 28m)
+      // 2. 三面全場籃球場 (Offset Z: -13.2, 0, 13.2 由北向南排列，球場長度為東西向 28m x 12.2m)
+      [-13.2, 0, 13.2].forEach(courtZ => {
+        // 天藍色主要活動球場面 (Vivid Ocean Blue Playing Area: 28m x 12.2m)
         const blueFloor = new THREE.Mesh(
-          new THREE.PlaneGeometry(12.6, 28),
+          new THREE.PlaneGeometry(28, 12.2),
           new THREE.MeshLambertMaterial({ color: 0x0284c7 })
         );
         blueFloor.rotation.x = -Math.PI / 2;
-        blueFloor.position.set(courtX, 0.01, 0);
+        blueFloor.position.set(0, 0.01, courtZ);
         blueFloor.receiveShadow = true;
         courtGroup.add(blueFloor);
 
-        // 磚紅色禁區三秒區 (Terracotta Red Key Areas: 4.8m x 5.8m on both ends)
-        [-11.1, 11.1].forEach(keyZ => {
+        // 磚紅色禁區三秒區 (Terracotta Red Key Areas: 5.8m x 4.8m on West and East ends)
+        [-11.1, 11.1].forEach(keyX => {
           const redKey = new THREE.Mesh(
-            new THREE.PlaneGeometry(4.8, 5.8),
+            new THREE.PlaneGeometry(5.8, 4.8),
             new THREE.MeshLambertMaterial({ color: 0xdc2626 })
           );
           redKey.rotation.x = -Math.PI / 2;
-          redKey.position.set(courtX, 0.015, keyZ);
+          redKey.position.set(keyX, 0.015, courtZ);
           courtGroup.add(redKey);
 
           // 禁區罰球半圓弧 (Free-throw circle arc)
@@ -5330,7 +5474,7 @@ function createGymSignTexture() {
             new THREE.MeshLambertMaterial({ color: 0xdc2626 })
           );
           ftCircle.rotation.x = -Math.PI / 2;
-          ftCircle.position.set(courtX, 0.016, keyZ + (keyZ < 0 ? 2.9 : -2.9));
+          ftCircle.position.set(keyX + (keyX < 0 ? 2.9 : -2.9), 0.016, courtZ);
           courtGroup.add(ftCircle);
         });
 
@@ -5340,30 +5484,31 @@ function createGymSignTexture() {
           new THREE.MeshLambertMaterial({ color: 0xdc2626 })
         );
         centerCircle.rotation.x = -Math.PI / 2;
-        centerCircle.position.set(courtX, 0.015, 0);
+        centerCircle.position.set(0, 0.015, courtZ);
         courtGroup.add(centerCircle);
 
-        // 白色全場劃線 (Pure White Boundary Lines & Half-court Line)
+        // 白色全場劃線 (Pure White Boundary Lines)
         const boundaryLine = new THREE.Mesh(
-          new THREE.PlaneGeometry(12.4, 27.8),
+          new THREE.PlaneGeometry(27.8, 12.0),
           new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
         );
         boundaryLine.rotation.x = -Math.PI / 2;
-        boundaryLine.position.set(courtX, 0.02, 0);
+        boundaryLine.position.set(0, 0.02, courtZ);
         courtGroup.add(boundaryLine);
 
-        // 中場白線 (Half Court Line)
+        // 中場白線 (Half Court Line - 縱向分割線)
         const halfLine = new THREE.Mesh(
-          new THREE.PlaneGeometry(12.4, 0.12),
+          new THREE.PlaneGeometry(0.12, 12.0),
           new THREE.MeshBasicMaterial({ color: 0xffffff })
         );
         halfLine.rotation.x = -Math.PI / 2;
-        halfLine.position.set(courtX, 0.022, 0);
+        halfLine.position.set(0, 0.022, courtZ);
         courtGroup.add(halfLine);
       });
 
       // 3. 專業標準籃球架 (White Backboards with Red Rims & Steel Posts)
-      function createHoop(x, z, rot) {
+      // 西端籃架面向東 (rot = Math.PI / 2)，東端籃架面向西 (rot = -Math.PI / 2)
+      function createHoopEW(x, z, rot) {
         const hoop = new THREE.Group();
         hoop.position.set(x, 0, z);
         hoop.rotation.y = rot;
@@ -5389,9 +5534,9 @@ function createGymSignTexture() {
         return hoop;
       }
 
-      for (let offset of [-14, 0, 14]) {
-        courtGroup.add(createHoop(offset, -14.2, 0));
-        courtGroup.add(createHoop(offset, 14.2, Math.PI));
+      for (let courtZ of [-13.2, 0, 13.2]) {
+        courtGroup.add(createHoopEW(-14.2, courtZ, Math.PI / 2));
+        courtGroup.add(createHoopEW(14.2, courtZ, -Math.PI / 2));
       }
 
       courtGroup.userData.roomId = "court-bb";
@@ -5400,7 +5545,7 @@ function createGymSignTexture() {
       ROOMS_DB["court-bb"] = {
         id: "court-bb",
         code: "OUT-BB",
-        name: "戶外籃球場群 (三面全場)",
+        name: "戶外籃球場群 (三面橫向全場)",
         buildingId: "court",
         buildingName: "綜合運動設施",
         floor: 1,
@@ -5444,37 +5589,131 @@ function createGymSignTexture() {
     }
     createBackMountainBackdrop();
 
-    // 4.8 蘭亭 & 訓平池 (位於北側圍牆景觀區)
+    // 4.8 蘭亭、訓平池與對稱雙花圃 (依 115 官方平面圖：北側景觀區由西至東為【花圃】➔【蘭亭】➔【訓平池】➔【花圃】)
     function createLanPavilion() {
       const gardenGroup = new THREE.Group();
-      gardenGroup.position.set(-18, 0, -66);
+      gardenGroup.position.set(0, 0, -66);
 
-      // 六角紅柱涼亭 (蘭亭)
+      // 橢圓形造景花圃建構函數 (Raised Symmetrical Flowerbed)
+      function createOvalFlowerBed(x, z) {
+        const fbGroup = new THREE.Group();
+        fbGroup.position.set(x, 0, z);
+
+        // 景觀石砌矮牆花壇 (Curb Wall)
+        const curb = new THREE.Mesh(
+          new THREE.CylinderGeometry(4.2, 4.4, 0.45, 24),
+          new THREE.MeshLambertMaterial({ color: 0x94a3b8 })
+        );
+        curb.scale.set(1.4, 1.0, 0.9);
+        curb.position.y = 0.225;
+        curb.castShadow = true;
+        fbGroup.add(curb);
+
+        // 肥沃土壤
+        const soil = new THREE.Mesh(
+          new THREE.CylinderGeometry(4.0, 4.0, 0.1, 24),
+          new THREE.MeshLambertMaterial({ color: 0x3e2723 })
+        );
+        soil.scale.set(1.38, 1.0, 0.88);
+        soil.position.y = 0.46;
+        fbGroup.add(soil);
+
+        // 彩色花叢群 (粉紅/正紅/暖黃/嫩綠)
+        const flowerColors = [0xec4899, 0xef4444, 0xf59e0b, 0xa855f7, 0x10b981];
+        for (let i = 0; i < 24; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const rad = Math.sqrt(Math.random()) * 3.2;
+          const fx = Math.cos(angle) * rad * 1.3;
+          const fz = Math.sin(angle) * rad * 0.8;
+          const fColor = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+
+          const flower = new THREE.Mesh(
+            new THREE.SphereGeometry(0.35 + Math.random() * 0.15, 8, 8),
+            new THREE.MeshLambertMaterial({ color: fColor })
+          );
+          flower.position.set(fx, 0.65 + Math.random() * 0.15, fz);
+          flower.castShadow = true;
+          fbGroup.add(flower);
+        }
+        return fbGroup;
+      }
+
+      // 1. 西側橢圓花圃 (x = -33)
+      gardenGroup.add(createOvalFlowerBed(-33, 0));
+
+      // 2. 六角紅柱涼亭 (蘭亭 x = -19)
       const pavilion = new THREE.Group();
+      pavilion.position.set(-19, 0, 0);
+
+      // 石造亭階台基
+      const pBase = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.1, 0.4, 6), new THREE.MeshLambertMaterial({ color: 0xe2e8f0 }));
+      pBase.position.y = 0.2;
+      pavilion.add(pBase);
+
       for (let i = 0; i < 6; i++) {
         const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 4.0, 8), new THREE.MeshLambertMaterial({ color: 0x991b1b }));
         pillar.position.set(Math.cos(i * Math.PI / 3) * 3.2, 2.0, Math.sin(i * Math.PI / 3) * 3.2);
+        pillar.castShadow = true;
         pavilion.add(pillar);
       }
+      // 涼亭六角歇山錐形紅瓦屋頂
       const pRoof = new THREE.Mesh(new THREE.ConeGeometry(5.2, 2.8, 6), new THREE.MeshLambertMaterial({ color: 0xb91c1c }));
       pRoof.position.y = 5.2;
+      pRoof.castShadow = true;
       pavilion.add(pRoof);
+
+      // 蘭亭古風木質立面匾額
+      const plaque = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.5, 0.08), new THREE.MeshLambertMaterial({ color: 0x78350f }));
+      plaque.position.set(0, 3.8, 2.8);
+      pavilion.add(plaque);
+
       gardenGroup.add(pavilion);
 
-      // 訓平池 (荷花睡蓮池 x=16 相對亭位即 x=-2)
-      const pool = new THREE.Mesh(
-        new THREE.CylinderGeometry(8.5, 8.5, 0.6, 32),
+      // 3. 訓平池 (圓形水池 x = -5)
+      const poolGroup = new THREE.Group();
+      poolGroup.position.set(-5, 0, 0);
+
+      // 石造水池岸邊
+      const poolRim = new THREE.Mesh(
+        new THREE.CylinderGeometry(6.4, 6.6, 0.5, 32),
+        new THREE.MeshLambertMaterial({ color: 0x94a3b8 })
+      );
+      poolRim.position.y = 0.25;
+      poolGroup.add(poolRim);
+
+      // 清澈水面
+      const poolWater = new THREE.Mesh(
+        new THREE.CylinderGeometry(5.8, 5.8, 0.4, 32),
         new THREE.MeshLambertMaterial({ color: 0x0284c7, transparent: true, opacity: 0.88 })
       );
-      pool.position.set(16, 0.25, 0);
-      gardenGroup.add(pool);
+      poolWater.position.y = 0.35;
+      poolGroup.add(poolWater);
 
-      for (let i = 0; i < 7; i++) {
-        const pad = new THREE.Mesh(new THREE.CircleGeometry(0.7 + Math.random() * 0.4, 12), new THREE.MeshLambertMaterial({ color: 0x15803d }));
+      // 翠綠荷葉與蓮花
+      for (let i = 0; i < 9; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * 4.2;
+        const pad = new THREE.Mesh(new THREE.CircleGeometry(0.7 + Math.random() * 0.35, 12), new THREE.MeshLambertMaterial({ color: 0x15803d }));
         pad.rotation.x = -Math.PI / 2;
-        pad.position.set(16 + (Math.random() - 0.5) * 9, 0.58, (Math.random() - 0.5) * 9);
-        gardenGroup.add(pad);
+        pad.position.set(Math.cos(angle) * dist, 0.56, Math.sin(angle) * dist);
+        poolGroup.add(pad);
+
+        if (i % 2 === 0) {
+          const lotus = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), new THREE.MeshLambertMaterial({ color: 0xf472b6 }));
+          lotus.position.set(Math.cos(angle) * dist, 0.72, Math.sin(angle) * dist);
+          poolGroup.add(lotus);
+        }
       }
+
+      // 「訓平池」刻石地標
+      const pondStone = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.0, 0.6), new THREE.MeshLambertMaterial({ color: 0x64748b }));
+      pondStone.position.set(0, 0.5, 6.2);
+      poolGroup.add(pondStone);
+
+      gardenGroup.add(poolGroup);
+
+      // 4. 東側橢圓花圃 (x = 9)
+      gardenGroup.add(createOvalFlowerBed(9, 0));
 
       gardenGroup.userData.roomId = "lan-pavilion";
       scene.add(gardenGroup);
@@ -5482,7 +5721,7 @@ function createGymSignTexture() {
       ROOMS_DB["lan-pavilion"] = {
         id: "lan-pavilion",
         code: "OUT-LAN",
-        name: "蘭亭與訓平池 (生態池)",
+        name: "蘭亭、訓平池與雙花圃",
         buildingId: "garden",
         buildingName: "校園景觀生態區",
         floor: 1,
@@ -5823,24 +6062,102 @@ function createGymSignTexture() {
       hasDecal: false
     });
 
-    // 4.10 綜合大樓中庭平面停車場 (Parking Lot P)
+    // 4.10 綜合大樓中庭平面停車場與特教學習園地 (依 115 官方平面圖：中庭設有 P 停車場，東側設有特教學習園地)
     function createMultiBuildingParking() {
-      const pLot = new THREE.Mesh(new THREE.PlaneGeometry(24, 15), new THREE.MeshLambertMaterial({ color: 0x334155 }));
+      const parkGroup = new THREE.Group();
+      parkGroup.position.set(74, 0, -23);
+
+      // 1. 柏油路面地坪 (24m x 15m)
+      const pLot = new THREE.Mesh(new THREE.PlaneGeometry(24, 15), new THREE.MeshLambertMaterial({ color: 0x1e293b }));
       pLot.rotation.x = -Math.PI / 2;
-      pLot.position.set(74, 0.03, -23);
+      pLot.position.y = 0.03;
       pLot.receiveShadow = true;
-      pLot.userData.roomId = "parking-lot";
-      scene.add(pLot);
+      parkGroup.add(pLot);
+
+      // 2. 白色汽車停車格劃線 (8 格標準停車格)
+      const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      [-9, -6, -3, 0, 3, 6, 9].forEach(stallX => {
+        // 兩側長邊線
+        const sideLine = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 5.0), lineMat);
+        sideLine.rotation.x = -Math.PI / 2;
+        sideLine.position.set(stallX, 0.035, -4.5);
+        parkGroup.add(sideLine);
+
+        // 輪檔防撞條 (Wheel Stops)
+        const stopBar = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.12, 0.15), new THREE.MeshLambertMaterial({ color: 0xfacc15 }));
+        stopBar.position.set(stallX + 1.25, 0.06, -6.6);
+        stopBar.castShadow = true;
+        parkGroup.add(stopBar);
+      });
+
+      // 3. 藍色 P 停車場立柱標示牌 (Parking Sign Post)
+      const pPost = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.6, 8), new THREE.MeshLambertMaterial({ color: 0x475569 }));
+      pPost.position.set(-11, 1.3, 6.0);
+      parkGroup.add(pPost);
+
+      const pBoard = new THREE.Mesh(new THREE.CircleGeometry(0.45, 24), new THREE.MeshLambertMaterial({ color: 0x0284c7 }));
+      pBoard.position.set(-11, 2.6, 6.0);
+      parkGroup.add(pBoard);
+
+      parkGroup.userData.roomId = "parking-lot";
+      scene.add(parkGroup);
+
+      // 4. 特教學習園地 (位於綜合大樓東側 x=96, z=-23)
+      const spedGardenGroup = new THREE.Group();
+      spedGardenGroup.position.set(96, 0, -23);
+
+      // 綠意植栽基座
+      const spedGround = new THREE.Mesh(new THREE.PlaneGeometry(12, 22), new THREE.MeshLambertMaterial({ color: 0x15803d }));
+      spedGround.rotation.x = -Math.PI / 2;
+      spedGround.position.y = 0.02;
+      spedGround.receiveShadow = true;
+      spedGardenGroup.add(spedGround);
+
+      // 自然石板步道 (Stepping stones)
+      for (let sz = -9; sz <= 9; sz += 2.2) {
+        const stone = new THREE.Mesh(new THREE.CircleGeometry(0.55 + Math.random() * 0.15, 10), new THREE.MeshLambertMaterial({ color: 0xe2e8f0 }));
+        stone.rotation.x = -Math.PI / 2;
+        stone.position.set((Math.random() - 0.5) * 1.5, 0.03, sz);
+        spedGardenGroup.add(stone);
+      }
+
+      // 感官體驗花草與灌木 (Sensory Garden Shrubs)
+      const shrubColors = [0xec4899, 0xa855f7, 0xf59e0b, 0x10b981];
+      for (let i = 0; i < 16; i++) {
+        const sx = (Math.random() - 0.5) * 8;
+        const sz = (Math.random() - 0.5) * 18;
+        const shrub = new THREE.Mesh(
+          new THREE.SphereGeometry(0.4 + Math.random() * 0.25, 8, 8),
+          new THREE.MeshLambertMaterial({ color: shrubColors[i % shrubColors.length] })
+        );
+        shrub.position.set(sx, 0.45, sz);
+        shrub.castShadow = true;
+        spedGardenGroup.add(shrub);
+      }
+
+      spedGardenGroup.userData.roomId = "sped-garden";
+      scene.add(spedGardenGroup);
 
       ROOMS_DB["parking-lot"] = {
         id: "parking-lot",
         code: "PARK-P",
-        name: "綜合大樓平面停車場",
+        name: "綜合大樓平面停車場 (P)",
         buildingId: "multi-building",
         buildingName: "綜合大樓設施",
         floor: 1,
         cat: "admin",
         node: "parking-lot"
+      };
+
+      ROOMS_DB["sped-garden"] = {
+        id: "sped-garden",
+        code: "SPED-GDN",
+        name: "特教學習園地 (生態體驗區)",
+        buildingId: "multi-building",
+        buildingName: "綜合大樓東側景觀區",
+        floor: 1,
+        cat: "special",
+        node: "multi-1f-lib"
       };
     }
     createMultiBuildingParking();
@@ -6772,11 +7089,13 @@ function createGymSignTexture() {
       { name: "蔣公銅像", x: -36, y: 2.5, z: 32 },
       { name: "魔術方塊地標", x: -3.5, y: 3.5, z: 55.5 },
       { name: "孔雀造景雕塑", x: -20.5, y: 3.0, z: 55.5 },
-      { name: "戶外排球場", x: -22, y: 1.8, z: -38 },
-      { name: "籃球場群", x: 12, y: 1.8, z: -38 },
-      { name: "蘭亭訓平池", x: -18, y: 2.2, z: -66 },
-      { name: "校大門", x: -10, y: 3.5, z: 86 },
-      { name: "警衛室", x: 6, y: 3.2, z: 86 }
+      { name: "戶外排球場與看台", x: -10, y: 1.8, z: -36 },
+      { name: "戶外籃球場群", x: 18, y: 1.8, z: -36 },
+      { name: "蘭亭與訓平池", x: -12, y: 2.2, z: -66 },
+      { name: "綜合大樓停車場", x: 74, y: 1.8, z: -23 },
+      { name: "特教學習園地", x: 96, y: 1.8, z: -23 },
+      { name: "學生腳踏車停車棚", x: 80, y: 2.5, z: 90 },
+      { name: "校大門與警衛室", x: 0, y: 3.2, z: 86 }
     ];
     const landmarkElements = [];
 
@@ -8885,30 +9204,53 @@ function createGymSignTexture() {
       miniCtx.lineWidth = 1.2;
       miniCtx.stroke();
 
-      // 5. 戶外排球場 (綠色, 位於操場與籃球場之間 x=-22, z=-38)
-      const vbX = toMiniX(-22 - 7);
-      const vbZ = toMiniZ(-38 - 14);
-      const vbW = 14 * (328 / 250);
-      const vbH = 28 * (328 / 180);
+      // 5. 戶外排球場與階梯看台 (綠色排球場 x=-8, z=-36；灰色看台 x=-19)
+      const vbBleacherX = toMiniX(-19 - 1.8);
+      const vbBleacherZ = toMiniZ(-36 - 20);
+      const vbBleacherW = 3.6 * (328 / 250);
+      const vbBleacherH = 40 * (328 / 180);
+      miniCtx.fillStyle = "#94a3b8";
+      miniCtx.fillRect(vbBleacherX, vbBleacherZ, vbBleacherW, vbBleacherH);
+
+      const vbX = toMiniX(-8 - 8);
+      const vbZ = toMiniZ(-36 - 21);
+      const vbW = 16 * (328 / 250);
+      const vbH = 42 * (328 / 180);
       miniCtx.fillStyle = "#16a34a";
       miniCtx.fillRect(vbX, vbZ, vbW, vbH);
       miniCtx.strokeStyle = "#ffffff";
       miniCtx.lineWidth = 1.2;
       miniCtx.strokeRect(vbX, vbZ, vbW, vbH);
 
-      // 6. 戶外籃球場群 (黃色, 3座全場, x=12, z=-38)
-      const bbX = toMiniX(12 - 22);
-      const bbZ = toMiniZ(-38 - 16);
-      const bbW = 44 * (328 / 250);
-      const bbH = 32 * (328 / 180);
-      miniCtx.fillStyle = "#eab308";
+      // 6. 戶外籃球場群 (依官方平面圖：3座東西橫向全場, x=18, z=-36)
+      const bbX = toMiniX(18 - 17);
+      const bbZ = toMiniZ(-36 - 22);
+      const bbW = 34 * (328 / 250);
+      const bbH = 44 * (328 / 180);
+      miniCtx.fillStyle = "#0284c7";
       miniCtx.fillRect(bbX, bbZ, bbW, bbH);
       miniCtx.strokeStyle = "#ffffff";
       miniCtx.lineWidth = 1.4;
       miniCtx.strokeRect(bbX, bbZ, bbW, bbH);
+      // 繪製 3 面全場橫向分割線
+      miniCtx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+      miniCtx.lineWidth = 1.0;
+      miniCtx.beginPath();
+      miniCtx.moveTo(bbX, bbZ + bbH * (1 / 3));
+      miniCtx.lineTo(bbX + bbW, bbZ + bbH * (1 / 3));
+      miniCtx.moveTo(bbX, bbZ + bbH * (2 / 3));
+      miniCtx.lineTo(bbX + bbW, bbZ + bbH * (2 / 3));
+      miniCtx.stroke();
 
-      // 7. 蘭亭與訓平池 (北側圍牆景觀區)
-      const lanX = toMiniX(-18);
+      // 7. 蘭亭、訓平池與雙花圃 (北側景觀區由西至東為【花圃】➔【蘭亭】➔【訓平池】➔【花圃】)
+      const fb1X = toMiniX(-33);
+      const fbZ = toMiniZ(-66);
+      miniCtx.fillStyle = "#ec4899";
+      miniCtx.beginPath();
+      miniCtx.arc(fb1X, fbZ, 4.5, 0, Math.PI * 2);
+      miniCtx.fill();
+
+      const lanX = toMiniX(-19);
       const lanZ = toMiniZ(-66);
       miniCtx.fillStyle = "#dc2626";
       miniCtx.beginPath();
@@ -8917,14 +9259,20 @@ function createGymSignTexture() {
       miniCtx.strokeStyle = "#ffffff";
       miniCtx.stroke();
 
-      const pondX = toMiniX(-2);
+      const pondX = toMiniX(-5);
       const pondZ = toMiniZ(-66);
       miniCtx.fillStyle = "#0284c7";
       miniCtx.beginPath();
-      miniCtx.arc(pondX, pondZ, 8, 0, Math.PI * 2);
+      miniCtx.arc(pondX, pondZ, 7.5, 0, Math.PI * 2);
       miniCtx.fill();
       miniCtx.strokeStyle = "#38bdf8";
       miniCtx.stroke();
+
+      const fb2X = toMiniX(9);
+      miniCtx.fillStyle = "#ec4899";
+      miniCtx.beginPath();
+      miniCtx.arc(fb2X, fbZ, 4.5, 0, Math.PI * 2);
+      miniCtx.fill();
 
       // 8. 蔣公銅像庭園 (x=-36, z=32)
       const statueX = toMiniX(-36);
@@ -8981,8 +9329,8 @@ function createGymSignTexture() {
         else if (cfg.id === "grade8-front") miniName = "八年級(南棟)";
         else if (cfg.id === "grade9-back") miniName = "九年級";
         else if (cfg.id === "grade8-mid") miniName = "八年級(中)";
-        else if (cfg.id === "art-building") miniName = "藝術館";
-        else if (cfg.id === "tech-building") miniName = "科技館";
+        else if (cfg.id === "art-building") miniName = "藝術閣";
+        else if (cfg.id === "tech-building") miniName = "科技閣";
         else if (cfg.id === "multi-building") miniName = "綜合大樓";
         else if (cfg.id === "new-grade7") miniName = "七年級/特教";
 
