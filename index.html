@@ -1920,6 +1920,7 @@
       <button class="nav-mode-pill" id="btn-mode-bird" title="全校鳥瞰視野 (快捷鍵 M)">鳥瞰 <span class="key-badge">M</span></button>
       <button class="nav-mode-pill active" id="btn-mode-third" title="第三人稱跟隨視角 (快捷鍵 V)">第三人稱 <span class="key-badge">V</span></button>
       <button class="nav-mode-pill" id="btn-edit-rooms" title="檢視與編輯教室配置">編輯教室</button>
+      <button class="nav-icon-circle" id="btn-map-overlay" title="查看 115 官方校園平面圖">🗺️</button>
       <button class="nav-icon-circle" id="btn-help-circle" title="操作說明與快捷鍵">?</button>
     </div>
   </header>
@@ -9032,7 +9033,7 @@ function createGymSignTexture() {
 
     const helpModal = document.getElementById("help-modal");
     const modalBackdrop = document.getElementById("modal-backdrop");
-    const btnHelp = document.getElementById("btn-help") || document.getElementById("btn-help-circle");
+    const btnHelp = document.getElementById("btn-help-circle");
     if (btnHelp) {
       btnHelp.onclick = () => {
         welcomeCard.classList.toggle("hidden");
