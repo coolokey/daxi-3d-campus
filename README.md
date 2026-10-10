@@ -1,5 +1,6 @@
-# 桃園市立大溪國中 115 學年度 3D 智慧校園立體導覽圖 🏫
-> **Ta-Yung / Daxi Junior High School 115 Academic Year 3D Smart Campus Map**  
+# 桃園市立大溪國中 115 學年度 3D 智慧行政導航與跨學科探索平台 🏫
+> **Ta-Yung / Daxi Junior High School 115 Academic Year 3D Smart Campus & Learning Quest Platform**  
+> 🏆 桃園市「AI好幫手」智慧行政協作與校園創新應用提案專案作品  
 > 100% 依據大溪國中官方《115學年度校園平面圖》與真實空拍影像（DJI Mavic 2）高精度空間重構。
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-success?logo=github)](https://coolokey.github.io/daxi-3d-campus/)

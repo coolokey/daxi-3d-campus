@@ -980,6 +980,151 @@
       transform: translateY(-1px);
     }
 
+    /* Three Pillars Feature Cards on Welcome Card */
+    .feature-trio {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 18px;
+    }
+    .feature-item {
+      background: rgba(15, 39, 68, 0.65);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      border-radius: 12px;
+      padding: 10px 13px;
+      transition: all 0.2s ease;
+    }
+    .feature-item:hover {
+      background: rgba(22, 54, 94, 0.85);
+      border-color: rgba(245, 158, 11, 0.45);
+      transform: translateX(3px);
+    }
+    .feature-item.admin { border-left: 3.5px solid #38bdf8; }
+    .feature-item.learning { border-left: 3.5px solid #a855f7; }
+    .feature-item.culture { border-left: 3.5px solid #10b981; }
+    .feature-head {
+      font-size: 13px;
+      font-weight: 800;
+      color: #f8fafc;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .feature-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .feature-tag.admin { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+    .feature-tag.learning { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+    .feature-tag.culture { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .feature-body {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .welcome-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .welcome-btn-guest {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 12px;
+      padding: 11px 10px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .welcome-btn-guest:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+      transform: translateY(-1px);
+    }
+    .welcome-btn-rpg {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #ffffff;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      border-radius: 12px;
+      padding: 11px 10px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .welcome-btn-rpg:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Modal for RPG & Curriculum Blueprint */
+    #rpg-blueprint-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.92);
+      width: min(640px, calc(100vw - 32px));
+      max-height: 88vh;
+      overflow-y: auto;
+      background: rgba(11, 26, 47, 0.98);
+      backdrop-filter: blur(28px);
+      border: 1.5px solid rgba(167, 139, 250, 0.45);
+      border-radius: 24px;
+      padding: 24px 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(124, 58, 237, 0.25);
+      z-index: 160;
+      color: #fff;
+      display: none;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #rpg-blueprint-modal.open {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .blueprint-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 14px 0;
+    }
+    @media (max-width: 600px) {
+      .blueprint-grid { grid-template-columns: 1fr; }
+    }
+    .blueprint-card {
+      background: rgba(15, 39, 68, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .blueprint-card h4 {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #c084fc;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .blueprint-card p {
+      font-size: 12.5px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
     /* Camera Flash Animation */
     #camera-flash {
       position: fixed;
@@ -2200,17 +2345,44 @@
   <div id="labels-container"></div>
   <div id="avatar-nametag">🧑‍🎓 大溪同學 (您在此)</div>
 
-  <!-- Welcome / Operation Guide Card (大溪國中新生與訪客探索指南) -->
+  <!-- Welcome / Operation Guide Card (大溪國中智慧校園探索指南) -->
   <div id="welcome-card">
     <button class="welcome-close" id="btn-close-welcome" title="關閉說明">✕</button>
-    <div class="welcome-badge">⭐ 115 學年度全新啟航</div>
-    <h1 class="welcome-title">探索大溪・青春啟航</h1>
-    <p class="welcome-desc">歡迎來到桃園市立大溪國中！漫步於中棟百年木藝閣、中庭六角蘭亭池畔、全新科技藝術閣與運動場。支援全校處室教室精準查找、一鍵日夜時序晨昏星空光影、校園實境尋寶集章，以及拍立得打卡拍照！</p>
-    <p class="welcome-desc sub">快速尋找地點：在上方搜尋欄輸入名稱，或點選下方快捷標籤，金色導航光束將為您規劃跨樓層最佳路徑。</p>
+    <div class="welcome-badge">🏆 桃園市「AI好幫手」智慧校園提案專案</div>
+    <h1 class="welcome-title">大溪智境・3D 智慧行政導航與跨學科探索平台</h1>
+    <p class="welcome-desc">依據大溪國中 115 學年度官方平面圖與無人機實況精準空間重構，打造「智慧行政導引 × 跨學科闖關打怪 × 校史文化走讀」三位一體平台：</p>
     
-    <div class="welcome-actions">
-      <button id="welcome-btn-enter" class="welcome-btn-primary">走進校園漫遊</button>
-      <button id="welcome-btn-overview" class="welcome-btn-secondary">全校鳥瞰巡覽</button>
+    <!-- Three Pillars Feature Trio -->
+    <div class="feature-trio">
+      <div class="feature-item admin">
+        <div class="feature-head">
+          <span>🏛️ 智慧行政・來賓研習導航</span>
+          <span class="feature-tag admin">行政減量 50%+</span>
+        </div>
+        <div class="feature-body">外賓與研習教師一鍵「3D 自動帶路」直達處室與會場，實體樓梯爬升導引，徹底消除迷航。</div>
+      </div>
+      <div class="feature-item learning">
+        <div class="feature-head">
+          <span>⚔️ 跨科挑戰・AI 闖關打怪學習</span>
+          <span class="feature-tag learning">教學創新</span>
+        </div>
+        <div class="feature-body">國英數社自教材轉化為 RPG 關卡，NPC 對話解謎、AI 動態出題與學習弱點即時診斷。</div>
+      </div>
+      <div class="feature-item culture">
+        <div class="feature-head">
+          <span>📜 文化走讀・80 週年校園懷舊</span>
+          <span class="feature-tag culture">文化傳承</span>
+        </div>
+        <div class="feature-body">漫步百年木藝閣、六角蘭亭池畔、彩色魔術方塊等特色地標尋寶集章，頒發數位榮譽認證。</div>
+      </div>
+    </div>
+
+    <!-- Action Buttons Grid -->
+    <div class="welcome-actions-grid">
+      <button id="welcome-btn-guest" class="welcome-btn-guest" title="查看來賓研習會議場所並一鍵導航">📍 研習會場導航</button>
+      <button id="welcome-btn-rpg-blueprint" class="welcome-btn-rpg" title="查看跨學科 AI 闖關打怪教學藍圖">🎮 跨科闖關藍圖</button>
+      <button id="welcome-btn-enter" class="welcome-btn-primary" title="進入 3D 校園自由漫遊">🚶 走進校園漫遊</button>
+      <button id="welcome-btn-overview" class="welcome-btn-secondary" title="全校鳥瞰視野巡覽">🌐 全校鳥瞰巡覽</button>
     </div>
 
     <div class="welcome-shortcuts">
@@ -2242,7 +2414,7 @@
       <div class="brand-logo">溪</div>
       <div>
         <div class="brand-title">桃園市立大溪國中</div>
-        <div class="brand-subtitle">115學年度 3D 智慧探索校園</div>
+        <div class="brand-subtitle">AI 智慧行政研習導航 × 跨學科沉浸探索平台</div>
       </div>
     </div>
     <div id="current-location-badge">● 校門口迎賓廣場</div>
@@ -2266,6 +2438,8 @@
 
     <!-- Top Action Buttons (Dynamic Island Actions) -->
     <div class="top-actions">
+      <button class="nav-feature-pill" id="btn-top-venues" title="常用研習與開會場所導航">📍 研習會場</button>
+      <button class="nav-feature-pill" id="btn-top-rpg" title="查看跨學科 AI 闖關打怪教學藍圖">🎮 跨科闖關</button>
       <button class="nav-feature-pill" id="btn-sky-cycle" title="切換日夜天候時序光影（晨曦 / 夕照 / 星夜）">☀️ 晴空晨曦</button>
       <button class="nav-feature-pill badge-pill" id="btn-quest-stamp" title="大溪之星・校園實境尋寶集章任務">🎖️ 集章 0/6</button>
       <button class="nav-feature-pill" id="btn-polaroid-camera" title="拍立得相機打卡拍照 (生成明信片下載)">📸 拍立得打卡</button>
@@ -2529,6 +2703,45 @@
     <div style="display:flex; justify-content:flex-end; gap:10px;">
       <button class="venue-card-btn secondary" id="btn-close-polaroid">再拍一張</button>
       <button class="venue-card-btn primary" id="btn-download-polaroid" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff;">📥 下載拍立得明信片 (PNG)</button>
+    </div>
+  </div>
+
+  <!-- RPG & Curriculum Blueprint Modal (跨學科 AI 闖關打怪學習藍圖) -->
+  <div id="rpg-blueprint-modal">
+    <div class="quest-header">
+      <div class="quest-title-wrap">
+        <h2 style="color:#c084fc;">⚔️ 跨學科 AI 闖關打怪・沉浸學習藍圖</h2>
+        <div class="quest-subtitle">結合 115 官方校園空間與國中各科領域教材，打造 RPG 探索與 AI 動態出題評量</div>
+      </div>
+      <button class="nav-close" id="btn-close-rpg-modal">✕</button>
+    </div>
+
+    <div class="blueprint-grid">
+      <div class="blueprint-card">
+        <h4>📐 數學領域・空間幾何秘境</h4>
+        <p>於科技館與木藝閣設立任務，結合平面坐標、三視圖、函數幾何謎題，破解機關獲得科技能源核心晶片。</p>
+      </div>
+      <div class="blueprint-card">
+        <h4>📜 國文與社會・大溪文史走讀</h4>
+        <p>於蘭亭、孔雀雕塑與校史室化身文史 NPC，融入大溪木藝歷史、在地老街文化與校史故事對話挑戰。</p>
+      </div>
+      <div class="blueprint-card">
+        <h4>🔬 自然科學・理化生態守護</h4>
+        <p>於訓平池生態區與理化實驗室，進行酸鹼中和、生態食物鏈與能源轉型動態任務，擊敗知識怪獸。</p>
+      </div>
+      <div class="blueprint-card">
+        <h4>🌏 英語與資訊・AI 雙語助教</h4>
+        <p>串接 Gemini / ChatGPT 多模態模型，提供外語校園導覽情境對話，並依作答反饋進行動態自適應出題。</p>
+      </div>
+    </div>
+
+    <div style="background:rgba(124, 58, 237, 0.15); border:1px solid rgba(167, 139, 250, 0.3); border-radius:14px; padding:12px 14px; margin-bottom:14px;">
+      <div style="font-size:13px; font-weight:800; color:#e9d5ff; margin-bottom:4px;">🚀 雙模整合架構：3D 實境導航 × 2D JRPG 探索</div>
+      <div style="font-size:12px; color:#cbd5e1; line-height:1.5;">本專案同步具備 2D Top-Down RPG（未來科技校園 RPG）與 3D 空間，支援手機/平板/電腦跨載具流暢探險打怪，兼顧研習行政實用性與課堂教學趣味性！</div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button class="venue-card-btn primary" id="btn-close-rpg" style="background:linear-gradient(135deg, #7c3aed, #6d28d9); color:#fff;">返回 3D 校園</button>
     </div>
   </div>
 
@@ -9634,6 +9847,46 @@ function createGymSignTexture() {
       };
     }
 
+    // 來賓研習導航快速通道 (行政減量)
+    const btnGuest = document.getElementById("welcome-btn-guest");
+    const btnTopVenues = document.getElementById("btn-top-venues");
+    function showGuestVenues() {
+      if (welcomeCard) welcomeCard.classList.add("hidden");
+      const searchQuickVenues = document.getElementById("search-quick-venues");
+      const searchInputEl = document.getElementById("search-input");
+      if (searchQuickVenues && searchInputEl) {
+        searchQuickVenues.style.display = "block";
+        searchInputEl.focus();
+      }
+    }
+    if (btnGuest) btnGuest.onclick = showGuestVenues;
+    if (btnTopVenues) btnTopVenues.onclick = showGuestVenues;
+
+    // 跨學科 AI 闖關打怪學習藍圖 Modal
+    const rpgModal = document.getElementById("rpg-blueprint-modal");
+    const btnRpgBlueprint = document.getElementById("welcome-btn-rpg-blueprint");
+    const btnTopRpg = document.getElementById("btn-top-rpg");
+    const btnCloseRpg = document.getElementById("btn-close-rpg");
+    const btnCloseRpgModal = document.getElementById("btn-close-rpg-modal");
+
+    function openRpgModal() {
+      if (welcomeCard) welcomeCard.classList.add("hidden");
+      if (rpgModal && modalBackdrop) {
+        rpgModal.classList.add("open");
+        modalBackdrop.classList.add("open");
+      }
+    }
+    function closeRpgModal() {
+      if (rpgModal && modalBackdrop) {
+        rpgModal.classList.remove("open");
+        modalBackdrop.classList.remove("open");
+      }
+    }
+    if (btnRpgBlueprint) btnRpgBlueprint.onclick = openRpgModal;
+    if (btnTopRpg) btnTopRpg.onclick = openRpgModal;
+    if (btnCloseRpg) btnCloseRpg.onclick = closeRpgModal;
+    if (btnCloseRpgModal) btnCloseRpgModal.onclick = closeRpgModal;
+
     const btnHome = document.getElementById("btn-home");
     if (btnHome) {
       btnHome.onclick = () => {
@@ -9663,6 +9916,7 @@ function createGymSignTexture() {
     if (modalBackdrop) {
       modalBackdrop.onclick = () => {
         if (helpModal) helpModal.classList.remove("open");
+        if (rpgModal) rpgModal.classList.remove("open");
         modalBackdrop.classList.remove("open");
         if (mapModal) mapModal.classList.remove("open");
       };
