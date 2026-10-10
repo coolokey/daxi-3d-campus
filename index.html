@@ -21,18 +21,21 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0f172a;
-      --panel: rgba(15, 23, 42, 0.88);
-      --panel-border: rgba(255, 255, 255, 0.16);
+      --bg: #0b1a2f;
+      --panel: rgba(11, 26, 47, 0.90);
+      --panel-border: rgba(56, 189, 248, 0.22);
       --text: #f8fafc;
       --muted: #94a3b8;
-      --accent: #fbbf24;
+      --accent: #f59e0b; /* 大溪百年木藝琥珀金 */
+      --accent-glow: rgba(245, 158, 11, 0.4);
       --brand: #ef4444;
       --ok: #10b981;
-      --info: #38bdf8;
+      --info: #38bdf8; /* 大漢溪水藍 */
+      --daxi-wood: #a16207;
+      --daxi-navy: #0f2744;
       --font: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --num: "Barlow Condensed", monospace;
-      --radius: 12px;
+      --radius: 14px;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
@@ -55,18 +58,19 @@
       height: 100%;
       outline: none;
       touch-action: none;
+      z-index: 0;
     }
 
     .glass {
       background: var(--panel);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--panel-border);
       border-radius: var(--radius);
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
 
-    /* Top Navigation Bar */
+    /* Top Navigation Bar - 現代靈動膠囊導覽島 */
     #top-nav {
       position: absolute;
       top: 0;
@@ -85,33 +89,43 @@
     .brand-btn {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 6px 14px 6px 8px;
+      gap: 11px;
+      padding: 6px 16px 6px 9px;
       color: var(--text);
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(245, 158, 11, 0.28);
     }
-    .brand-btn:hover { filter: brightness(1.2); transform: translateY(-1px); }
+    .brand-btn:hover {
+      border-color: #f59e0b;
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.35);
+      transform: translateY(-1px);
+    }
     .brand-logo {
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #e63946, #c0392b);
+      background: linear-gradient(135deg, #0284c7, #1e3a8a);
       display: grid;
       place-items: center;
       font-size: 22px;
-      box-shadow: 0 0 0 2px #fff, 0 4px 10px rgba(0,0,0,0.3);
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 0 0 2px #f59e0b, 0 4px 12px rgba(0,0,0,0.4);
     }
     .brand-title {
       font-size: 15px;
       font-weight: 900;
       letter-spacing: 0.05em;
       line-height: 1.2;
+      background: linear-gradient(120deg, #ffffff 40%, #fde68a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .brand-subtitle {
       font-size: 11px;
-      color: var(--accent);
+      color: #38bdf8;
       letter-spacing: 0.08em;
       font-weight: 700;
     }
@@ -119,35 +133,35 @@
     /* Search Bar */
     .search-box {
       position: relative;
-      flex: 1 1 260px;
-      max-width: 380px;
+      flex: 1 1 240px;
+      max-width: 340px;
       min-width: 180px;
     }
     .search-box input {
       width: 100%;
-      height: 44px;
-      padding: 0 14px 0 40px;
+      height: 42px;
+      padding: 0 14px 0 38px;
       border-radius: var(--radius);
       border: 1px solid var(--panel-border);
       background: var(--panel);
       color: var(--text);
-      font-size: 14px;
+      font-size: 13.5px;
       outline: none;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
       transition: all 0.2s ease;
     }
     .search-box input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3);
-      background: rgba(15, 23, 42, 0.96);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+      background: rgba(11, 26, 47, 0.98);
     }
     .search-icon {
       position: absolute;
-      left: 14px;
-      top: 13px;
-      opacity: 0.7;
+      left: 13px;
+      top: 12px;
+      opacity: 0.75;
       pointer-events: none;
-      font-size: 16px;
+      font-size: 15px;
     }
     #search-results {
       position: absolute;
@@ -187,42 +201,85 @@
       margin-left: 6px;
     }
 
-    /* Top Action Buttons (Exact Replica of media_1791469297996_bb3e98fa.png) */
+    /* Top Action Buttons (Dynamic Island Actions) */
     .top-actions {
       display: flex;
-      gap: 8px;
+      gap: 7px;
       align-items: center;
       flex-shrink: 0;
     }
-    .nav-mode-pill {
-      height: 40px;
-      padding: 0 16px;
+    .nav-feature-pill {
+      height: 38px;
+      padding: 0 13px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #f1f5f9;
+      cursor: pointer;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 12px;
+      background: rgba(14, 34, 61, 0.92);
+      backdrop-filter: blur(14px);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+      user-select: none;
+    }
+    .nav-feature-pill:hover {
+      background: rgba(22, 48, 84, 0.96);
+      border-color: #f59e0b;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+      transform: translateY(-1px);
+    }
+    .nav-feature-pill.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0b1a2f;
+      border-color: #f59e0b;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+      font-weight: 800;
+    }
+    .nav-feature-pill.badge-pill {
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+    }
+    .nav-feature-pill.badge-pill:hover {
+      background: rgba(245, 158, 11, 0.25);
+      color: #fff;
+    }
+    .nav-mode-pill {
+      height: 38px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #f1f5f9;
       cursor: pointer;
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 12px;
-      background: #182230;
+      background: rgba(14, 34, 61, 0.92);
       backdrop-filter: blur(12px);
       transition: all 0.18s ease;
       white-space: nowrap;
       user-select: none;
     }
     .nav-mode-pill:hover {
-      background: #243247;
+      background: #1e3a5f;
       border-color: rgba(255, 255, 255, 0.3);
       color: #ffffff;
     }
     .nav-mode-pill.active {
-      background: #fdfbf7;
-      color: #0f172a;
-      border-color: #fdfbf7;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+      background: #ffffff;
+      color: #0b1a2f;
+      border-color: #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
+      font-weight: 800;
     }
     .nav-mode-pill .key-badge {
       display: inline-block;
@@ -235,29 +292,31 @@
       border: 1px solid rgba(255, 255, 255, 0.18);
     }
     .nav-mode-pill.active .key-badge {
-      background: rgba(15, 23, 42, 0.08);
-      color: #475569;
-      border-color: rgba(15, 23, 42, 0.15);
+      background: rgba(11, 26, 47, 0.1);
+      color: #334155;
+      border-color: rgba(11, 26, 47, 0.18);
     }
     .nav-icon-circle {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 12px;
       display: grid;
       place-items: center;
-      background: #182230;
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(14, 34, 61, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.25);
       color: #f1f5f9;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 900;
       cursor: pointer;
       transition: all 0.18s ease;
       user-select: none;
     }
     .nav-icon-circle:hover {
-      background: #243247;
-      border-color: rgba(255, 255, 255, 0.3);
+      background: #1e3a5f;
+      border-color: #f59e0b;
       color: #ffffff;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+      transform: translateY(-1px);
     }
 
     /* Search Quick Venues Popover (Exact Replica of media_1791469297996_bb3e98fa.png) */
@@ -344,61 +403,134 @@
       transform: translateY(-2px);
     }
 
-    /* Floor Selector (Right Side) - 完美對標大勇國小極簡黑透膠囊面板 (media 2/3/4) */
-    #floor-selector {
+    /* Modern Floating Campus Dock (大溪國中現代圓角浮動整合控制列) */
+    #campus-dock {
       position: absolute;
-      right: 18px;
-      top: 130px;
+      bottom: calc(18px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 5px;
-      padding: 8px 6px;
-      background: rgba(15, 23, 42, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(16px);
+      gap: 10px;
+      padding: 6px 14px;
+      background: rgba(11, 26, 47, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 20px;
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.65), 0 0 20px rgba(2, 132, 199, 0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       z-index: 85;
       user-select: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: calc(100vw - 32px);
+      overflow-x: auto;
+      scrollbar-width: none;
     }
-    .floor-selector-title {
-      font-size: 11px;
-      font-weight: 700;
+    #campus-dock::-webkit-scrollbar { display: none; }
+    .dock-section {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dock-label {
+      font-size: 11.5px;
+      font-weight: 800;
       color: #94a3b8;
-      letter-spacing: 1px;
-      margin-bottom: 3px;
-      padding: 0 4px;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      padding: 0 2px;
+    }
+    .dock-divider {
+      width: 1px;
+      height: 22px;
+      background: rgba(255, 255, 255, 0.16);
+      flex-shrink: 0;
+    }
+    .dock-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(2, 132, 199, 0.12);
+      padding: 3px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    #floor-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .floor-btn {
-      width: 48px;
-      height: 38px;
-      border-radius: 10px;
+      min-width: 42px;
+      height: 32px;
+      padding: 0 8px;
+      border-radius: 8px;
       border: none;
       background: transparent;
-      color: #f1f5f9;
+      color: #cbd5e1;
       font-family: var(--font), var(--num), sans-serif;
-      font-size: 14.5px;
-      font-weight: 800;
+      font-size: 13.5px;
+      font-weight: 700;
       cursor: pointer;
       display: grid;
       place-items: center;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.18s ease;
+      white-space: nowrap;
     }
     .floor-btn:hover {
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.15);
       color: #ffffff;
-      transform: scale(1.05);
     }
     .floor-btn.active {
-      background: #ffffff !important;
-      color: #0f172a !important;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+      color: #0b1a2f !important;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.45);
       font-weight: 900;
-      transform: scale(1.04);
+    }
+    .dock-pill {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(15, 39, 68, 0.6);
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+    .dock-pill:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+    .dock-pill.active {
+      background: #ffffff !important;
+      color: #0b1a2f !important;
+      border-color: #ffffff !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      font-weight: 800;
+    }
+    .dock-pill.active .key-badge {
+      background: rgba(11, 26, 47, 0.12);
+      color: #1e293b;
+    }
+    .dock-pill.subtle {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+    }
+    .dock-pill.subtle:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: #38bdf8;
+      color: #38bdf8;
     }
 
-    /* 大勇國小特色立體浮動教室膠囊徽章 (Dayong 3D Floating Room Badges) */
+    /* 大溪國中特色立體浮動教室膠囊徽章 (Dayong 3D Floating Room Badges) */
     .dayong-room-badge {
       position: absolute;
       left: 0;
@@ -730,21 +862,21 @@
       user-select: none;
     }
 
-    /* Welcome / Operation Guide Card (Direct Reference to media_1791335021168.png) */
+    /* Welcome / Operation Guide Card (大溪國中新生與訪客探索指南) */
     #welcome-card {
       position: absolute;
       left: 20px;
       top: calc(76px + env(safe-area-inset-top, 0px));
-      width: min(440px, calc(100vw - 32px));
+      width: min(450px, calc(100vw - 32px));
       max-height: calc(100vh - 96px);
       overflow-y: auto;
-      background: rgba(24, 32, 47, 0.94);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(11, 26, 47, 0.94);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(56, 189, 248, 0.28);
       border-radius: 24px;
       padding: 26px 24px 22px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(2, 132, 199, 0.2);
       z-index: 50;
       color: #ffffff;
       transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -775,22 +907,28 @@
       color: #ffffff;
     }
     .welcome-badge {
-      font-size: 14.5px;
+      font-size: 13.5px;
       font-weight: 800;
-      color: #fbbf24;
-      letter-spacing: 0.04em;
+      color: #f59e0b;
+      letter-spacing: 0.06em;
       margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .welcome-title {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 900;
       color: #ffffff;
       letter-spacing: 0.02em;
       line-height: 1.25;
       margin-bottom: 12px;
+      background: linear-gradient(120deg, #ffffff 40%, #fde68a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .welcome-desc {
-      font-size: 14.5px;
+      font-size: 14px;
       color: #cbd5e1;
       line-height: 1.6;
       margin-bottom: 8px;
@@ -806,40 +944,249 @@
     }
     .welcome-btn-primary {
       flex: 1;
-      background: #facc15;
-      color: #0f172a;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0b1a2f;
       border: none;
       border-radius: 12px;
       padding: 12px 18px;
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 900;
       cursor: pointer;
       text-align: center;
-      box-shadow: 0 4px 14px rgba(250, 204, 21, 0.35);
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
       transition: all 0.2s;
     }
     .welcome-btn-primary:hover {
-      background: #fde047;
+      filter: brightness(1.1);
       transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(250, 204, 21, 0.45);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
     }
     .welcome-btn-secondary {
       flex: 1;
-      background: #283344;
+      background: rgba(15, 39, 68, 0.8);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       border-radius: 12px;
       padding: 12px 18px;
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 800;
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
     }
     .welcome-btn-secondary:hover {
-      background: #334155;
-      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(26, 58, 98, 0.9);
+      border-color: #38bdf8;
       transform: translateY(-1px);
+    }
+
+    /* Camera Flash Animation */
+    #camera-flash {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: opacity 0.08s ease-out;
+    }
+    #camera-flash.flash {
+      opacity: 0.95;
+      transition: none;
+    }
+
+    /* Quest / Stamp Modal (大溪之星・校園實境尋寶集章) */
+    #quest-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.92);
+      width: min(580px, calc(100vw - 32px));
+      max-height: 88vh;
+      overflow-y: auto;
+      background: rgba(11, 26, 47, 0.96);
+      backdrop-filter: blur(24px);
+      border: 1.5px solid rgba(245, 158, 11, 0.4);
+      border-radius: 24px;
+      padding: 24px 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.2);
+      z-index: 150;
+      pointer-events: auto;
+      color: #fff;
+      display: none;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #quest-modal.open {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .quest-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 12px;
+    }
+    .quest-title-wrap h2 {
+      font-size: 20px;
+      font-weight: 900;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .quest-subtitle {
+      font-size: 12.5px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .quest-progress-bar-wrap {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      height: 10px;
+      margin: 12px 0 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .quest-progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #f59e0b);
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+    .quest-stamps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .stamp-card {
+      background: rgba(15, 39, 68, 0.65);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    .stamp-card.unlocked {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.12);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.15);
+    }
+    .stamp-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 255, 255, 0.25);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      color: #64748b;
+      background: rgba(0, 0, 0, 0.2);
+      transition: all 0.2s;
+    }
+    .stamp-card.unlocked .stamp-icon-wrap {
+      border: 2px solid #f59e0b;
+      background: linear-gradient(135deg, #f59e0b, #b45309);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+      transform: scale(1.05);
+    }
+    .stamp-info { flex: 1; min-width: 0; }
+    .stamp-name { font-size: 13.5px; font-weight: 800; color: #f8fafc; }
+    .stamp-clue { font-size: 11px; color: #94a3b8; margin-top: 3px; line-height: 1.35; }
+    .stamp-action-btn {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: transparent;
+      color: #38bdf8;
+      cursor: pointer;
+      margin-top: 5px;
+      display: inline-block;
+      transition: all 0.15s;
+    }
+    .stamp-action-btn:hover { background: #38bdf8; color: #0b1a2f; }
+
+    /* Polaroid Card Modal */
+    #polaroid-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.92);
+      width: min(460px, calc(100vw - 32px));
+      background: rgba(11, 26, 47, 0.96);
+      backdrop-filter: blur(24px);
+      border: 1.5px solid rgba(56, 189, 248, 0.3);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+      z-index: 150;
+      pointer-events: auto;
+      color: #fff;
+      display: none;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #polaroid-modal.open {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .polaroid-preview-wrap {
+      background: #fdfbf7;
+      padding: 12px 12px 18px;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      color: #1e293b;
+      margin-bottom: 16px;
+    }
+    #polaroid-canvas {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      display: block;
+    }
+
+    /* Certificate Modal */
+    #certificate-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.92);
+      width: min(620px, calc(100vw - 32px));
+      background: rgba(11, 26, 47, 0.96);
+      backdrop-filter: blur(24px);
+      border: 2px solid #f59e0b;
+      border-radius: 24px;
+      padding: 24px 20px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(245, 158, 11, 0.3);
+      z-index: 155;
+      pointer-events: auto;
+      color: #fff;
+      display: none;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #certificate-modal.open {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    #certificate-canvas {
+      width: 100%;
+      border-radius: 12px;
+      display: block;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
     .welcome-shortcuts {
       border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -897,7 +1244,7 @@
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
     }
 
-    /* FPS Pointer Lock Crosshair (大勇國小沉浸準星) */
+    /* FPS Pointer Lock Crosshair (大溪國中沉浸準星) */
     #fps-crosshair {
       position: absolute;
       left: 50%;
@@ -1045,15 +1392,11 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     }
 
-    /* Avatar Speed & Turn Controls (media_1791355815735.png) */
+    /* Avatar Speed & Turn Controls (Integrated inside #campus-dock) */
     #avatar-bottom-controls {
-      position: absolute;
-      bottom: calc(24px + var(--safe-bottom));
-      left: 50%;
-      transform: translateX(-50%);
       display: flex;
-      gap: 12px;
-      z-index: 35;
+      align-items: center;
+      gap: 6px;
       pointer-events: auto;
     }
     .avatar-ctrl-pill {
@@ -1290,12 +1633,13 @@
 
     /* Campus Plan 2D Overlay Modal (M 鍵大地圖檢視) */
     #campus-map-modal {
-      position: absolute;
+      position: fixed;
       inset: 20px;
       background: rgba(15, 23, 42, 0.96);
       border: 2px solid var(--accent);
       border-radius: 16px;
-      z-index: 70;
+      z-index: 150;
+      pointer-events: auto;
       display: none;
       flex-direction: column;
       box-shadow: 0 20px 50px rgba(0,0,0,0.85);
@@ -1325,22 +1669,24 @@
 
     /* Help Modal */
     #help-modal {
-      position: absolute;
+      position: fixed;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
       width: min(500px, calc(100% - 32px));
       padding: 24px;
       display: none;
-      z-index: 60;
+      z-index: 150;
+      pointer-events: auto;
     }
     #help-modal.open { display: block; }
     #modal-backdrop {
-      position: absolute;
+      position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.7);
       display: none;
-      z-index: 55;
+      z-index: 140;
+      pointer-events: auto;
     }
     /* Top Floating Walk Instruction Banner (Matching Reference media_1791468841831_414f259e.png) */
     #walk-instruction-banner {
@@ -1854,56 +2200,60 @@
   <div id="labels-container"></div>
   <div id="avatar-nametag">🧑‍🎓 大溪同學 (您在此)</div>
 
-  <!-- Welcome / Operation Guide Card (Direct Reference to media_1791335021168.png) -->
+  <!-- Welcome / Operation Guide Card (大溪國中新生與訪客探索指南) -->
   <div id="welcome-card">
     <button class="welcome-close" id="btn-close-welcome" title="關閉說明">✕</button>
-    <div class="welcome-badge">115 學年度</div>
-    <h1 class="welcome-title">走進大溪國中</h1>
-    <p class="welcome-desc">帶著小朋友走過每一條走廊、每一座樓梯。搜尋教室，黃色路線會帶你走到門口。</p>
-    <p class="welcome-desc sub">找研習或會議場地：點上方搜尋框，直接選擇常用場地，就能顯示路線。</p>
+    <div class="welcome-badge">⭐ 115 學年度全新啟航</div>
+    <h1 class="welcome-title">探索大溪・青春啟航</h1>
+    <p class="welcome-desc">歡迎來到桃園市立大溪國中！漫步於中棟百年木藝閣、中庭六角蘭亭池畔、全新科技藝術閣與運動場。支援全校處室教室精準查找、一鍵日夜時序晨昏星空光影、校園實境尋寶集章，以及拍立得打卡拍照！</p>
+    <p class="welcome-desc sub">快速尋找地點：在上方搜尋欄輸入名稱，或點選下方快捷標籤，金色導航光束將為您規劃跨樓層最佳路徑。</p>
     
     <div class="welcome-actions">
-      <button id="welcome-btn-enter" class="welcome-btn-primary">走進校園</button>
-      <button id="welcome-btn-overview" class="welcome-btn-secondary">先看鳥瞰</button>
+      <button id="welcome-btn-enter" class="welcome-btn-primary">走進校園漫遊</button>
+      <button id="welcome-btn-overview" class="welcome-btn-secondary">全校鳥瞰巡覽</button>
     </div>
 
     <div class="welcome-shortcuts">
       <div class="shortcut-item">
         <span class="shortcut-key">W A S D</span>
-        <span class="shortcut-desc">預設跑步（Shift 加速、空白鍵跳）</span>
+        <span class="shortcut-desc">跑步移動（Shift 加速、空白鍵跳躍）</span>
       </div>
       <div class="shortcut-item">
         <span class="shortcut-key">滑鼠</span>
-        <span class="shortcut-desc">轉頭；手機用左搖桿移動、右半邊滑動轉頭</span>
+        <span class="shortcut-desc">按住拖曳 360° 自由旋轉視野</span>
       </div>
       <div class="shortcut-item">
         <span class="shortcut-key">V</span>
-        <span class="shortcut-desc">切換第三人稱／第一人稱</span>
+        <span class="shortcut-desc">切換第三人稱／第一人稱沉浸視角</span>
       </div>
       <div class="shortcut-item">
         <span class="shortcut-key">M</span>
-        <span class="shortcut-desc">鳥瞰全校、逐層查看</span>
+        <span class="shortcut-desc">全校鳥瞰視野／逐層空間透視</span>
       </div>
     </div>
   </div>
 
-  <!-- Top Navigation Bar (Exact Replica of media_1791469297996_bb3e98fa.png) -->
+  <!-- Camera Flash Effect -->
+  <div id="camera-flash"></div>
+
+  <!-- Top Navigation Bar - 現代靈動膠囊導覽島 -->
   <header id="top-nav">
     <div class="brand-btn glass" id="btn-home" title="返回全校鳥瞰視野">
       <div class="brand-logo">溪</div>
       <div>
         <div class="brand-title">桃園市立大溪國中</div>
-        <div class="brand-subtitle">115學年度 3D 智慧校園導覽</div>
+        <div class="brand-subtitle">115學年度 3D 智慧探索校園</div>
       </div>
     </div>
-    <div id="current-location-badge">● 校門口廣場</div>
+    <div id="current-location-badge">● 校門口迎賓廣場</div>
 
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="找教室或地點：301、健康中心、38..." autocomplete="off">
+      <input type="text" id="search-input" placeholder="找教室或處室：木藝、801、健康中心..." autocomplete="off">
       <div id="search-quick-venues">
         <div class="quick-venues-header">常用研習與開會場地</div>
         <div class="quick-venues-chips">
+          <button class="quick-venue-btn" data-to="woodwork-1">大溪木藝教室</button>
           <button class="quick-venue-btn" data-to="library">圖書館</button>
           <button class="quick-venue-btn" data-to="history-room">校史室</button>
           <button class="quick-venue-btn" data-to="physics-lab">理化實驗室</button>
@@ -1914,18 +2264,18 @@
       <ul id="search-results" class="glass"></ul>
     </div>
 
-    <!-- Top Action Buttons (Exact Replica of media_1791469297996_bb3e98fa.png) -->
+    <!-- Top Action Buttons (Dynamic Island Actions) -->
     <div class="top-actions">
-      <button class="nav-mode-pill" id="btn-mode-walk" title="第一人稱視角漫遊">步行</button>
-      <button class="nav-mode-pill" id="btn-mode-bird" title="全校鳥瞰視野 (快捷鍵 M)">鳥瞰 <span class="key-badge">M</span></button>
-      <button class="nav-mode-pill active" id="btn-mode-third" title="第三人稱跟隨視角 (快捷鍵 V)">第三人稱 <span class="key-badge">V</span></button>
-      <button class="nav-mode-pill" id="btn-edit-rooms" title="檢視與編輯教室配置">編輯教室</button>
-      <button class="nav-icon-circle" id="btn-map-overlay" title="查看 115 官方校園平面圖">🗺️</button>
+      <button class="nav-feature-pill" id="btn-sky-cycle" title="切換日夜天候時序光影（晨曦 / 夕照 / 星夜）">☀️ 晴空晨曦</button>
+      <button class="nav-feature-pill badge-pill" id="btn-quest-stamp" title="大溪之星・校園實境尋寶集章任務">🎖️ 集章 0/6</button>
+      <button class="nav-feature-pill" id="btn-polaroid-camera" title="拍立得相機打卡拍照 (生成明信片下載)">📸 拍立得打卡</button>
+      <button class="nav-feature-pill" id="btn-map-overlay" title="查看 115 官方校園平面圖">🗺️ 平面圖</button>
+      <button class="nav-feature-pill" id="btn-edit-rooms" title="檢視與編輯教室配置">📋 教室配置</button>
       <button class="nav-icon-circle" id="btn-help-circle" title="操作說明與快捷鍵">?</button>
     </div>
   </header>
 
-  <!-- Top Floating Walk Instruction Banner (Matching Reference media_1791468841831_414f259e.png) -->
+  <!-- Top Floating Walk Instruction Banner -->
   <div id="walk-instruction-banner">
     <span>按住左鍵拖曳轉頭，放開就停止，可直接點選按鈕</span>
     <button class="banner-btn" id="btn-turn-left" title="向左轉身 (快捷鍵 Q / ←)">←</button>
@@ -1958,17 +2308,42 @@
     <div class="venue-chip" data-to="volleyball-out">🏐 戶外排球場</div>
   </div>
 
-  <!-- Floor Selector (對標大勇國小樓層展示切換面板) -->
-  <div id="floor-selector">
-    <div class="floor-selector-title">樓層</div>
-    <button class="floor-btn active" data-f="all" title="顯示全校大樓鳥瞰外觀">全部</button>
-    <button class="floor-btn" data-f="4" title="檢視 4F 樓層空間配置">4F</button>
-    <button class="floor-btn" data-f="3" title="檢視 3F 樓層空間配置">3F</button>
-    <button class="floor-btn" data-f="2" title="檢視 2F 樓層空間配置">2F</button>
-    <button class="floor-btn" data-f="1" title="檢視 1F 樓層空間配置">1F</button>
+  <!-- Modern Floating Campus Dock (大溪國中現代圓角浮動整合控制列) -->
+  <div id="campus-dock">
+    <!-- Floor Selector Section -->
+    <div class="dock-section" id="floor-selector">
+      <span class="dock-label">🏢 樓層</span>
+      <div class="dock-btn-group">
+        <button class="floor-btn active" data-f="all" title="顯示全校大樓鳥瞰外觀">全部</button>
+        <button class="floor-btn" data-f="4" title="檢視 4F 樓層空間配置">4F</button>
+        <button class="floor-btn" data-f="3" title="檢視 3F 樓層空間配置">3F</button>
+        <button class="floor-btn" data-f="2" title="檢視 2F 樓層空間配置">2F</button>
+        <button class="floor-btn" data-f="1" title="檢視 1F 樓層空間配置">1F</button>
+      </div>
+    </div>
+
+    <div class="dock-divider"></div>
+
+    <!-- Perspective Switcher Section -->
+    <div class="dock-section">
+      <span class="dock-label">👁️ 視角</span>
+      <div class="dock-btn-group">
+        <button class="dock-pill" id="btn-mode-walk" title="第一人稱視角漫遊">🚶 步行</button>
+        <button class="dock-pill active" id="btn-mode-third" title="第三人稱跟隨視角 (快捷鍵 V)">🏃 第三人稱 <span class="key-badge">V</span></button>
+        <button class="dock-pill" id="btn-mode-bird" title="全校鳥瞰視野 (快捷鍵 M)">🦅 鳥瞰 <span class="key-badge">M</span></button>
+      </div>
+    </div>
+
+    <div class="dock-divider"></div>
+
+    <!-- Avatar Speed & Turn Sensitivity Pills -->
+    <div class="dock-section" id="avatar-bottom-controls">
+      <button class="dock-pill subtle" id="btn-speed-ctrl" title="點擊設定移動速度">⚡ 速度 100%</button>
+      <button class="dock-pill subtle" id="btn-turn-ctrl" title="點擊設定轉頭靈敏度與操作方式">🔄 轉頭 100%</button>
+    </div>
   </div>
 
-  <!-- 2D High-Definition Minimap (Reference: media_1791335056310.png) -->
+  <!-- 2D High-Definition Minimap (大溪國中高解析小地圖) -->
   <div id="minimap-card" title="點擊小地圖可快速定位傳送">
     <canvas id="minimap-canvas"></canvas>
     <div class="minimap-compass" title="指北標記">北</div>
@@ -1982,12 +2357,6 @@
     <div class="dpad-center">MOVE</div>
     <button class="dpad-btn dpad-right" id="dpad-right">▶</button>
     <button class="dpad-btn dpad-down" id="dpad-down">▼</button>
-  </div>
-
-  <!-- Avatar Controls: Speed & Turn Sensitivity Pills (Reference: media_1791355815735.png) -->
-  <div id="avatar-bottom-controls">
-    <button class="avatar-ctrl-pill" id="btn-speed-ctrl" title="點擊設定移動速度">速度 100%</button>
-    <button class="avatar-ctrl-pill" id="btn-turn-ctrl" title="點擊設定轉頭靈敏度與操作方式">轉頭 100%</button>
   </div>
 
   <!-- Speed Settings Modal (Reference: media_1791355815739.png) -->
@@ -2101,6 +2470,65 @@
     </div>
     <div class="map-modal-body">
       <img src="campus_plan_115.jpg" onerror="this.src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200'" alt="大溪國中115學年度校園平面圖">
+    </div>
+  </div>
+
+  <!-- Quest Modal (大溪之星・校園實境尋寶集章) -->
+  <div id="quest-modal">
+    <div class="quest-header">
+      <div class="quest-title-wrap">
+        <h2>🎖️ 大溪之星・校園實境尋寶集章趣</h2>
+        <div class="quest-subtitle">漫步大溪國中 6 大精選特色地標，靠近 8 米自動蓋章！集滿解鎖 115 數位榮譽學生證。</div>
+      </div>
+      <button class="nav-close" id="btn-close-quest-modal">✕</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; color:#fbbf24;">
+      <span>探索集章進度</span>
+      <span id="quest-progress-text">0 / 6 完成</span>
+    </div>
+    <div class="quest-progress-bar-wrap">
+      <div class="quest-progress-bar-fill" id="quest-progress-fill"></div>
+    </div>
+    <div class="quest-stamps-grid" id="quest-stamps-grid">
+      <!-- Generated dynamically in JS -->
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button class="venue-card-btn secondary" id="btn-close-quest">繼續探索</button>
+      <button class="venue-card-btn primary" id="btn-open-certificate" style="display:none; background:linear-gradient(135deg, #f59e0b, #d97706); color:#0b1a2f;">🏆 領取榮譽探索證書</button>
+    </div>
+  </div>
+
+  <!-- Certificate Modal (榮譽數位學生證 / 探索證書) -->
+  <div id="certificate-modal">
+    <div class="quest-header">
+      <div class="quest-title-wrap">
+        <h2 style="color:#f59e0b;">🏆 大溪國中 115 榮譽數位學生證</h2>
+        <div class="quest-subtitle">恭喜您成功探索校園 6 大特色地標！榮獲大溪國中特頒數位探索榮譽認證。</div>
+      </div>
+      <button class="nav-close" id="btn-close-cert-modal">✕</button>
+    </div>
+    <canvas id="certificate-canvas" width="800" height="500"></canvas>
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button class="venue-card-btn secondary" id="btn-close-cert">關閉</button>
+      <button class="venue-card-btn primary" id="btn-download-cert" style="background:#10b981; color:#fff;">📥 下載榮譽證書 (PNG)</button>
+    </div>
+  </div>
+
+  <!-- Polaroid Modal (拍立得相框打卡) -->
+  <div id="polaroid-modal">
+    <div class="quest-header">
+      <div class="quest-title-wrap">
+        <h2 style="color:#38bdf8;">📸 大溪國中 拍立得打卡相片</h2>
+        <div class="quest-subtitle">記錄您在大溪國中的專屬探索足跡，一鍵存成紀念相片！</div>
+      </div>
+      <button class="nav-close" id="btn-close-polaroid-modal">✕</button>
+    </div>
+    <div class="polaroid-preview-wrap">
+      <canvas id="polaroid-canvas" width="600" height="720"></canvas>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button class="venue-card-btn secondary" id="btn-close-polaroid">再拍一張</button>
+      <button class="venue-card-btn primary" id="btn-download-polaroid" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff;">📥 下載拍立得明信片 (PNG)</button>
     </div>
   </div>
 
@@ -2499,7 +2927,7 @@
        2. THREE.JS SCENE SETUP & PROCEDURAL PBR TEXTURES
        ========================================================================== */
     const canvas = document.getElementById("webgl-canvas");
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: true, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
@@ -2545,6 +2973,170 @@
     sunLight.shadow.bias = -0.0005;
     scene.add(sunLight);
 
+    // Dynamic Time & Sky Lighting System (☀️ 晨曦 / 🌅 夕照 / 🌙 星夜)
+    let currentSkyTime = "day";
+    const campusWindowMaterials = [];
+    const campusStreetLamps = [];
+
+    // Synthesized Audio chime using Web Audio API
+    function playChimeSound(type = "success") {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        if (type === "success") {
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.15, now + idx * 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.1);
+            osc.stop(now + idx * 0.1 + 0.36);
+          });
+        } else if (type === "shutter") {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(120, now);
+          osc.frequency.exponentialRampToValueAtTime(30, now + 0.08);
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        }
+      } catch (err) {
+        // Audio might be blocked before first user interaction
+      }
+    }
+
+    function setCampusLighting(mode, notify = true) {
+      currentSkyTime = mode;
+      const btnSky = document.getElementById("btn-sky-cycle");
+      if (mode === "day") {
+        if (btnSky) btnSky.innerHTML = "☀️ 晴空晨曦";
+        scene.background.set(0x88bdda);
+        scene.fog.color.set(0x88bdda);
+        scene.fog.density = 0.0028;
+        ambientLight.color.set(0xffffff);
+        ambientLight.intensity = 0.52;
+        hemiLight.color.set(0xe8f4f8);
+        hemiLight.groundColor.set(0x3d4e33);
+        hemiLight.intensity = 0.65;
+        sunLight.color.set(0xfffaec);
+        sunLight.intensity = 1.15;
+        sunLight.position.set(85, 160, 90);
+        campusWindowMaterials.forEach(m => {
+          m.emissive = new THREE.Color(0x000000);
+          m.emissiveIntensity = 0.0;
+        });
+        campusStreetLamps.forEach(lamp => {
+          lamp.bulb.material.color.set(0xe2e8f0);
+          lamp.bulb.material.emissive = new THREE.Color(0x000000);
+          lamp.bulb.material.emissiveIntensity = 0.0;
+          if (lamp.light) lamp.light.intensity = 0.0;
+        });
+        if (notify) showToast("已切換為【☀️ 晴空晨曦】：蔚藍朝陽灑落大溪校園！");
+      } else if (mode === "sunset") {
+        if (btnSky) btnSky.innerHTML = "🌅 溪畔夕照";
+        scene.background.set(0xea580c);
+        scene.fog.color.set(0xc2410c);
+        scene.fog.density = 0.0035;
+        ambientLight.color.set(0xfed7aa);
+        ambientLight.intensity = 0.45;
+        hemiLight.color.set(0xfb923c);
+        hemiLight.groundColor.set(0x7c2d12);
+        hemiLight.intensity = 0.55;
+        sunLight.color.set(0xfdba74);
+        sunLight.intensity = 1.45;
+        sunLight.position.set(130, 48, -70);
+        campusWindowMaterials.forEach(m => {
+          m.emissive = new THREE.Color(0xfef08a);
+          m.emissiveIntensity = 0.35;
+        });
+        campusStreetLamps.forEach(lamp => {
+          lamp.bulb.material.color.set(0xfef08a);
+          lamp.bulb.material.emissive = new THREE.Color(0xfbbf24);
+          lamp.bulb.material.emissiveIntensity = 0.6;
+          if (lamp.light) lamp.light.intensity = 0.7;
+        });
+        if (notify) showToast("已切換為【🌅 溪畔夕照】：金黃晚霞斜映大漢溪畔！");
+      } else if (mode === "night") {
+        if (btnSky) btnSky.innerHTML = "🌙 晚自習星夜";
+        scene.background.set(0x091122);
+        scene.fog.color.set(0x091122);
+        scene.fog.density = 0.0032;
+        ambientLight.color.set(0x38bdf8);
+        ambientLight.intensity = 0.28;
+        hemiLight.color.set(0x1e293b);
+        hemiLight.groundColor.set(0x020617);
+        hemiLight.intensity = 0.35;
+        sunLight.color.set(0x60a5fa);
+        sunLight.intensity = 0.32;
+        sunLight.position.set(40, 110, 40);
+        campusWindowMaterials.forEach(m => {
+          m.emissive = new THREE.Color(0xfef08a);
+          m.emissiveIntensity = 0.95;
+        });
+        campusStreetLamps.forEach(lamp => {
+          lamp.bulb.material.color.set(0xfffbeb);
+          lamp.bulb.material.emissive = new THREE.Color(0xfbbf24);
+          lamp.bulb.material.emissiveIntensity = 1.0;
+          if (lamp.light) lamp.light.intensity = 1.25;
+        });
+        if (notify) showToast("已切換為【🌙 晚自習星夜】：溫馨教室窗燈與庭園路燈點亮！");
+      }
+    }
+
+    function cycleSkyTime() {
+      if (currentSkyTime === "day") setCampusLighting("sunset");
+      else if (currentSkyTime === "sunset") setCampusLighting("night");
+      else setCampusLighting("day");
+    }
+
+    // 建立校園庭園路燈景觀 (Campus Lanterns)
+    function createCampusStreetLamps() {
+      const lampPositions = [
+        { x: -16, z: 82 }, { x: -4, z: 82 },
+        { x: -16, z: 64 }, { x: -4, z: 64 },
+        { x: -30, z: 46 }, { x: -10, z: 46 }, { x: 10, z: 46 },
+        { x: -30, z: 20 }, { x: -2, z: 20 }, { x: 20, z: 20 },
+        { x: -24, z: -10 }, { x: 0, z: -10 }, { x: 22, z: -10 },
+        { x: -18, z: -40 }, { x: 4, z: -40 },
+        { x: -22, z: -60 }, { x: -2, z: -60 }
+      ];
+      const poleMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+      lampPositions.forEach(pos => {
+        const lampGroup = new THREE.Group();
+        lampGroup.position.set(pos.x, 0, pos.z);
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 3.8, 8), poleMat);
+        post.position.y = 1.9;
+        lampGroup.add(post);
+
+        const cap = new THREE.Mesh(new THREE.ConeGeometry(0.38, 0.18, 8), poleMat);
+        cap.position.y = 3.9;
+        lampGroup.add(cap);
+
+        const bulbMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+        const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 12), bulbMat);
+        bulb.position.y = 3.75;
+        lampGroup.add(bulb);
+
+        const pLight = new THREE.PointLight(0xf59e0b, 0, 16);
+        pLight.position.y = 3.75;
+        lampGroup.add(pLight);
+
+        scene.add(lampGroup);
+        campusStreetLamps.push({ bulb, light: pLight });
+      });
+    }
+
     function createPaverTexture() {
       const cvs = document.createElement("canvas");
       cvs.width = 256; cvs.height = 256;
@@ -2589,7 +3181,7 @@
     let cameraOrbitYaw = Math.PI; // 相機水平環視方位角 (可 360° 繞人物旋轉，轉至正面觀察學生)
     let cameraOrbitPitch = -0.14; // 相機垂直俯仰角 (-0.65 ~ 0.75 弧度)
     let avatarBodyAngle = Math.PI; // 人物身體當前面向 (站立時身體不動，滑鼠環視可看人物正面)
-    let cameraDistance = 4.4; // 鏡頭距離角色適中距離，支援滑鼠滾輪無縫平滑縮放 (對標大勇國小)
+    let cameraDistance = 4.4; // 鏡頭距離角色適中距離，支援滑鼠滾輪無縫平滑縮放 (對標大溪國中)
     const cameraHeight = 1.95;  // 鏡頭跟隨高度，俯看校園前進方向無阻擋
     let prevAvatarPos = new THREE.Vector3(0, 0, 96);
     const avatarSpeed = 16;
@@ -2800,7 +3392,7 @@
       nameTag.position.set(-0.21, 0.28, 0.233);
       torsoGroup.add(nameTag);
 
-      // 3D 雙肩人體工學書包 (背於身後 -Z，深藍＋反光條＋前側拉鍊袋，對標大勇國小)
+      // 3D 雙肩人體工學書包 (背於身後 -Z，深藍＋反光條＋前側拉鍊袋，對標大溪國中)
       const backpackGroup = new THREE.Group();
       backpackGroup.position.set(0, 0.06, -0.27);
       
@@ -2875,32 +3467,47 @@
       headGroup.add(eyeR);
       avatarParts.eyes = [eyeL, eyeR];
 
-      // 標誌性小黃帽 (圓球帽頂 + 前沿遮陽帽舌，完美還原校園照片)
-      const capMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
-      const capDome = new THREE.Mesh(
-        new THREE.SphereGeometry(0.395, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.52),
-        capMat
-      );
-      capDome.position.y = 0.02;
-      headGroup.add(capDome);
+      // 大溪國中青少年俐落短髮 (3D立體層次髮型 + 前額碎髮劉海 + 兩側立體鬢角)
+      const hairMat = new THREE.MeshLambertMaterial({ color: 0x241814 }); // 自然深褐黑髮色
 
-      // 帽頂小圓鈕扣
-      const capBtn = new THREE.Mesh(
-        new THREE.SphereGeometry(0.045, 12, 12),
-        new THREE.MeshLambertMaterial({ color: 0xeab308 })
+      // 1. 髮型頂蓋主體 (立體球頂)
+      const hairBase = new THREE.Mesh(
+        new THREE.SphereGeometry(0.405, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.54),
+        hairMat
       );
-      capBtn.position.y = 0.435;
-      headGroup.add(capBtn);
+      hairBase.position.y = 0.04;
+      hairBase.scale.set(1.02, 1.05, 1.04);
+      headGroup.add(hairBase);
 
-      // 前向遮陽帽沿 (黃色弧形遮陽板，緊密貼合帽頂下緣)
-      const visor = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.36, 0.41, 0.024, 24, 1, false, -Math.PI * 0.30, Math.PI * 0.60),
-        capMat
+      // 2. 後腦勺自然收攏髮腳
+      const hairBack = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.38, 0.32, 0.28, 20, 1, false, Math.PI * 0.4, Math.PI * 1.2),
+        hairMat
       );
-      visor.position.set(0, 0.02, 0.16);
-      visor.rotation.x = 0.10;
-      visor.castShadow = true;
-      headGroup.add(visor);
+      hairBack.position.set(0, -0.08, -0.12);
+      headGroup.add(hairBack);
+
+      // 3. 前額層次瀏海 (青少年清爽朝氣碎髮)
+      const fringeConfigs = [
+        { x: -0.16, y: 0.20, z: 0.34, rx: 0.35, ry: -0.2, rz: 0.15, sx: 0.10, sy: 0.22, sz: 0.08 },
+        { x: -0.05, y: 0.23, z: 0.36, rx: 0.38, ry: -0.05, rz: 0.05, sx: 0.12, sy: 0.24, sz: 0.08 },
+        { x: 0.07, y: 0.22, z: 0.36, rx: 0.38, ry: 0.08, rz: -0.08, sx: 0.11, sy: 0.23, sz: 0.08 },
+        { x: 0.18, y: 0.19, z: 0.33, rx: 0.35, ry: 0.25, rz: -0.18, sx: 0.10, sy: 0.20, sz: 0.08 },
+      ];
+      fringeConfigs.forEach(cfg => {
+        const lock = new THREE.Mesh(new THREE.ConeGeometry(cfg.sx, cfg.sy, 6), hairMat);
+        lock.position.set(cfg.x, cfg.y, cfg.z);
+        lock.rotation.set(cfg.rx, cfg.ry, cfg.rz);
+        headGroup.add(lock);
+      });
+
+      // 4. 兩側立體鬢角
+      const sideburnL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.22, 0.10), hairMat);
+      sideburnL.position.set(-0.38, 0.02, 0.08);
+      headGroup.add(sideburnL);
+      const sideburnR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.22, 0.10), hairMat);
+      sideburnR.position.set(0.38, 0.02, 0.08);
+      headGroup.add(sideburnR);
 
       torsoGroup.add(headGroup);
 
@@ -3064,7 +3671,7 @@
       return "#0284c7";
     }
 
-    // 4.0 Collision & Multi-Floor Surface Engine (大勇國小 GRID 空間網格分割與物理推擠穿牆防禦系統)
+    // 4.0 Collision & Multi-Floor Surface Engine (大溪國中 GRID 空間網格分割與物理推擠穿牆防禦系統)
     const WALL_COLLIDERS = [];
     const WALK_SURFACES = [];
     const STAIR_PADS = [];
@@ -3210,7 +3817,7 @@
       return false;
     }
 
-    // 大勇國小 Penetration Push-out 物理投影推擠公式 (防卡牆與極致滑順)
+    // 大溪國中 Penetration Push-out 物理投影推擠公式 (防卡牆與極致滑順)
     function collideSpatial(pos, radius, avatarY) {
       const cs = GRID.cs;
       const minCX = Math.floor((pos.x - radius) / cs);
@@ -3274,7 +3881,7 @@
       }
     }
 
-    // 大勇國小 3D 樓梯雙向傳送光圈產生器 (Staircase Teleport Pad Mesh)
+    // 大溪國中 3D 樓梯雙向傳送光圈產生器 (Staircase Teleport Pad Mesh)
     function createStairPadMesh(labelText, hexColor) {
       const padGroup = new THREE.Group();
       // 外環光圈
@@ -3525,7 +4132,7 @@
       return tex;
     }
 
-    // 4.11.2 彩色跳格子地繪紋理產生器 (1~10 繽紛方格地繪，依據照片 04_02 與大勇國小 hopscotch)
+    // 4.11.2 彩色跳格子地繪紋理產生器 (1~10 繽紛方格地繪，依據照片 04_02 與大溪國中 hopscotch)
     function createHopscotchTexture() {
       const cvs = document.createElement('canvas');
       cvs.width = 256;
@@ -3644,7 +4251,7 @@ function createGymSignTexture() {
       return new THREE.CanvasTexture(canvas);
     }
 
-    // 4.1.1 台灣校園磁磚與柱體馬賽克擬真紋理 (Procedural Canvas Textures - 大勇國小概念)
+    // 4.1.1 台灣校園磁磚與柱體馬賽克擬真紋理 (Procedural Canvas Textures - 大溪國中概念)
     function createSchoolTileTexture(color = "#f1ece4", groutColor = "#94a3b8") {
       const canvas = document.createElement("canvas");
       canvas.width = 128;
@@ -4855,7 +5462,7 @@ function createGymSignTexture() {
         registerWalkRamp(worldX - stairWidth / 2 - 0.3, worldX + stairWidth / 2 + 0.3, worldZ - flightLength, worldZ + 0.2, 'z', worldZ, baseH, worldZ - flightLength, topH);
         registerWalkFlat(worldX - stairWidth / 2 - 0.5, worldX + stairWidth / 2 + 0.5, worldZ - flightLength - 2.4, worldZ - flightLength, topH);
 
-        // 4.4.1 大勇國小階梯雙向光圈傳送點 (Staircase Dual Teleport Pads)
+        // 4.4.1 大溪國中階梯雙向光圈傳送點 (Staircase Dual Teleport Pads)
         // 下層入口光圈 (▲ 上樓到 f+1 F)
         const padBase = createStairPadMesh(`▲ 上樓 (${f + 1}F)`, 0xfbbf24);
         padBase.position.set(0, baseH + 0.05, 0.4);
@@ -5733,7 +6340,7 @@ function createGymSignTexture() {
     createLanPavilion();
 
     // 4.9 空中穿堂（黃色鋼桁架連通走廊 Yellow Truss Skybridges）
-    // 依據校園真實建置與大勇國小立體空橋特色，打造高真實感亮黃色鋼骨 Warren 桁架、採光雨遮罩、透明安全防風護板、STEAM 科技實驗室彩繪護板
+    // 依據校園真實建置與大溪國中立體空橋特色，打造高真實感亮黃色鋼骨 Warren 桁架、採光雨遮罩、透明安全防風護板、STEAM 科技實驗室彩繪護板
     function createYellowTrussSkybridge(cfg) {
       const {
         id,
@@ -6319,6 +6926,7 @@ function createGymSignTexture() {
       const corridorFloorMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.7 });
       const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.9, side: THREE.DoubleSide });
       const glassMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.55 });
+      campusWindowMaterials.push(glassMat);
       const chalkboardMat = new THREE.MeshStandardMaterial({ color: 0x1b4332, roughness: 0.85 });
       const whiteboardMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
       const woodTrimMat = new THREE.MeshLambertMaterial({ color: 0xa16207 });
@@ -6761,6 +7369,7 @@ function createGymSignTexture() {
         const pinkTileMat = new THREE.MeshLambertMaterial({ map: pinkTileTex, color: 0xfbcfe8 });
         const whiteTrimMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
         const glassMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 });
+        campusWindowMaterials.push(glassMat);
 
         const towerGroup = new THREE.Group();
         const posX = -cfg.width / 2 - 0.6;
@@ -6855,7 +7464,7 @@ function createGymSignTexture() {
         roofMeshes.push(roofMesh);
       }
 
-      // 頂樓高架太陽能光電遮陽棚 (依據空拍照 01_06 與大勇國小 solarRoof：高架鋼構立柱＋面南傾斜深藍單晶矽太陽能板矩陣)
+      // 頂樓高架太陽能光電遮陽棚 (依據空拍照 01_06 與大溪國中 solarRoof：高架鋼構立柱＋面南傾斜深藍單晶矽太陽能板矩陣)
       if (cfg.id === "grade9-back" || cfg.id === "grade7-new" || cfg.id === "multi-building") {
         const solarTex = createSolarPanelTexture();
         const solarMat = new THREE.MeshStandardMaterial({
@@ -6944,7 +7553,7 @@ function createGymSignTexture() {
         });
       });
 
-      // 大勇國小同款大樓標題徽章 (Dayong Building Floor Header Badge)
+      // 大溪國中同款大樓標題徽章 (Dayong Building Floor Header Badge)
       const bldHeaderDiv = document.createElement("div");
       bldHeaderDiv.className = "dayong-bld-header-badge";
       bldHeaderDiv.innerHTML = `<span class="bld-dot"></span><span class="bld-title">${cfg.name}</span>`;
@@ -6961,7 +7570,10 @@ function createGymSignTexture() {
       });
     });
 
-    // 4.12 中庭校訓精神石碑與彩色跳格子地繪 (依據照片 03_01、03_06、04_02 與大勇國小 hopscotch)
+    // 建立校園庭園路燈
+    createCampusStreetLamps();
+
+    // 4.12 中庭校訓精神石碑與彩色跳格子地繪 (依據照片 03_01、03_06、04_02 與大溪國中 hopscotch)
     function setupCourtyardMottoAndHopscotch() {
       // 1. 大溪國中校訓精神景觀石碑 (勤學・勵志・熱情・感恩)
       const mottoGroup = new THREE.Group();
@@ -7015,7 +7627,7 @@ function createGymSignTexture() {
     }
     setupCourtyardMottoAndHopscotch();
 
-    // 4.13 校園四周邊界防護圍欄 (依據照片 01_08、07_06 與大勇國小 fence：南界通透鋼欄＋北側山腳防護安全圍籬)
+    // 4.13 校園四周邊界防護圍欄 (依據照片 01_08、07_06 與大溪國中 fence：南界通透鋼欄＋北側山腳防護安全圍籬)
     function setupCampusBoundaryFences() {
       const fenceMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.3 });
       const greenFenceMat = new THREE.MeshStandardMaterial({ color: 0x15803d, metalness: 0.6, roughness: 0.4 });
@@ -7729,6 +8341,7 @@ function createGymSignTexture() {
 
     function bindDpad(btnId, directionKey) {
       const el = document.getElementById(btnId);
+      if (!el) return;
       const start = (e) => {
         e.preventDefault();
         moveInput[directionKey] = true;
@@ -8017,7 +8630,7 @@ function createGymSignTexture() {
       });
     }
 
-    // 7.1 Excel 雙向快速匯出 / 匯入 (大勇國小概念)
+    // 7.1 Excel 雙向快速匯出 / 匯入 (大溪國中概念)
     function exportToExcel() {
       const lines = ["教室代號\t教室名稱\t所屬大樓\t樓層\t類別代碼"];
       BUILDINGS_CONFIG.forEach(cfg => {
@@ -8142,7 +8755,7 @@ function createGymSignTexture() {
     }
 
     /* ==========================================================================
-       8. VENUE CARD, NAVIGATION & CAMERA TRANSITIONS (大勇國小概念)
+       8. VENUE CARD, NAVIGATION & CAMERA TRANSITIONS (大溪國中概念)
        ========================================================================== */
     let currentSelectedRoomId = null;
     let currentNavRoomId = null;
@@ -8634,7 +9247,7 @@ function createGymSignTexture() {
     }
 
     // ==========================================================================
-    // 大勇國小 3D 滑鼠完整交互系統 (Dayong Full Mouse Interaction Engine)
+    // 大溪國中 3D 滑鼠完整交互系統 (Dayong Full Mouse Interaction Engine)
     // 1. 鳥瞰 360° 軌道旋轉 (左鍵拖曳) & 視角平移 (右鍵 / Shift+左鍵)
     // 2. 指數級平滑滾輪縮放 (指數曲線 Math.exp & 第三人稱/第一人稱無縫切換)
     // 3. 指針鎖定 (Pointer Lock 沉浸 FPS 準星模式 & Glitch 防跳針防禦)
@@ -8645,7 +9258,7 @@ function createGymSignTexture() {
     let isPointerLocked = false;
     let lastPointerMoveTime = 0;
 
-    // 監聽指針鎖定狀態變更 (對標大勇國小 FPS 沉浸視角)
+    // 監聽指針鎖定狀態變更 (對標大溪國中 FPS 沉浸視角)
     document.addEventListener("pointerlockchange", () => {
       isPointerLocked = (document.pointerLockElement === renderer.domElement);
       const crosshair = document.getElementById("fps-crosshair");
@@ -8694,7 +9307,7 @@ function createGymSignTexture() {
         if (!isPointerLocked) renderer.domElement.style.cursor = "default";
       }
 
-      // 3D 空間射線短點擊交互 (大勇國小特色：點選建築、公共藝術、地標即彈出地點資訊卡)
+      // 3D 空間射線短點擊交互 (大溪國中特色：點選建築、公共藝術、地標即彈出地點資訊卡)
       if (e && e.target === renderer.domElement) {
         const dx = e.clientX - mouseClickDownPos.x;
         const dy = e.clientY - mouseClickDownPos.y;
@@ -8733,7 +9346,7 @@ function createGymSignTexture() {
       }
     });
 
-    // 禁用畫布上的右鍵選單，防止右鍵旋轉或平移視角時跳出瀏覽器選單 (對標大勇國小)
+    // 禁用畫布上的右鍵選單，防止右鍵旋轉或平移視角時跳出瀏覽器選單 (對標大溪國中)
     renderer.domElement.addEventListener("contextmenu", (e) => {
       e.preventDefault();
     });
@@ -8745,7 +9358,7 @@ function createGymSignTexture() {
         const deltaX = e.movementX || 0;
         const deltaY = e.movementY || 0;
         const jumpHypot = Math.hypot(deltaX, deltaY);
-        // 大勇國小同款防跳針過濾 (過濾切換視窗或解鎖時產生的巨大異常跳動)
+        // 大溪國中同款防跳針過濾 (過濾切換視窗或解鎖時產生的巨大異常跳動)
         if (jumpHypot > 1800) return;
         if (performance.now() - lastPointerMoveTime < 60 && jumpHypot > 320) return;
         lastPointerMoveTime = performance.now();
@@ -8801,12 +9414,12 @@ function createGymSignTexture() {
       }
     });
 
-    // 滑鼠滾輪縮放 (對標大勇國小指數級平滑縮放與人物視角切換)
+    // 滑鼠滾輪縮放 (對標大溪國中指數級平滑縮放與人物視角切換)
     window.addEventListener("wheel", (e) => {
       if (e.target.closest && (e.target.closest("#search-results") || e.target.closest(".modal-ctrl-panel") || e.target.closest("#venue-card"))) return;
       if (currentMode === "avatar" || currentMode === "firstperson") {
         e.preventDefault();
-        // 大勇國小同款指數縮放：Math.exp(deltaY * 0.0012)
+        // 大溪國中同款指數縮放：Math.exp(deltaY * 0.0012)
         const zoomExp = Math.exp(e.deltaY * 0.0012);
         cameraDistance = Math.max(1.5, Math.min(9.5, cameraDistance * zoomExp));
 
@@ -8890,7 +9503,7 @@ function createGymSignTexture() {
         }
       });
 
-      // 4. 大勇國小款式大樓標題徽章（例如「八年級棟 1F」、「尊師樓 2F」）
+      // 4. 大溪國中款式大樓標題徽章（例如「八年級棟 1F」、「尊師樓 2F」）
       dayongHeaderBadges.forEach(item => {
         const cfg = item.building;
         const titleEl = item.element.querySelector(".bld-title");
@@ -8909,7 +9522,7 @@ function createGymSignTexture() {
         }
       });
 
-      // 5. 隱藏預設舊版文字標籤與在單層模式下隱藏地標（維持樓層剖切畫面整潔對標大勇國小）
+      // 5. 隱藏預設舊版文字標籤與在單層模式下隱藏地標（維持樓層剖切畫面整潔對標大溪國中）
       labelElements.forEach(item => {
         if (item && item.element) item.element.style.display = "none";
       });
@@ -8919,7 +9532,7 @@ function createGymSignTexture() {
         }
       });
 
-      // 6. 相機平滑飛行導引（對標大勇國小樓層展示視角：鳥瞰斜視角，清晰俯瞰各大樓剖面格局）
+      // 6. 相機平滑飛行導引（對標大溪國中樓層展示視角：鳥瞰斜視角，清晰俯瞰各大樓剖面格局）
       if (controls && camera && typeof animateCameraTo === "function") {
         if (floorVal === "4") {
           // 4F 專屬聚焦：全校唯一的四層樓專科大樓「藝術館」
@@ -9063,6 +9676,423 @@ function createGymSignTexture() {
     if (btnCloseMapModal && mapModal) {
       btnCloseMapModal.onclick = () => mapModal.classList.remove("open");
     }
+
+    /* ==========================================================================
+       CAMPUS QUEST & STAMP SYSTEM (大溪之星・校園實境尋寶集章趣)
+       ========================================================================== */
+    const QUEST_CHECKPOINTS = [
+      {
+        id: "lanting",
+        title: "蘭亭與訓平池",
+        badge: "🌸 蘭亭荷花章",
+        emoji: "🌸",
+        x: -12,
+        y: 0,
+        z: -66,
+        clue: "漫步至中庭水景花園，尋找典雅六角中式蘭亭與錦鯉荷花池",
+        desc: "大溪國中歷史悠久的中庭景觀，春日荷花盛開，是學生課餘休憩讀書之處。"
+      },
+      {
+        id: "statue",
+        title: "孔子像庭園",
+        badge: "🗿 至聖先師章",
+        emoji: "🗿",
+        x: -36,
+        y: 0,
+        z: 32,
+        clue: "位於行政大樓前庭圓環，至聖先師行教雕像矗立於綠意花台之中",
+        desc: "勉勵全校學子有教無類、格物致知，涵養大溪青年的崇高品格。"
+      },
+      {
+        id: "woodwork-1",
+        title: "大溪木藝教室",
+        badge: "🪵 大溪木藝章",
+        emoji: "🪵",
+        x: 0,
+        y: 0,
+        z: -18,
+        clue: "位於中棟大樓 1 樓，傳承大溪百年神桌木雕與生活木工藝技術",
+        desc: "大溪國中獨創校本木藝特色課程，結合魯班工藝與現代創客木作。"
+      },
+      {
+        id: "rubiks-cube",
+        title: "彩色魔術方塊",
+        badge: "🎲 創意方塊章",
+        emoji: "🎲",
+        x: -3.5,
+        y: 0,
+        z: 55.5,
+        clue: "迎賓大道旁最吸睛的彩色幾何公共藝術地標",
+        desc: "象徵大溪國中學子思維多維度、多元適性發展與跳脫框架的創造力。"
+      },
+      {
+        id: "peacock",
+        title: "綠彩孔雀雕塑",
+        badge: "🦚 靈秀孔雀章",
+        emoji: "🦚",
+        x: -20.5,
+        y: 0,
+        z: 55.5,
+        clue: "迎賓花園中展翅開屏的孔雀馬賽克雕塑",
+        desc: "象徵開屏展現青春羽翼，生機盎然的大溪生態與校園活力象徵。"
+      },
+      {
+        id: "art-pavilion",
+        title: "科技與藝術閣",
+        badge: "🎨 藝文之星章",
+        emoji: "🎨",
+        x: 28,
+        y: 0,
+        z: -48,
+        clue: "校園東北側專科大樓，匯聚美術、音樂、陶藝與資訊生活科技教室",
+        desc: "大溪科技中心與藝術展演聚落，培育學生美感與動手實踐能力的搖籃。"
+      }
+    ];
+
+    const collectedStamps = {};
+    let totalStampsCollected = 0;
+
+    function initQuestUI() {
+      const container = document.getElementById("quest-stamps-grid");
+      if (!container) return;
+      container.innerHTML = QUEST_CHECKPOINTS.map(cp => `
+        <div class="stamp-card ${collectedStamps[cp.id] ? 'unlocked' : ''}" id="card-stamp-${cp.id}">
+          <div class="stamp-icon-wrap">${collectedStamps[cp.id] ? cp.emoji : '🔒'}</div>
+          <div class="stamp-info">
+            <div class="stamp-name">${cp.title}</div>
+            <div class="stamp-clue">${cp.clue}</div>
+            <button class="stamp-action-btn" onclick="teleportOrWalkToQuest('${cp.id}')">🧭 帶我去尋寶</button>
+          </div>
+        </div>
+      `).join("");
+      updateQuestProgressUI();
+    }
+
+    function updateQuestProgressUI() {
+      const total = QUEST_CHECKPOINTS.length;
+      const count = Object.keys(collectedStamps).length;
+      totalStampsCollected = count;
+      const textEl = document.getElementById("quest-progress-text");
+      const fillEl = document.getElementById("quest-progress-fill");
+      const badgeBtn = document.getElementById("btn-quest-stamp");
+      const certBtn = document.getElementById("btn-open-certificate");
+
+      if (textEl) textEl.textContent = `${count} / ${total} 完成`;
+      if (fillEl) fillEl.style.width = `${(count / total) * 100}%`;
+      if (badgeBtn) badgeBtn.innerHTML = `🎖️ 集章 ${count}/${total}`;
+      if (certBtn) certBtn.style.display = count >= total ? "inline-flex" : "none";
+    }
+
+    function checkQuestProximity(avatarPos) {
+      if (!avatarPos) return;
+      QUEST_CHECKPOINTS.forEach(cp => {
+        if (!collectedStamps[cp.id]) {
+          const dx = avatarPos.x - cp.x;
+          const dz = avatarPos.z - cp.z;
+          const dist = Math.sqrt(dx * dx + dz * dz);
+          if (dist <= 8.5) {
+            collectedStamps[cp.id] = true;
+            playChimeSound("success");
+            const newCount = Object.keys(collectedStamps).length;
+            showToast(`🎉【大溪尋寶集章趣】成功收集到【${cp.title}】探索章！（${newCount}/${QUEST_CHECKPOINTS.length}）`);
+            updateQuestProgressUI();
+            const cardEl = document.getElementById(`card-stamp-${cp.id}`);
+            if (cardEl) {
+              cardEl.classList.add("unlocked");
+              const iconWrap = cardEl.querySelector(".stamp-icon-wrap");
+              if (iconWrap) iconWrap.textContent = cp.emoji;
+            }
+            if (newCount === QUEST_CHECKPOINTS.length) {
+              setTimeout(() => {
+                showToast("🏆 太棒了！您已集滿 6 大特色地標！特頒發【大溪國中 115 數位榮譽學生證】！");
+                openCertificateModal();
+              }, 1200);
+            }
+          }
+        }
+      });
+    }
+
+    window.teleportOrWalkToQuest = function(questId) {
+      const cp = QUEST_CHECKPOINTS.find(c => c.id === questId);
+      if (!cp) return;
+      document.getElementById("quest-modal").classList.remove("open");
+      document.getElementById("modal-backdrop").classList.remove("open");
+      if (avatarGroup) {
+        avatarGroup.position.set(cp.x, 0, cp.z + 4);
+        avatarAngle = Math.PI;
+        avatarBodyAngle = Math.PI;
+        cameraOrbitYaw = Math.PI;
+        avatarGroup.rotation.y = avatarBodyAngle;
+        if (currentMode === "avatar") {
+          const behindPos = new THREE.Vector3(avatarGroup.position.x, avatarGroup.position.y + 1.95, avatarGroup.position.z + 3.5);
+          const lookPos = avatarGroup.position.clone().add(new THREE.Vector3(0, 0.95, 0));
+          animateCameraTo(behindPos, lookPos, 600);
+        }
+      }
+      showToast(`已抵達【${cp.title}】！${cp.desc}`);
+    };
+
+    function drawCertificate() {
+      const cvs = document.getElementById("certificate-canvas");
+      if (!cvs) return;
+      const ctx = cvs.getContext("2d");
+      const W = cvs.width, H = cvs.height;
+
+      // 1. 背景與典雅深藍漸層
+      const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+      bgGrad.addColorStop(0, "#0b1a2f");
+      bgGrad.addColorStop(1, "#182b45");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. 雙重金箔邊框
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 6;
+      ctx.strokeRect(16, 16, W - 32, H - 32);
+
+      ctx.strokeStyle = "rgba(254, 243, 199, 0.4)";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(24, 24, W - 48, H - 48);
+
+      const drawCorner = (cx, cy) => {
+        ctx.fillStyle = "#f59e0b";
+        ctx.beginPath();
+        ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+        ctx.fill();
+      };
+      drawCorner(24, 24);
+      drawCorner(W - 24, 24);
+      drawCorner(24, H - 24);
+      drawCorner(W - 24, H - 24);
+
+      // 3. 校徽金印
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(W / 2, 85, 36, 0, Math.PI * 2);
+      ctx.fillStyle = "#0284c7";
+      ctx.fill();
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 32px 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("溪", W / 2, 85);
+      ctx.restore();
+
+      // 4. 榮譽標題
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "bold 26px 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("桃園市立大溪國中 115 學年度", W / 2, 155);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 34px 'Noto Sans TC', sans-serif";
+      ctx.fillText("數位榮譽探索學生證", W / 2, 202);
+
+      // 5. 認證字樣
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = "500 15.5px 'Noto Sans TC', sans-serif";
+      ctx.fillText("茲證明 探索先鋒 同學 熱情完成全校 3D 智慧立體巡禮，", W / 2, 248);
+      ctx.fillText("成功解鎖【蘭亭】、【木藝閣】、【孔子像】等 6 大校園特色文化地標，", W / 2, 276);
+      ctx.fillText("展現自主學習、追求卓越與熱愛大溪之青年風範，特頒此證以資表揚！", W / 2, 304);
+
+      // 6. 印章集章徽章列
+      const emojis = ["🌸 蘭亭", "🗿 孔子", "🪵 木藝", "🎲 方塊", "🦚 孔雀", "🎨 藝術"];
+      const startX = W / 2 - 250;
+      emojis.forEach((em, idx) => {
+        const x = startX + idx * 100;
+        const y = 360;
+        ctx.fillStyle = "rgba(245, 158, 11, 0.18)";
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(x, y, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#fef3c7";
+        ctx.font = "bold 13px 'Noto Sans TC', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(em, x, y + 5);
+      });
+
+      // 7. 日期與校長簽署
+      const today = new Date();
+      const dateStr = `${today.getFullYear()} 年 ${today.getMonth() + 1} 月 ${today.getDate()} 日`;
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "600 13.5px 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(`發證日期：${dateStr}`, 45, 442);
+      ctx.fillText(`證書編號：DXJH-115-STAR-${Math.floor(1000 + Math.random() * 9000)}`, 45, 464);
+
+      // 校長金印
+      ctx.save();
+      ctx.fillStyle = "rgba(239, 68, 68, 0.88)";
+      ctx.fillRect(W - 165, 415, 120, 52);
+      ctx.strokeStyle = "#b91c1c";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(W - 165, 415, 120, 52);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 15px 'Noto Sans TC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("大溪國中校長印", W - 105, 446);
+      ctx.restore();
+    }
+
+    function openCertificateModal() {
+      drawCertificate();
+      document.getElementById("certificate-modal").classList.add("open");
+      document.getElementById("modal-backdrop").classList.add("open");
+    }
+
+    /* Polaroid Snapshot Function */
+    function takePolaroidSnapshot() {
+      const flash = document.getElementById("camera-flash");
+      if (flash) {
+        flash.classList.add("flash");
+        setTimeout(() => flash.classList.remove("flash"), 90);
+      }
+      playChimeSound("shutter");
+
+      const labelsContainer = document.getElementById("labels-container");
+      if (labelsContainer) labelsContainer.style.display = "none";
+      const crosshair = document.getElementById("fps-crosshair");
+      if (crosshair) crosshair.style.display = "none";
+
+      renderer.render(scene, camera);
+      const imgData = renderer.domElement.toDataURL("image/png");
+
+      if (labelsContainer) labelsContainer.style.display = "block";
+      if (crosshair && isPointerLocked) crosshair.style.display = "block";
+
+      const img = new Image();
+      img.onload = () => {
+        const pCvs = document.getElementById("polaroid-canvas");
+        if (!pCvs) return;
+        const ctx = pCvs.getContext("2d");
+        const PW = pCvs.width, PH = pCvs.height;
+
+        ctx.fillStyle = "#fcfbfa";
+        ctx.fillRect(0, 0, PW, PH);
+
+        const photoX = 28;
+        const photoY = 28;
+        const photoW = PW - 56;
+        const photoH = PH - 168;
+
+        ctx.drawImage(img, photoX, photoY, photoW, photoH);
+
+        ctx.strokeStyle = "rgba(0,0,0,0.12)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(photoX, photoY, photoW, photoH);
+
+        ctx.fillStyle = "#0c1a2d";
+        ctx.font = "bold 24px 'Noto Sans TC', sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("我在大溪國中 ✨ 青春啟航", photoX + 4, photoY + photoH + 52);
+
+        ctx.fillStyle = "#64748b";
+        ctx.font = "500 14px 'Noto Sans TC', sans-serif";
+        const today = new Date();
+        const timeStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+        ctx.fillText(`115學年度 3D 智慧探索留念 • ${timeStr}`, photoX + 4, photoY + photoH + 82);
+
+        ctx.save();
+        ctx.translate(PW - 70, photoY + photoH + 62);
+        ctx.rotate(-0.12);
+        ctx.fillStyle = "rgba(2, 132, 199, 0.15)";
+        ctx.beginPath();
+        ctx.arc(0, 0, 26, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#0284c7";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = "#0284c7";
+        ctx.font = "bold 11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("DXJH", 0, -6);
+        ctx.fillText("大溪", 0, 8);
+        ctx.restore();
+
+        document.getElementById("polaroid-modal").classList.add("open");
+        document.getElementById("modal-backdrop").classList.add("open");
+      };
+      img.src = imgData;
+    }
+
+    // Modal & Action Listeners
+    const questModal = document.getElementById("quest-modal");
+    const certModal = document.getElementById("certificate-modal");
+    const polaroidModal = document.getElementById("polaroid-modal");
+
+    document.getElementById("btn-sky-cycle")?.addEventListener("click", cycleSkyTime);
+    document.getElementById("btn-quest-stamp")?.addEventListener("click", () => {
+      initQuestUI();
+      questModal.classList.add("open");
+      modalBackdrop.classList.add("open");
+    });
+    document.getElementById("btn-close-quest-modal")?.addEventListener("click", () => {
+      questModal.classList.remove("open");
+      modalBackdrop.classList.remove("open");
+    });
+    document.getElementById("btn-close-quest")?.addEventListener("click", () => {
+      questModal.classList.remove("open");
+      modalBackdrop.classList.remove("open");
+    });
+    document.getElementById("btn-open-certificate")?.addEventListener("click", () => {
+      questModal.classList.remove("open");
+      openCertificateModal();
+    });
+    document.getElementById("btn-close-cert-modal")?.addEventListener("click", () => {
+      certModal.classList.remove("open");
+      modalBackdrop.classList.remove("open");
+    });
+    document.getElementById("btn-close-cert")?.addEventListener("click", () => {
+      certModal.classList.remove("open");
+      modalBackdrop.classList.remove("open");
+    });
+    document.getElementById("btn-download-cert")?.addEventListener("click", () => {
+      const cvs = document.getElementById("certificate-canvas");
+      const link = document.createElement("a");
+      link.download = "大溪國中115數位榮譽學生證.png";
+      link.href = cvs.toDataURL("image/png");
+      link.click();
+      showToast("🎉 已成功下載【大溪國中 115 數位榮譽學生證】！");
+    });
+    document.getElementById("btn-polaroid-camera")?.addEventListener("click", takePolaroidSnapshot);
+    document.getElementById("btn-close-polaroid-modal")?.addEventListener("click", () => {
+      polaroidModal.classList.remove("open");
+      modalBackdrop.classList.remove("open");
+    });
+    document.getElementById("btn-close-polaroid")?.addEventListener("click", () => {
+      polaroidModal.classList.remove("open");
+      modalBackdrop.classList.remove("open");
+    });
+    document.getElementById("btn-download-polaroid")?.addEventListener("click", () => {
+      const cvs = document.getElementById("polaroid-canvas");
+      const link = document.createElement("a");
+      link.download = `大溪國中拍立得打卡照片_${Date.now()}.png`;
+      link.href = cvs.toDataURL("image/png");
+      link.click();
+      showToast("📸 拍立得照片已下載！歡迎分享到社群與朋友！");
+    });
+
+    if (modalBackdrop) {
+      modalBackdrop.onclick = () => {
+        if (helpModal) helpModal.classList.remove("open");
+        modalBackdrop.classList.remove("open");
+        if (mapModal) mapModal.classList.remove("open");
+        if (questModal) questModal.classList.remove("open");
+        if (certModal) certModal.classList.remove("open");
+        if (polaroidModal) polaroidModal.classList.remove("open");
+      };
+    }
+
+    initQuestUI();
 
     // 2D High-Definition Minimap (115學年度官方平面圖精準繪製)
     const miniCanvas = document.getElementById("minimap-canvas");
@@ -9367,7 +10397,7 @@ function createGymSignTexture() {
       miniCtx.fillText("正門", toMiniX(-10), toMiniZ(88));
       miniCtx.fillText("車道", toMiniX(52.5), toMiniZ(12));
 
-      // 10.5 跨樓層 2D 平面圖動態圖層同步 (大勇國小 paintFloorMap 概念)
+      // 10.5 跨樓層 2D 平面圖動態圖層同步 (大溪國中 paintFloorMap 概念)
       const currentAvatarY = avatarGroup ? avatarGroup.position.y : 0;
       let detectedFloorNum = 1;
       if (currentAvatarY >= 9.5) detectedFloorNum = 4;
@@ -9673,7 +10703,7 @@ miniCanvas.addEventListener("click", (e) => {
               curPos.z = testZ;
             }
 
-            // 3. 實體階梯升降與跨樓層地坪跟隨 (如大勇國小物理地形)
+            // 3. 實體階梯升降與跨樓層地坪跟隨 (如大溪國中物理地形)
             if (!isJumping) {
               const stairInfo = checkStairElevation(curPos.x, curPos.y, curPos.z);
               if (stairInfo.onStair) {
@@ -9684,12 +10714,12 @@ miniCanvas.addEventListener("click", (e) => {
               jumpBaseY = curPos.y;
             }
 
-            // 大勇國小 Spatial Hash Push-out 二次投影校正，徹底防穿牆並滑順沿牆推離
+            // 大溪國中 Spatial Hash Push-out 二次投影校正，徹底防穿牆並滑順沿牆推離
             collideSpatial(curPos, AVATAR_COLLISION_RADIUS, currentY);
           }
         }
 
-        // 4. 大勇國小樓梯口雙向光圈傳送檢測 (Stair Teleport Pads)
+        // 4. 大溪國中樓梯口雙向光圈傳送檢測 (Stair Teleport Pads)
         if (avatarGroup && useStairPads && !isJumping && stairPadCooldown <= 0) {
           const curP = avatarGroup.position;
           for (let i = 0; i < STAIR_PADS.length; i++) {
@@ -9749,10 +10779,15 @@ miniCanvas.addEventListener("click", (e) => {
         }
       }
 
+      // 6. 尋寶集章距離偵測 (Quest Proximity Check)
+      if (avatarGroup) {
+        checkQuestProximity(avatarGroup.position);
+      }
+
       // 3. AVATAR WALKING LIMB ANIMATION & CAMERA FOLLOW
       if (avatarGroup) {
         const padTime = clock.getElapsedTime();
-        // 自動眨眼系統 (對標大勇國小：每 3.7 秒自動眨眼一次，持續約 140ms)
+        // 自動眨眼系統 (對標大溪國中：每 3.7 秒自動眨眼一次，持續約 140ms)
         const isBlinking = (Math.floor(padTime * 1000) % 3700 < 140);
         if (avatarParts.eyes && avatarParts.eyes.length) {
           const blinkScale = isBlinking ? 0.12 : 1.0;
@@ -9823,7 +10858,7 @@ miniCanvas.addEventListener("click", (e) => {
           }
         }
 
-        // Camera Follow in Avatar / First-Person Mode (環視跟隨視角，對標大勇國小)
+        // Camera Follow in Avatar / First-Person Mode (環視跟隨視角，對標大溪國中)
         if (currentMode === "avatar") {
           avatarGroup.rotation.y = avatarBodyAngle;
           if (!isCameraAnimating) {
@@ -9961,7 +10996,7 @@ miniCanvas.addEventListener("click", (e) => {
         }
       });
 
-      // 大勇國小款式大樓標題徽章 3D 浮動投影更新
+      // 大溪國中款式大樓標題徽章 3D 浮動投影更新
       dayongHeaderBadges.forEach(item => {
         if (item.element.style.display === "none") return;
         const wp = item.worldPos.clone();
@@ -9979,7 +11014,7 @@ miniCanvas.addEventListener("click", (e) => {
         }
       });
 
-      // 大勇國小特色立體浮動教室膠囊徽章 3D 空間投影定位更新
+      // 大溪國中特色立體浮動教室膠囊徽章 3D 空間投影定位更新
       const camDist = camera.position.distanceTo(controls.target);
       roomBadgeElements.forEach(item => {
         if (item.element.style.display === "none") return;
